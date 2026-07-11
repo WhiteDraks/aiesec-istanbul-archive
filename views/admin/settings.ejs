@@ -105,10 +105,12 @@
           </div>
           <div style="flex: 1; min-width: 250px;">
             <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
-              <label for="hero_bg_image" class="btn btn-secondary" style="margin: 0; cursor: pointer;">Görsel Seç</label>
-              <input type="file" id="hero_bg_image" name="hero_bg_image" accept="image/*" style="display: none;" onchange="previewHeroBg(event)">
+              <label for="hero_bg_image" id="label-hero-bg" class="btn btn-secondary" style="margin: 0; cursor: pointer;">
+                <%= settings.hero_bg_image ? 'Görseli Değiştir' : 'Görsel Seç' %>
+              </label>
+              <input type="file" id="hero_bg_image" name="hero_bg_image" accept="image/*" style="display: none;" onchange="openCropper(event, 'hero_bg_image', 'hero-bg-preview', 'remove-hero-bg', 'label-hero-bg', 16/9)">
               <% if (settings.hero_bg_image) { %>
-                <button type="button" class="btn btn-outline" style="color: #ff4d4f; border-color: #ff4d4f;" onclick="removeHeroBg()">Görseli Kaldır</button>
+                <button type="button" class="btn btn-outline" id="btn-remove-hero-bg" style="color: #ff4d4f; border-color: #ff4d4f;" onclick="removeHeroBg()">Görseli Kaldır</button>
               <% } %>
             </div>
             <input type="hidden" name="remove_hero_bg" id="remove-hero-bg" value="false">
@@ -144,22 +146,15 @@
 </section>
 
 <script>
-function previewHeroBg(event) {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      document.getElementById('hero-bg-preview').src = e.target.result;
-      document.getElementById('remove-hero-bg').value = 'false';
-    }
-    reader.readAsDataURL(file);
-  }
-}
-
 function removeHeroBg() {
-  document.getElementById('hero-bg-preview').src = '/images/default-cover.jpg';
-  document.getElementById('remove-hero-bg').value = 'true';
-  document.getElementById('hero_bg_image').value = '';
+  if (confirm('Ana sayfa arka plan görselini kaldırmak istediğinizden emin misiniz?')) {
+    document.getElementById('hero-bg-preview').src = '/images/default-cover.jpg';
+    document.getElementById('remove-hero-bg').value = 'true';
+    document.getElementById('hero_bg_image').value = '';
+    document.getElementById('label-hero-bg').innerText = 'Görsel Seç';
+    const removeBtn = document.getElementById('btn-remove-hero-bg');
+    if (removeBtn) removeBtn.style.display = 'none';
+  }
 }
 </script>
 

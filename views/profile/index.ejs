@@ -19,7 +19,7 @@
             <label for="photo" class="btn btn-secondary" id="label-photo" style="margin-bottom: 0; cursor: pointer;">
               <%= user.photo && user.photo !== '/images/default-avatar.svg' ? 'Fotoğrafı Değiştir' : 'Fotoğraf Seç' %>
             </label>
-            <input type="file" id="photo" name="photo" accept="image/*" style="display: none;" onchange="previewImage(event)">
+            <input type="file" id="photo" name="photo" accept="image/*" style="display: none;" onchange="openCropper(event, 'photo', 'photo-preview', 'remove-photo-input', 'label-photo', 1)">
             
             <button type="button" class="btn btn-outline btn-sm" id="btn-remove-photo" onclick="triggerRemovePhoto()" style="color: #ff4d4f; border-color: #ff4d4f; padding: 0.4rem 0.8rem; font-size: 0.85rem; display: <%= user.photo && user.photo !== '/images/default-avatar.svg' ? 'inline-block' : 'none' %>;">
               Fotoğrafı Kaldır
@@ -201,19 +201,7 @@
 </style>
 
 <script>
-function previewImage(event) {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      document.getElementById('photo-preview').src = e.target.result;
-      document.getElementById('remove-photo-input').value = 'false';
-      document.getElementById('btn-remove-photo').style.display = 'inline-block';
-      document.getElementById('label-photo').innerText = 'Fotoğrafı Değiştir';
-    }
-    reader.readAsDataURL(file);
-  }
-}
+
 
 function triggerRemovePhoto() {
   if (confirm('Profil fotoğrafınızı kaldırmak istediğinizden emin misiniz?')) {
