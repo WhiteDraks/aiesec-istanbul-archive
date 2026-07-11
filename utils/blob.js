@@ -25,7 +25,7 @@ async function uploadToBlob(buffer, originalName, prefix = 'uploads/') {
   }
 
   const { url } = await put(filename, buffer, {
-    access: 'public',
+    access: 'private',
   });
 
   return url;
