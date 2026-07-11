@@ -1,13 +1,24 @@
 <%- include('../layout/header') %>
 
-<main class="page-container">
-  <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
-    <div>
-      <h1 class="page-title">EB Yönetimi</h1>
-      <p class="page-subtitle">EB takımlarını, başarılarını ve fotoğraflarını yönetin.</p>
+<section class="page-hero page-hero-sm page-hero-admin">
+  <div class="page-hero-bg"></div>
+  <div class="container">
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; border: none; padding: 0; background: none;">
+      <div>
+        <div class="breadcrumb">
+          <a href="/admin">Admin Paneli</a>
+          <span>›</span>
+          <span>EB Yönetimi</span>
+        </div>
+        <h1 class="page-hero-title" style="margin-top: 0.5rem;">EB Yönetimi</h1>
+        <p class="page-hero-sub">EB takımlarını, başarılarını ve fotoğraflarını yönetin.</p>
+      </div>
+      <a href="/admin" class="btn btn-outline btn-sm" style="border-color: rgba(255,255,255,0.4); color: #fff; background: rgba(4,13,26,0.6); backdrop-filter: blur(4px);">← Admin Paneline Dön</a>
     </div>
-    <a href="/admin" class="btn btn-outline">← Admin Paneline Dön</a>
   </div>
+</section>
+
+<main class="container" style="margin-top: 3rem; margin-bottom: 5rem;">
 
   <div class="admin-grid" style="grid-template-columns: 1fr;">
     <div class="admin-card">

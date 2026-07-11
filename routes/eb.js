@@ -78,6 +78,7 @@ router.get('/:year', isLoggedIn, isApproved, async (req, res) => {
         u.school,
         u.email,
         u.linkedin,
+        u.phone,
         u.sector,
         u.aiesec_journey,
         u.roles_history,

@@ -117,6 +117,37 @@
 
       <div class="form-divider" style="margin: 2rem 0; border-top: 1px dashed var(--border);"></div>
 
+      <div class="form-divider" style="margin: 2rem 0; border-top: 1px dashed var(--border);"></div>
+
+      <!-- Homepage Hero Section Content -->
+      <div class="form-section">
+        <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Ana Sayfa Karşılama (Hero) Metinleri</h3>
+        <p class="form-hint" style="margin-bottom: 1.5rem;">Ana sayfanın en üstünde yer alan karşılama metinlerini düzenleyin.</p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+          <div class="form-group">
+            <label for="hero_title" class="form-label">Hero Başlığı (Normal Metin)</label>
+            <input type="text" id="hero_title" name="hero_title" class="form-input" value="<%= settings.hero_title || 'Alumni' %>" required placeholder="Alumni">
+          </div>
+          <div class="form-group">
+            <label for="hero_title_gradient" class="form-label">Hero Başlığı (Renkli Geçişli Kelime)</label>
+            <input type="text" id="hero_title_gradient" name="hero_title_gradient" class="form-input" value="<%= settings.hero_title_gradient || 'Executive Board' %>" required placeholder="Executive Board">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="hero_subtitle" class="form-label">Hero Alt Başlık Açıklaması</label>
+          <textarea id="hero_subtitle" name="hero_subtitle" class="form-input" rows="3" required placeholder="AIESEC İstanbul'un geçmiş Executive Board dönemlerini keşfedin..."><%= settings.hero_subtitle || '' %></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="hero_cta_text" class="form-label">Aksiyon (Buton) Yazısı</label>
+          <input type="text" id="hero_cta_text" name="hero_cta_text" class="form-input" value="<%= settings.hero_cta_text || 'EB Takımlarını Keşfet' %>" required placeholder="EB Takımlarını Keşfet">
+        </div>
+      </div>
+
+      <div class="form-divider" style="margin: 2rem 0; border-top: 1px dashed var(--border);"></div>
+
       <!-- Homepage Hero Background Image -->
       <div class="form-section">
         <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Ana Sayfa Arka Plan Görseli</h3>

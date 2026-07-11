@@ -16,19 +16,18 @@
     </div>
 
     <h1 class="hero-title">
-      Alumni
-      <span class="hero-title-gradient">Executive Board</span>
+      <%= siteSettings.hero_title || 'Alumni' %>
+      <span class="hero-title-gradient"><%= siteSettings.hero_title_gradient || 'Executive Board' %></span>
       Archive
     </h1>
 
     <p class="hero-subtitle">
-      AIESEC İstanbul'un geçmiş Executive Board dönemlerini, liderlik hikayelerini
-      ve başarılarını keşfedin. Her dönem, bir neslin izlerini taşıyor.
+      <%= siteSettings.hero_subtitle || 'AIESEC İstanbul\'un geçmiş Executive Board dönemlerini, liderlik hikayelerini ve başarılarını keşfedin. Her dönem, bir neslin izlerini taşıyor.' %>
     </p>
 
     <div class="hero-actions">
       <a href="/eb" class="btn btn-primary btn-lg">
-        EB Takımlarını Keşfet
+        <%= siteSettings.hero_cta_text || 'EB Takımlarını Keşfet' %>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </a>
       <% if (!currentUser) { %>
