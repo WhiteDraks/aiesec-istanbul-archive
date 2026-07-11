@@ -125,11 +125,17 @@ router.get('/:year', isLoggedIn, isApproved, async (req, res) => {
       return res.redirect('/eb');
     }
 
+    const canEditTeam = req.session.user && (
+      req.session.user.role === 'admin' ||
+      members.some(m => m.id === req.session.userId)
+    );
+
     res.render('eb/detail', {
       title: `${team.title} - AIESEC İstanbul`,
       team,
       members,
       memories,
+      canEditTeam,
     });
   } catch (err) {
     console.error(err);
@@ -189,6 +195,57 @@ router.post('/:year/memories/:id/delete', isLoggedIn, isApproved, async (req, re
   } catch (err) {
     console.error('Failed to delete memory:', err);
     req.flash('error', 'Anı silinirken bir hata oluştu.');
+    res.redirect(`/eb/${encodeURIComponent(req.params.year)}`);
+  }
+});
+
+/**
+ * POST /eb/:year/achievements
+ * Updates the achievements for a specific EB period.
+ * Only the period's EB team members or admin can perform this action.
+ */
+router.post('/:year/achievements', isLoggedIn, isApproved, async (req, res) => {
+  try {
+    const { year } = req.params;
+    const { achievements } = req.body;
+
+    // Check if user is member of this EB year
+    const sql = getSQL();
+    const isMember = await sql`
+      SELECT 1 FROM users
+      WHERE id = ${req.session.userId}
+        AND status = 'approved'
+        AND EXISTS (
+          SELECT 1
+          FROM jsonb_array_elements(
+            CASE WHEN roles_history IS NULL OR roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE roles_history END
+          ) AS role_entry
+          WHERE role_entry->>'year' = ${year}
+        )
+    `;
+
+    const canEdit = req.session.user?.role === 'admin' || isMember.length > 0;
+
+    if (!canEdit) {
+      req.flash('error', 'Bu dönemin başarılarını düzenleme yetkiniz bulunmamaktadır.');
+      return res.redirect(`/eb/${encodeURIComponent(year)}`);
+    }
+
+    // Clean up achievements list from text input
+    let achievementsArray = [];
+    if (achievements) {
+      achievementsArray = achievements.split('\n').map(a => a.trim()).filter(a => a.length > 0);
+    }
+
+    // Find or create EBTeam meta entry
+    const teamMeta = await EBTeam.findOrCreateByYear(year);
+    await EBTeam.update(teamMeta.id, { achievements: achievementsArray });
+
+    req.flash('success', 'Dönem başarıları başarıyla güncellendi.');
+    res.redirect(`/eb/${encodeURIComponent(year)}`);
+  } catch (err) {
+    console.error('Failed to update achievements:', err);
+    req.flash('error', 'Başarılar güncellenirken bir hata oluştu.');
     res.redirect(`/eb/${encodeURIComponent(req.params.year)}`);
   }
 });
