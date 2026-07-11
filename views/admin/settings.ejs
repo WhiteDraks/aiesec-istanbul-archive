@@ -123,12 +123,32 @@
 
       <!-- Alt Bilgi (Footer) -->
       <div class="form-section" style="margin-bottom: 2rem;">
-        <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Alt Bilgi (Footer) Metni</h3>
-        <p class="form-hint" style="margin-bottom: 1.5rem;">Sayfa altındaki imza / yapımcı bilgisini özelleştirin.</p>
+        <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Alt Bilgi (Footer) Özelleştirme</h3>
+        <p class="form-hint" style="margin-bottom: 1.5rem;">Sayfa altındaki imza metnini, rengini ve görsel efektlerini düzenleyin.</p>
         
-        <div class="form-group">
+        <div class="form-group" style="margin-bottom: 1.5rem;">
           <label for="footer_credit" class="form-label">Footer İmzası</label>
           <input type="text" id="footer_credit" name="footer_credit" class="form-input" value="<%= settings.footer_credit %>" required placeholder="Geçmiş liderlik deneyimlerini onurlandırmak için 26.27 LCVP F&L Elif Kurnaz tarafından yapıldı.">
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+          <div class="form-group">
+            <label for="footer_credit_color" class="form-label">İmza Rengi</label>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <input type="color" id="footer_credit_color_picker" value="<%= settings.footer_credit_color || '#ffffff' %>" style="width: 40px; height: 40px; border: none; border-radius: 6px; cursor: pointer;" oninput="document.getElementById('footer_credit_color').value = this.value">
+              <input type="text" id="footer_credit_color" name="footer_credit_color" class="form-input" value="<%= settings.footer_credit_color || '#ffffff' %>" required oninput="document.getElementById('footer_credit_color_picker').value = this.value">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="footer_credit_effect" class="form-label">Görsel Efekt / Eklenti</label>
+            <select id="footer_credit_effect" name="footer_credit_effect" class="form-input">
+              <option value="none" <%= settings.footer_credit_effect === 'none' ? 'selected' : '' %>>Düz (Efektsiz)</option>
+              <option value="neon-glow" <%= settings.footer_credit_effect === 'neon-glow' ? 'selected' : '' %>>Neon Işıltısı (Glow) ✨</option>
+              <option value="gradient-text" <%= settings.footer_credit_effect === 'gradient-text' ? 'selected' : '' %>>Renk Geçişi (Rainbow/Gradient) 🌈</option>
+              <option value="pulse-animation" <%= settings.footer_credit_effect === 'pulse-animation' ? 'selected' : '' %>>Nefes Alma Efekti (Pulse/Zoom) 💓</option>
+            </select>
+          </div>
         </div>
       </div>
 

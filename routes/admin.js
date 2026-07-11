@@ -175,7 +175,8 @@ router.post('/settings', upload.single('hero_bg_image'), async (req, res) => {
   try {
     const fields = [
       'theme_primary', 'theme_secondary', 'theme_background', 'theme_surface',
-      'site_title', 'site_logo_emblem', 'site_logo_text', 'site_logo_sub', 'footer_credit'
+      'site_title', 'site_logo_emblem', 'site_logo_text', 'site_logo_sub', 'footer_credit',
+      'footer_credit_color', 'footer_credit_effect'
     ];
 
     for (const field of fields) {
@@ -214,6 +215,8 @@ router.post('/settings/reset', async (req, res) => {
       { key: 'site_logo_text', value: 'AIESEC' },
       { key: 'site_logo_sub', value: 'İstanbul' },
       { key: 'footer_credit', value: 'Geçmiş liderlik deneyimlerini onurlandırmak için 26.27 LCVP F&L Elif Kurnaz tarafından yapıldı.' },
+      { key: 'footer_credit_color', value: '#ffffff' },
+      { key: 'footer_credit_effect', value: 'none' },
       { key: 'hero_bg_image', value: '' }
     ];
 

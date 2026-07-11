@@ -52,7 +52,51 @@
 
     <div class="footer-bottom">
       <p>&copy; <%= new Date().getFullYear() %> <%= siteSettings.site_logo_text || 'AIESEC' %> <%= siteSettings.site_logo_sub || 'İstanbul' %> Alumni Archive. Tüm hakları saklıdır.</p>
-      <p class="footer-sub" style="color: #ffffff; text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);"><%= siteSettings.footer_credit || 'Geçmiş liderlik deneyimlerini onurlandırmak için 26.27 LCVP F&L Elif Kurnaz tarafından yapıldı.' %></p>
+      
+      <!-- Dynamic Footer Style Injection -->
+      <style>
+        .footer-credit-text {
+          color: <%= siteSettings.footer_credit_color || '#ffffff' %>;
+          display: inline-block;
+          font-weight: 500;
+          transition: all 0.3s ease;
+        }
+        <% if (siteSettings.footer_credit_effect === 'neon-glow') { %>
+        .footer-credit-text {
+          text-shadow: 0 0 5px <%= siteSettings.footer_credit_color || '#ffffff' %>,
+                       0 0 10px <%= siteSettings.footer_credit_color || '#ffffff' %>cc,
+                       0 0 20px <%= siteSettings.footer_credit_color || '#ffffff' %>88;
+        }
+        <% } else if (siteSettings.footer_credit_effect === 'gradient-text') { %>
+        .footer-credit-text {
+          background: linear-gradient(135deg, <%= siteSettings.footer_credit_color || '#ffffff' %> 0%, var(--primary) 50%, #00AEEF 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          font-weight: 700;
+        }
+        <% } else if (siteSettings.footer_credit_effect === 'pulse-animation') { %>
+        .footer-credit-text {
+          animation: footerCreditPulse 2s infinite alternate;
+        }
+        @keyframes footerCreditPulse {
+          from {
+            opacity: 0.7;
+            transform: scale(0.98);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1.02);
+            text-shadow: 0 0 8px <%= siteSettings.footer_credit_color || '#ffffff' %>bb;
+          }
+        }
+        <% } %>
+      </style>
+      
+      <p class="footer-sub">
+        Geçmiş liderlik deneyimlerini onurlandırmak için 
+        <span class="footer-credit-text"><%= siteSettings.footer_credit || '26.27 LCVP F&L Elif Kurnaz' %></span> 
+        tarafından yapıldı.
+      </p>
     </div>
   </div>
 </footer>
