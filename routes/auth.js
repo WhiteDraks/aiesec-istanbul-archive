@@ -15,7 +15,7 @@ router.get('/register', (req, res) => {
 router.post('/register', async (req, res) => {
   if (req.session.userId) return res.redirect('/');
 
-  const { name, email, password, passwordConfirm, school, ebYear } = req.body;
+  const { name, email, password, passwordConfirm, school, ebYear, kvkk } = req.body;
 
   // Validation
   const errors = [];
@@ -23,6 +23,7 @@ router.post('/register', async (req, res) => {
   if (!email || !/^\S+@\S+\.\S+$/.test(email)) errors.push('Geçerli bir e-posta adresi giriniz.');
   if (!password || password.length < 6) errors.push('Şifre en az 6 karakter olmalıdır.');
   if (password !== passwordConfirm) errors.push('Şifreler eşleşmiyor.');
+  if (!kvkk) errors.push('KVKK Aydınlatma Metnini onaylamanız gerekmektedir.');
 
   if (errors.length > 0) {
     return res.render('auth/register', {
