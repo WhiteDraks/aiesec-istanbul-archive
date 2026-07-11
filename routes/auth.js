@@ -34,7 +34,7 @@ router.post('/register', async (req, res) => {
 
   try {
     // Check if email already exists
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const existingUser = await User.findByEmail(email);
     if (existingUser) {
       return res.render('auth/register', {
         title: 'Kayıt Ol - AIESEC İstanbul',
@@ -43,17 +43,15 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    const newUser = new User({
+    await User.create({
       name: name.trim(),
       email: email.trim().toLowerCase(),
       password,
       school: school ? school.trim() : '',
-      ebYear: ebYear ? ebYear.trim() : '',
+      eb_year: ebYear ? ebYear.trim() : '',
       status: 'pending',
       role: 'user',
     });
-
-    await newUser.save();
 
     req.flash('success', 'Kaydınız başarıyla alındı! Admin onayı bekleniyor. Onay sonrası giriş yapabilirsiniz.');
     res.redirect('/auth/login');
@@ -87,24 +85,24 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    // Find user and explicitly select password field
-    const user = await User.findOne({ email: email.trim().toLowerCase() }).select('+password');
+    // Find user
+    const user = await User.findByEmail(email);
 
     if (!user) {
       req.flash('error', 'E-posta veya şifre hatalı.');
       return res.redirect('/auth/login');
     }
 
-    const isMatch = await user.comparePassword(password);
+    const isMatch = await User.comparePassword(password, user.password);
     if (!isMatch) {
       req.flash('error', 'E-posta veya şifre hatalı.');
       return res.redirect('/auth/login');
     }
 
     // Store user info in session (exclude password)
-    req.session.userId = user._id.toString();
+    req.session.userId = user.id;
     req.session.user = {
-      _id: user._id.toString(),
+      id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,

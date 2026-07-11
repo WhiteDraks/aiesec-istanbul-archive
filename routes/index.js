@@ -5,8 +5,8 @@ const EBTeam = require('../models/EBTeam');
 // GET / - Ana sayfa
 router.get('/', async (req, res) => {
   try {
-    // Get latest 4 EB teams for homepage preview
-    const teams = await EBTeam.find().sort({ order: -1, createdAt: -1 }).limit(6);
+    // Get latest 6 EB teams for homepage preview using SQL model
+    const teams = await EBTeam.findLatest(6);
     res.render('index', {
       title: 'AIESEC İstanbul Alumni Archive',
       teams,

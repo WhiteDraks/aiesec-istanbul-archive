@@ -10,10 +10,10 @@ router.use(isLoggedIn, isAdmin);
 router.get('/', async (req, res) => {
   try {
     const [pendingUsers, approvedUsers, rejectedUsers, totalUsers] = await Promise.all([
-      User.find({ status: 'pending', role: 'user' }).sort({ createdAt: -1 }),
-      User.find({ status: 'approved', role: 'user' }).sort({ approvedAt: -1 }),
-      User.find({ status: 'rejected', role: 'user' }).sort({ updatedAt: -1 }),
-      User.countDocuments({ role: 'user' }),
+      User.findAllByStatus('pending'),
+      User.findAllByStatus('approved'),
+      User.findAllByStatus('rejected'),
+      User.countByRole('user'),
     ]);
 
     res.render('admin/panel', {
@@ -39,11 +39,7 @@ router.get('/', async (req, res) => {
 // POST /admin/approve/:id - Kullanıcı onayla
 router.post('/approve/:id', async (req, res) => {
   try {
-    await User.findByIdAndUpdate(req.params.id, {
-      status: 'approved',
-      approvedAt: new Date(),
-      approvedBy: req.session.user._id,
-    });
+    await User.updateStatus(req.params.id, 'approved', req.session.user.id);
     req.flash('success', 'Kullanıcı başarıyla onaylandı.');
   } catch (err) {
     console.error(err);
@@ -55,9 +51,7 @@ router.post('/approve/:id', async (req, res) => {
 // POST /admin/reject/:id - Kullanıcı reddet
 router.post('/reject/:id', async (req, res) => {
   try {
-    await User.findByIdAndUpdate(req.params.id, {
-      status: 'rejected',
-    });
+    await User.updateStatus(req.params.id, 'rejected');
     req.flash('success', 'Kullanıcı reddedildi.');
   } catch (err) {
     console.error(err);
@@ -69,7 +63,7 @@ router.post('/reject/:id', async (req, res) => {
 // POST /admin/delete/:id - Kullanıcı sil (opsiyonel)
 router.post('/delete/:id', async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.params.id);
+    await User.delete(req.params.id);
     req.flash('success', 'Kullanıcı silindi.');
   } catch (err) {
     console.error(err);
@@ -81,9 +75,7 @@ router.post('/delete/:id', async (req, res) => {
 // POST /admin/reset/:id - Rejected → Pending yap (tekrar değerlendirme)
 router.post('/reset/:id', async (req, res) => {
   try {
-    await User.findByIdAndUpdate(req.params.id, {
-      status: 'pending',
-    });
+    await User.updateStatus(req.params.id, 'pending');
     req.flash('success', 'Kullanıcı tekrar değerlendirme listesine alındı.');
   } catch (err) {
     console.error(err);

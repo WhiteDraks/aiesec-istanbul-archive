@@ -82,10 +82,10 @@
                     <%= new Date(u.createdAt).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }) %>
                   </td>
                   <td class="action-cell">
-                    <form action="/admin/approve/<%= u._id %>" method="POST" style="display:inline">
+                    <form action="/admin/approve/<%= u.id %>" method="POST" style="display:inline">
                       <button type="submit" class="btn btn-approve btn-xs">✓ Onayla</button>
                     </form>
-                    <form action="/admin/reject/<%= u._id %>" method="POST" style="display:inline">
+                    <form action="/admin/reject/<%= u.id %>" method="POST" style="display:inline">
                       <button type="submit" class="btn btn-reject btn-xs">✕ Reddet</button>
                     </form>
                   </td>
@@ -131,10 +131,10 @@
                     <%= u.approvedAt ? new Date(u.approvedAt).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }) : '—' %>
                   </td>
                   <td class="action-cell">
-                    <form action="/admin/reject/<%= u._id %>" method="POST" style="display:inline">
+                    <form action="/admin/reject/<%= u.id %>" method="POST" style="display:inline">
                       <button type="submit" class="btn btn-reject btn-xs">✕ İptal</button>
                     </form>
-                    <form action="/admin/delete/<%= u._id %>" method="POST" style="display:inline" onsubmit="return confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')">
+                    <form action="/admin/delete/<%= u.id %>" method="POST" style="display:inline" onsubmit="return confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')">
                       <button type="submit" class="btn btn-delete btn-xs">🗑 Sil</button>
                     </form>
                   </td>
@@ -174,10 +174,10 @@
                   <td><%= u.email %></td>
                   <td><%= u.school || '—' %></td>
                   <td class="action-cell">
-                    <form action="/admin/reset/<%= u._id %>" method="POST" style="display:inline">
+                    <form action="/admin/reset/<%= u.id %>" method="POST" style="display:inline">
                       <button type="submit" class="btn btn-approve btn-xs">↺ Tekrar Değerlendir</button>
                     </form>
-                    <form action="/admin/delete/<%= u._id %>" method="POST" style="display:inline" onsubmit="return confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')">
+                    <form action="/admin/delete/<%= u.id %>" method="POST" style="display:inline" onsubmit="return confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')">
                       <button type="submit" class="btn btn-delete btn-xs">🗑 Sil</button>
                     </form>
                   </td>
