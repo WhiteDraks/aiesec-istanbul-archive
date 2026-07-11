@@ -138,4 +138,43 @@ router.post('/:id/gallery', upload.array('photos', 5), async (req, res) => {
   }
 });
 
+// POST /admin/eb/year/:year/delete - EB Dönemini Sil
+router.post('/year/:year/delete', async (req, res) => {
+  try {
+    const { year } = req.params;
+    const sql = getSQL();
+
+    // 1. Delete eb_teams metadata
+    await sql`DELETE FROM eb_teams WHERE year = ${year}`;
+
+    // 2. Remove this year from all users' roles_history
+    await sql`
+      UPDATE users
+      SET roles_history = (
+        SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+        FROM jsonb_array_elements(
+          CASE WHEN roles_history IS NULL OR roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE roles_history END
+        ) AS elem
+        WHERE elem->>'year' <> ${year}
+      )
+      WHERE EXISTS (
+        SELECT 1
+        FROM jsonb_array_elements(
+          CASE WHEN roles_history IS NULL OR roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE roles_history END
+        ) AS elem
+        WHERE elem->>'year' = ${year}
+      )
+    `;
+
+    // 3. Clear memories if they are year-bound
+    await sql`DELETE FROM eb_memories WHERE year = ${year}`;
+
+    req.flash('success', `${year} EB takımı ve bu döneme ait kayıtlar başarıyla silindi.`);
+  } catch (err) {
+    console.error('Failed to delete EB team:', err);
+    req.flash('error', 'Dönem silinirken bir hata oluştu.');
+  }
+  res.redirect('/admin/eb');
+});
+
 module.exports = router;

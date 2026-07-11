@@ -36,13 +36,16 @@
                   </span>
                 </td>
                 <td><%= team.meta?.gallery_images ? team.meta.gallery_images.length : 0 %> Fotoğraf</td>
-                <td>
-                  <% if (team.meta) { %>
-                    <a href="/admin/eb/<%= team.meta.id %>/edit" class="btn btn-sm btn-outline">Düzenle</a>
-                  <% } else { %>
-                    <a href="/admin/eb/year/<%= team.year %>/edit" class="btn btn-sm btn-outline">Düzenle</a>
-                  <% } %>
-                </td>
+                  <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <% if (team.meta) { %>
+                      <a href="/admin/eb/<%= team.meta.id %>/edit" class="btn btn-sm btn-outline">✎ Düzenle</a>
+                    <% } else { %>
+                      <a href="/admin/eb/year/<%= team.year %>/edit" class="btn btn-sm btn-outline">✎ Düzenle</a>
+                    <% } %>
+                    <form action="/admin/eb/year/<%= encodeURIComponent(team.year) %>/delete" method="POST" style="display: inline;" onsubmit="return confirm('<%= team.year %> dönemini silmek istediğinizden emin misiniz? Bu işlem dönem metadatalarını, anılarını silecek ve üyelerin rol geçmişlerinden bu dönemi kaldıracaktır.')">
+                      <button type="submit" class="btn btn-sm btn-delete">🗑 Sil</button>
+                    </form>
+                  </div>
               </tr>
             <% }) %>
             <% if (teams.length === 0) { %>
