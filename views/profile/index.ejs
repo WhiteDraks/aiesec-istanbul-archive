@@ -16,8 +16,8 @@
         </div>
         <div class="profile-photo-actions">
           <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <label for="photo" class="btn btn-secondary" style="margin-bottom: 0; cursor: pointer;">
-              Fotoğraf Seç
+            <label for="photo" class="btn btn-secondary" id="label-photo" style="margin-bottom: 0; cursor: pointer;">
+              <%= user.photo && user.photo !== '/images/default-avatar.svg' ? 'Fotoğrafı Değiştir' : 'Fotoğraf Seç' %>
             </label>
             <input type="file" id="photo" name="photo" accept="image/*" style="display: none;" onchange="previewImage(event)">
             
@@ -209,6 +209,7 @@ function previewImage(event) {
       document.getElementById('photo-preview').src = e.target.result;
       document.getElementById('remove-photo-input').value = 'false';
       document.getElementById('btn-remove-photo').style.display = 'inline-block';
+      document.getElementById('label-photo').innerText = 'Fotoğrafı Değiştir';
     }
     reader.readAsDataURL(file);
   }
@@ -220,6 +221,7 @@ function triggerRemovePhoto() {
     document.getElementById('remove-photo-input').value = 'true';
     document.getElementById('photo').value = ''; // clear any selected file
     document.getElementById('btn-remove-photo').style.display = 'none';
+    document.getElementById('label-photo').innerText = 'Fotoğraf Seç';
   }
 }
 

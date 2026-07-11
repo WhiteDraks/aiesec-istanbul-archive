@@ -4,7 +4,7 @@ const Memory = {
   async findByYear(year) {
     const sql = getSQL();
     return await sql`
-      SELECT m.id, m.team_year, m.photo_url, m.caption, m.created_at, u.name as user_name
+      SELECT m.id, m.team_year, m.user_id, m.photo_url, m.caption, m.created_at, u.name as user_name
       FROM eb_memories m
       LEFT JOIN users u ON m.user_id = u.id
       WHERE m.team_year = ${year}
