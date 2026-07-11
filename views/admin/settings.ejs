@@ -69,7 +69,7 @@
         
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
           <div class="form-group">
-            <label for="site_logo_emblem" class="form-label">Logo Amblemi</label>
+            <label for="site_logo_emblem" class="form-label">Logo Amblemi (Görsel yoksa kullanılır)</label>
             <input type="text" id="site_logo_emblem" name="site_logo_emblem" class="form-input" value="<%= settings.site_logo_emblem %>" required maxlength="5" placeholder="A">
           </div>
           
@@ -88,6 +88,29 @@
           <div class="form-group">
             <label for="site_title" class="form-label">Varsayılan Site Başlığı</label>
             <input type="text" id="site_title" name="site_title" class="form-input" value="<%= settings.site_title %>" required placeholder="AIESEC İstanbul Alumni Archive">
+          </div>
+        </div>
+
+        <!-- Site Logo Image Upload -->
+        <div class="form-group" style="margin-top: 1.5rem;">
+          <label class="form-label">Logo Görseli (Opsiyonel - Amblem yerine kullanılır)</label>
+          <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+            <div style="width: 50px; height: 50px; border-radius: 8px; overflow: hidden; background: #000; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;">
+              <img id="site-logo-preview" src="<%= settings.site_logo_image || '/images/default-avatar.svg' %>" alt="Site Logo Preview" style="width: 38px; height: 38px; object-fit: contain;">
+            </div>
+            <div>
+              <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.25rem;">
+                <label for="site_logo_image" id="label-site-logo" class="btn btn-secondary btn-sm" style="margin: 0; cursor: pointer;">
+                  <%= settings.site_logo_image ? 'Logoyu Değiştir' : 'Logo Seç' %>
+                </label>
+                <input type="file" id="site_logo_image" name="site_logo_image" accept="image/*" style="display: none;" onchange="openCropper(event, 'site_logo_image', 'site-logo-preview', 'remove-site-logo', 'label-site-logo', 1)">
+                <% if (settings.site_logo_image) { %>
+                  <button type="button" class="btn btn-outline btn-sm" id="btn-remove-site-logo" style="color: #ff4d4f; border-color: #ff4d4f;" onclick="removeSiteLogo()">Logoyu Kaldır</button>
+                <% } %>
+              </div>
+              <input type="hidden" name="remove_site_logo" id="remove-site-logo" value="false">
+              <p class="form-hint" style="margin: 0;">Maksimum 2MB. Kare (1:1) oranında görsel yüklemeniz önerilir.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -173,6 +196,17 @@ function removeHeroBg() {
     document.getElementById('hero_bg_image').value = '';
     document.getElementById('label-hero-bg').innerText = 'Görsel Seç';
     const removeBtn = document.getElementById('btn-remove-hero-bg');
+    if (removeBtn) removeBtn.style.display = 'none';
+  }
+}
+
+function removeSiteLogo() {
+  if (confirm('Logo görselini kaldırmak istediğinizden emin misiniz?')) {
+    document.getElementById('site-logo-preview').src = '/images/default-avatar.svg';
+    document.getElementById('remove-site-logo').value = 'true';
+    document.getElementById('site_logo_image').value = '';
+    document.getElementById('label-site-logo').innerText = 'Logo Seç';
+    const removeBtn = document.getElementById('btn-remove-site-logo');
     if (removeBtn) removeBtn.style.display = 'none';
   }
 }

@@ -38,7 +38,11 @@
   <div class="container nav-inner">
     <!-- Logo -->
     <a href="/" class="nav-logo" id="nav-logo">
-      <div class="logo-emblem"><%= siteSettings.site_logo_emblem || 'A' %></div>
+      <% if (siteSettings.site_logo_image) { %>
+        <img src="<%= siteSettings.site_logo_image %>" alt="Logo" style="height: 38px; width: 38px; object-fit: contain; border-radius: var(--radius-lg);" />
+      <% } else { %>
+        <div class="logo-emblem"><%= siteSettings.site_logo_emblem || 'A' %></div>
+      <% } %>
       <span class="logo-text">
         <strong><%= siteSettings.site_logo_text || 'AIESEC' %></strong> <%= siteSettings.site_logo_sub || 'İstanbul' %>
         <small><%= siteSettings.site_title || 'Alumni Archive' %></small>

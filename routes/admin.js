@@ -187,7 +187,10 @@ router.get('/settings', async (req, res) => {
 });
 
 // POST /admin/settings - Site Ayarları Kaydetme
-router.post('/settings', upload.single('hero_bg_image'), async (req, res) => {
+router.post('/settings', upload.fields([
+  { name: 'hero_bg_image', maxCount: 1 },
+  { name: 'site_logo_image', maxCount: 1 }
+]), async (req, res) => {
   try {
     const fields = [
       'theme_primary', 'theme_secondary', 'theme_background', 'theme_surface',
@@ -202,11 +205,21 @@ router.post('/settings', upload.single('hero_bg_image'), async (req, res) => {
     }
 
     // Handle background image upload
-    if (req.file) {
-      const url = await uploadToBlob(req.file.buffer, req.file.originalname, 'branding/');
+    if (req.files && req.files['hero_bg_image'] && req.files['hero_bg_image'][0]) {
+      const file = req.files['hero_bg_image'][0];
+      const url = await uploadToBlob(file.buffer, file.originalname, 'branding/');
       await SiteSetting.update('hero_bg_image', url);
     } else if (req.body.remove_hero_bg === 'true') {
       await SiteSetting.update('hero_bg_image', '');
+    }
+
+    // Handle site logo image upload
+    if (req.files && req.files['site_logo_image'] && req.files['site_logo_image'][0]) {
+      const file = req.files['site_logo_image'][0];
+      const url = await uploadToBlob(file.buffer, file.originalname, 'branding/');
+      await SiteSetting.update('site_logo_image', url);
+    } else if (req.body.remove_site_logo === 'true') {
+      await SiteSetting.update('site_logo_image', '');
     }
 
     req.flash('success', 'Site ayarları başarıyla güncellendi.');
@@ -233,7 +246,8 @@ router.post('/settings/reset', async (req, res) => {
       { key: 'footer_credit', value: 'Geçmiş liderlik deneyimlerini onurlandırmak için 26.27 LCVP F&L Elif Kurnaz tarafından yapıldı.' },
       { key: 'footer_credit_color', value: '#ffffff' },
       { key: 'footer_credit_effect', value: 'none' },
-      { key: 'hero_bg_image', value: '' }
+      { key: 'hero_bg_image', value: '' },
+      { key: 'site_logo_image', value: '' }
     ];
 
     for (const d of defaults) {

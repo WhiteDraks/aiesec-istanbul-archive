@@ -7,7 +7,11 @@
       <!-- Brand -->
       <div class="footer-brand">
         <div class="footer-logo">
-          <div class="logo-emblem logo-emblem-sm"><%= siteSettings.site_logo_emblem || 'A' %></div>
+          <% if (siteSettings.site_logo_image) { %>
+            <img src="<%= siteSettings.site_logo_image %>" alt="Logo" style="height: 28px; width: 28px; object-fit: contain; border-radius: var(--radius-md); margin-right: 0.5rem;" />
+          <% } else { %>
+            <div class="logo-emblem logo-emblem-sm"><%= siteSettings.site_logo_emblem || 'A' %></div>
+          <% } %>
           <span><strong><%= siteSettings.site_logo_text || 'AIESEC' %></strong> <%= siteSettings.site_logo_sub || 'İstanbul' %></span>
         </div>
         <p class="footer-tagline">Liderlik deneyimini paylaş,<br />geleceği birlikte inşa et.</p>
