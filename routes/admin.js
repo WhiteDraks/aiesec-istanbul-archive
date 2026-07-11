@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const upload = require('../middleware/upload');
+const { uploadToBlob } = require('../utils/blob');
 const { isLoggedIn, isAdmin } = require('../middleware/auth');
 const { sendApprovalEmail } = require('../utils/email');
 
@@ -74,6 +76,70 @@ router.post('/delete/:id', async (req, res) => {
     req.flash('error', 'Silme işleminde bir hata oluştu.');
   }
   res.redirect('/admin');
+});
+
+// GET /admin/user/:id/edit - Kullanıcı bilgilerini düzenleme formu
+router.get('/user/:id/edit', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      req.flash('error', 'Kullanıcı bulunamadı.');
+      return res.redirect('/admin');
+    }
+    res.render('admin/user-edit', {
+      title: `${user.name} - Düzenle - AIESEC İstanbul`,
+      user,
+    });
+  } catch (err) {
+    console.error(err);
+    req.flash('error', 'Kullanıcı yüklenirken bir hata oluştu.');
+    res.redirect('/admin');
+  }
+});
+
+// POST /admin/user/:id/edit - Kullanıcı bilgilerini güncelle
+router.post('/user/:id/edit', upload.single('photo'), async (req, res) => {
+  try {
+    const { name, school, department, linkedin, workplaces, sector, phone, aiesec_journey, role_years, role_titles } = req.body;
+    let photoUrl = null;
+
+    if (req.file) {
+      photoUrl = await uploadToBlob(req.file.buffer, req.file.originalname, 'avatars/');
+    }
+
+    let roles_history = [];
+    if (role_years && role_titles) {
+      const years = Array.isArray(role_years) ? role_years : [role_years];
+      const titles = Array.isArray(role_titles) ? role_titles : [role_titles];
+      for (let i = 0; i < years.length; i++) {
+        if (years[i].trim() || titles[i].trim()) {
+          roles_history.push({ year: years[i].trim(), role: titles[i].trim() });
+        }
+      }
+    }
+    const eb_year = roles_history.length > 0 ? roles_history[0].year : null;
+
+    await User.updateProfile(req.params.id, {
+      name: name?.trim(),
+      school: school?.trim(),
+      department: department?.trim(),
+      eb_year,
+      roles_history,
+      linkedin: linkedin?.trim(),
+      workplaces: workplaces?.trim(),
+      sector: sector?.trim(),
+      phone: phone?.trim(),
+      aiesec_journey: aiesec_journey?.trim(),
+      photo: photoUrl,
+    });
+
+    req.flash('success', 'Kullanıcı bilgileri güncellendi.');
+    res.redirect('/admin');
+  } catch (err) {
+    console.error('Admin kullanıcı düzenleme hatası:', err);
+    req.flash('error', 'Kullanıcı güncellenirken bir hata oluştu.');
+    res.redirect(`/admin/user/${req.params.id}/edit`);
+  }
 });
 
 // POST /admin/reset/:id - Rejected → Pending yap (tekrar değerlendirme)

@@ -2,13 +2,15 @@
 
 <main class="page-container">
   <div class="page-header">
-    <h1 class="page-title">Profilim</h1>
-    <p class="page-subtitle">Kişisel bilgilerinizi ve AIESEC geçmişinizi güncelleyin.</p>
+    <h1 class="page-title">Kullanıcı Düzenle</h1>
+    <p class="page-subtitle"><%= user.name %> (<%= user.email %>) — <%= user.status %></p>
   </div>
 
+  <p style="margin-bottom: 1.5rem;"><a href="/admin" class="table-link">← Admin Paneline Dön</a></p>
+
   <div class="profile-card">
-    <form action="/profile" method="POST" enctype="multipart/form-data" class="profile-form">
-      
+    <form action="/admin/user/<%= user.id %>/edit" method="POST" enctype="multipart/form-data" class="profile-form">
+
       <!-- Profil Fotoğrafı Alanı -->
       <div class="profile-photo-section">
         <div class="profile-photo-preview">
@@ -35,7 +37,7 @@
           </div>
           <div class="form-group">
             <label for="email" class="form-label">E-posta</label>
-            <input type="email" id="email" class="form-input" value="<%= user.email %>" disabled title="E-posta adresi değiştirilemez.">
+            <input type="email" id="email" class="form-input" value="<%= user.email %>" disabled title="E-posta adresi buradan değiştirilemez.">
           </div>
         </div>
         <div class="form-row">
@@ -74,7 +76,7 @@
         <h3>Kariyer & İş Hayatı</h3>
         <div class="form-row">
           <div class="form-group">
-            <label for="sector" class="form-label">Çalıştığınız Sektör</label>
+            <label for="sector" class="form-label">Çalıştığı Sektör</label>
             <select id="sector" name="sector" class="form-input">
               <option value="">Seçiniz...</option>
               <% const sectors = ['Teknoloji/Bilişim', 'Finans/Bankacılık', 'Pazarlama/Reklam', 'FMCG', 'Üretim/Sanayi', 'Danışmanlık', 'Eğitim', 'Sağlık', 'E-ticaret', 'Girişimcilik', 'Diğer']; %>
@@ -95,9 +97,9 @@
       <!-- AIESEC -->
       <div class="form-section">
         <h3>AIESEC Kariyeri</h3>
-        <p class="form-hint" style="margin-bottom: 1rem;">Geçmiş EB ve diğer AIESEC görevlerinizi ekleyebilirsiniz. Örn: 26.27 - LCP, 25.26 - LCVP B2C</p>
+        <p class="form-hint" style="margin-bottom: 1rem;">Geçmiş EB ve diğer AIESEC görevlerini ekleyebilirsin. Örn: 26.27 - LCP, 25.26 - LCVP B2C</p>
         <div id="roles-container">
-          <% const roles = (user.roles_history && Array.isArray(user.roles_history)) ? user.roles_history : [{year: '', role: ''}]; %>
+          <% const roles = (user.roles_history && Array.isArray(user.roles_history) && user.roles_history.length > 0) ? user.roles_history : [{year: '', role: ''}]; %>
           <% roles.forEach((r, idx) => { %>
             <div class="role-row">
               <div class="form-group" style="flex: 1;">
@@ -119,8 +121,8 @@
         <button type="button" class="btn btn-outline btn-sm" onclick="addRoleRow()" style="margin-top: 0.5rem; margin-bottom: 1.5rem;">+ Yeni Görev Ekle</button>
 
         <div class="form-group">
-          <label for="aiesec_journey" class="form-label">AIESEC Yolculuğunuz (Roller, Deneyimler)</label>
-          <textarea id="aiesec_journey" name="aiesec_journey" class="form-input" rows="4" placeholder="AIESEC içerisindeki görevlerinizden kısaca bahsedebilirsiniz..."><%= user.aiesec_journey || '' %></textarea>
+          <label for="aiesec_journey" class="form-label">AIESEC Yolculuğu (Roller, Deneyimler)</label>
+          <textarea id="aiesec_journey" name="aiesec_journey" class="form-input" rows="4"><%= user.aiesec_journey || '' %></textarea>
         </div>
       </div>
 
@@ -128,14 +130,6 @@
         <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
       </div>
 
-    </form>
-  </div>
-
-  <div class="profile-card danger-zone">
-    <h3>Tehlikeli Bölge</h3>
-    <p class="form-hint">Hesabını sildiğinde tüm bilgilerin kalıcı olarak kaldırılır. Bu işlem geri alınamaz.</p>
-    <form action="/profile/delete" method="POST" onsubmit="return confirm('Hesabını kalıcı olarak silmek istediğine emin misin? Bu işlem geri alınamaz.')">
-      <button type="submit" class="btn btn-delete">Hesabımı Sil</button>
     </form>
   </div>
 </main>
@@ -181,14 +175,6 @@
   display: flex;
   gap: 1rem;
   align-items: flex-start;
-  margin-bottom: 0.5rem;
-}
-.danger-zone {
-  margin-top: 2rem;
-  border-color: var(--danger, #dc3545);
-}
-.danger-zone h3 {
-  color: var(--danger, #dc3545);
   margin-bottom: 0.5rem;
 }
 </style>

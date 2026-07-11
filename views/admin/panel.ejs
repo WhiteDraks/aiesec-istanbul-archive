@@ -87,6 +87,7 @@
                     <%= new Date(u.created_at).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }) %>
                   </td>
                   <td class="action-cell">
+                    <a href="/admin/user/<%= u.id %>/edit" class="btn btn-outline btn-xs">✎ Düzenle</a>
                     <form action="/admin/approve/<%= u.id %>" method="POST" style="display:inline">
                       <button type="submit" class="btn btn-approve btn-xs">✓ Onayla</button>
                     </form>
@@ -136,6 +137,7 @@
                     <%= u.approved_at ? new Date(u.approved_at).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }) : '—' %>
                   </td>
                   <td class="action-cell">
+                    <a href="/admin/user/<%= u.id %>/edit" class="btn btn-outline btn-xs">✎ Düzenle</a>
                     <form action="/admin/reject/<%= u.id %>" method="POST" style="display:inline">
                       <button type="submit" class="btn btn-reject btn-xs">✕ İptal</button>
                     </form>
@@ -179,6 +181,7 @@
                   <td><%= u.email %></td>
                   <td><%= u.school || '—' %></td>
                   <td class="action-cell">
+                    <a href="/admin/user/<%= u.id %>/edit" class="btn btn-outline btn-xs">✎ Düzenle</a>
                     <form action="/admin/reset/<%= u.id %>" method="POST" style="display:inline">
                       <button type="submit" class="btn btn-approve btn-xs">↺ Tekrar Değerlendir</button>
                     </form>

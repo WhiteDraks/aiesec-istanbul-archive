@@ -83,4 +83,19 @@ router.post('/', upload.single('photo'), async (req, res) => {
   }
 });
 
+// POST /profile/delete - Kendi hesabını sil
+router.post('/delete', async (req, res) => {
+  try {
+    await User.delete(req.session.userId);
+    req.session.destroy((err) => {
+      if (err) console.error('Session destroy hatası:', err);
+      res.redirect('/');
+    });
+  } catch (err) {
+    console.error('Hesap silme hatası:', err);
+    req.flash('error', 'Hesabınız silinirken bir hata oluştu.');
+    res.redirect('/profile');
+  }
+});
+
 module.exports = router;
