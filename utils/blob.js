@@ -24,13 +24,12 @@ async function uploadToBlob(buffer, originalName, prefix = 'uploads/') {
     return `/images/default-avatar.svg?error=no-blob-token`;
   }
 
+  // The store is public; private access is rejected by the Blob API
   const result = await put(filename, buffer, {
-    access: 'private',
+    access: 'public',
   });
 
-  // For private blobs, `downloadUrl` is a signed URL that works in browsers (img tags)
-  // Fall back to `url` if downloadUrl is not available
-  return result.downloadUrl || result.url;
+  return result.url;
 }
 
 module.exports = { uploadToBlob };
