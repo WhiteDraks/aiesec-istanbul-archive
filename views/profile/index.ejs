@@ -1,0 +1,170 @@
+<%- include('../layout/header') %>
+
+<main class="page-container">
+  <div class="page-header">
+    <h1 class="page-title">Profilim</h1>
+    <p class="page-subtitle">Kişisel bilgilerinizi ve AIESEC geçmişinizi güncelleyin.</p>
+  </div>
+
+  <div class="profile-card">
+    <form action="/profile" method="POST" enctype="multipart/form-data" class="profile-form">
+      
+      <!-- Profil Fotoğrafı Alanı -->
+      <div class="profile-photo-section">
+        <div class="profile-photo-preview">
+          <img src="<%= user.photo || '/images/default-avatar.svg' %>" alt="<%= user.name %>" id="photo-preview">
+        </div>
+        <div class="profile-photo-actions">
+          <label for="photo" class="btn btn-secondary">
+            Fotoğraf Seç
+          </label>
+          <input type="file" id="photo" name="photo" accept="image/*" style="display: none;" onchange="previewImage(event)">
+          <p class="form-hint">Maksimum 5MB. JPG, PNG veya WebP.</p>
+        </div>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <!-- Temel Bilgiler -->
+      <div class="form-section">
+        <h3>Temel Bilgiler</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name" class="form-label">Ad Soyad</label>
+            <input type="text" id="name" name="name" class="form-input" value="<%= user.name %>" required>
+          </div>
+          <div class="form-group">
+            <label for="email" class="form-label">E-posta</label>
+            <input type="email" id="email" class="form-input" value="<%= user.email %>" disabled title="E-posta adresi değiştirilemez.">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phone" class="form-label">Telefon Numarası</label>
+            <input type="tel" id="phone" name="phone" class="form-input" value="<%= user.phone || '' %>" placeholder="Örn: +90 555 123 4567">
+          </div>
+          <div class="form-group">
+            <label for="linkedin" class="form-label">LinkedIn Profil URL</label>
+            <input type="url" id="linkedin" name="linkedin" class="form-input" value="<%= user.linkedin || '' %>" placeholder="https://linkedin.com/in/...">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <!-- Eğitim -->
+      <div class="form-section">
+        <h3>Eğitim Bilgileri</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="school" class="form-label">Üniversite</label>
+            <input type="text" id="school" name="school" class="form-input" value="<%= user.school || '' %>">
+          </div>
+          <div class="form-group">
+            <label for="department" class="form-label">Bölüm</label>
+            <input type="text" id="department" name="department" class="form-input" value="<%= user.department || '' %>">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <!-- Kariyer -->
+      <div class="form-section">
+        <h3>Kariyer & İş Hayatı</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="sector" class="form-label">Çalıştığınız Sektör</label>
+            <select id="sector" name="sector" class="form-input">
+              <option value="">Seçiniz...</option>
+              <% const sectors = ['Teknoloji/Bilişim', 'Finans/Bankacılık', 'Pazarlama/Reklam', 'FMCG', 'Üretim/Sanayi', 'Danışmanlık', 'Eğitim', 'Sağlık', 'E-ticaret', 'Girişimcilik', 'Diğer']; %>
+              <% sectors.forEach(s => { %>
+                <option value="<%= s %>" <%= user.sector === s ? 'selected' : '' %>><%= s %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="workplaces" class="form-label">Geçmiş/Mevcut İş Yerleri</label>
+            <input type="text" id="workplaces" name="workplaces" class="form-input" value="<%= user.workplaces || '' %>" placeholder="Örn: Google, Trendyol, Garanti BBVA">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <!-- AIESEC -->
+      <div class="form-section">
+        <h3>AIESEC Kariyeri</h3>
+        <div class="form-row">
+          <div class="form-group" style="flex: 1;">
+            <label for="eb_year" class="form-label">EB Dönemi</label>
+            <input type="text" id="eb_year" name="eb_year" class="form-input" value="<%= user.eb_year || '' %>" placeholder="Örn: 2026-2027">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="aiesec_journey" class="form-label">AIESEC Yolculuğunuz (Roller, Deneyimler)</label>
+          <textarea id="aiesec_journey" name="aiesec_journey" class="form-input" rows="4" placeholder="AIESEC içerisindeki görevlerinizden kısaca bahsedebilirsiniz..."><%= user.aiesec_journey || '' %></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions" style="margin-top: 2rem; text-align: right;">
+        <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
+      </div>
+
+    </form>
+  </div>
+</main>
+
+<style>
+.profile-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.02);
+}
+.profile-photo-section {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.profile-photo-preview img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--surface);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.form-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 2rem 0;
+}
+.form-section h3 {
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+  color: var(--text);
+}
+@media (max-width: 768px) {
+  .profile-photo-section {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+</style>
+
+<script>
+function previewImage(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('photo-preview').src = e.target.result;
+    }
+    reader.readAsDataURL(file);
+  }
+}
+</script>
+
+<%- include('../layout/footer') %>

@@ -84,6 +84,8 @@ app.use('/',      require('./routes/index'));
 app.use('/auth',  require('./routes/auth'));
 app.use('/eb',    require('./routes/eb'));
 app.use('/admin', require('./routes/admin'));
+app.use('/profile', require('./routes/profile'));
+app.use('/alumni',  require('./routes/alumni'));
 
 // ─── 404 Handler ──────────────────────────────────────────────────────────────
 app.use((req, res) => {

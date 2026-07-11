@@ -1,0 +1,219 @@
+<%- include('../layout/header') %>
+
+<main class="page-container">
+  <div class="page-header">
+    <h1 class="page-title">Mezunlar Rehberi</h1>
+    <p class="page-subtitle">AIESEC İstanbul mezunlarıyla bağlantı kurun, sektörlere göre filtreleyin.</p>
+  </div>
+
+  <!-- Sektör Filtreleri -->
+  <div class="alumni-filters">
+    <a href="/alumni" class="filter-btn <%= !activeSector ? 'active' : '' %>">Tümü</a>
+    <% sectors.forEach(sector => { %>
+      <a href="/alumni?sector=<%= encodeURIComponent(sector) %>" class="filter-btn <%= activeSector === sector ? 'active' : '' %>">
+        <%= sector %>
+      </a>
+    <% }) %>
+  </div>
+
+  <% if (alumni.length === 0) { %>
+    <div class="empty-state">
+      <div class="empty-icon">👥</div>
+      <h2>Kayıt Bulunamadı</h2>
+      <p>Bu sektörde henüz mezun kaydı bulunmamaktadır.</p>
+    </div>
+  <% } else { %>
+    <div class="alumni-grid">
+      <% alumni.forEach(person => { %>
+        <div class="alumni-card">
+          <div class="alumni-header">
+            <img src="<%= person.photo || '/images/default-avatar.svg' %>" alt="<%= person.name %>" class="alumni-avatar">
+            <div class="alumni-title">
+              <h3><%= person.name %></h3>
+              <span class="alumni-eb-year">EB <%= person.eb_year || 'Bilinmiyor' %></span>
+            </div>
+          </div>
+          
+          <div class="alumni-body">
+            <% if (person.sector) { %>
+              <div class="alumni-info-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                <span><strong>Sektör:</strong> <%= person.sector %></span>
+              </div>
+            <% } %>
+
+            <% if (person.workplaces) { %>
+              <div class="alumni-info-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                <span><strong>İş Yerleri:</strong> <%= person.workplaces %></span>
+              </div>
+            <% } %>
+
+            <% if (person.department || person.school) { %>
+              <div class="alumni-info-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                <span><strong>Eğitim:</strong> <%= person.school %> <%= person.department ? '- ' + person.department : '' %></span>
+              </div>
+            <% } %>
+
+            <% if (person.aiesec_journey) { %>
+              <div class="alumni-info-item journey-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+                <span><%= person.aiesec_journey %></span>
+              </div>
+            <% } %>
+          </div>
+
+          <div class="alumni-footer">
+            <% if (person.linkedin) { %>
+              <a href="<%= person.linkedin %>" target="_blank" class="alumni-link linkedin">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                LinkedIn
+              </a>
+            <% } %>
+            <a href="mailto:<%= person.email %>" class="alumni-link email">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              İletişim
+            </a>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</main>
+
+<style>
+.alumni-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
+}
+.filter-btn {
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.filter-btn:hover {
+  background: var(--hover);
+  color: var(--text);
+  border-color: var(--primary);
+}
+.filter-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.alumni-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.alumni-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+.alumni-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+}
+
+.alumni-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.alumni-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border);
+}
+.alumni-title h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+.alumni-eb-year {
+  font-size: 0.875rem;
+  color: var(--primary);
+  background: rgba(3, 126, 243, 0.1);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.alumni-body {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+.alumni-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.alumni-info-item svg {
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  color: var(--text-lighter);
+}
+.alumni-info-item strong {
+  color: var(--text);
+  font-weight: 500;
+}
+.journey-item {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--border);
+  font-style: italic;
+}
+
+.alumni-footer {
+  display: flex;
+  border-top: 1px solid var(--border);
+  background: var(--background);
+}
+.alumni-link {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.2s;
+  color: var(--text-muted);
+}
+.alumni-link:hover {
+  background: var(--hover);
+  color: var(--primary);
+}
+.alumni-link:not(:last-child) {
+  border-right: 1px solid var(--border);
+}
+</style>
+
+<%- include('../layout/footer') %>

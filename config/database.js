@@ -93,6 +93,15 @@ async function initDB() {
     CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire")
   `;
 
+  // Profile fields migrations
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS photo VARCHAR(500) DEFAULT '/images/default-avatar.svg'`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS department VARCHAR(255)`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS linkedin VARCHAR(500)`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS workplaces TEXT`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS sector VARCHAR(100)`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(50)`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS aiesec_journey TEXT`;
+
   console.log('✅ Veritabanı tabloları hazır.');
 }
 
