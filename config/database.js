@@ -127,6 +127,18 @@ async function initDB() {
     )
   `;
 
+  // Feedback table
+  await sql`
+    CREATE TABLE IF NOT EXISTS feedback (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id     UUID REFERENCES users(id) ON DELETE SET NULL,
+      name        VARCHAR(255),
+      email       VARCHAR(255),
+      message     TEXT NOT NULL,
+      created_at  TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
   // Seed default settings if empty
   const countRes = await sql`SELECT COUNT(*) FROM site_settings`;
   if (parseInt(countRes[0].count, 10) === 0) {

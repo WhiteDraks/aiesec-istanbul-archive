@@ -50,6 +50,10 @@
         Reddedilenler
         <span class="tab-badge tab-badge-rejected"><%= stats.rejected %></span>
       </button>
+      <button class="admin-tab" data-tab="feedbacks" role="tab" aria-selected="false">
+        Geri Bildirimler 💬
+        <% if (feedbacks.length > 0) { %><span class="tab-badge" style="background: var(--primary);"><%= feedbacks.length %></span><% } %>
+      </button>
     </div>
 
     <!-- ── Pending Users ── -->
@@ -186,6 +190,51 @@
                       <button type="submit" class="btn btn-approve btn-xs">↺ Tekrar Değerlendir</button>
                     </form>
                     <form action="/admin/delete/<%= u.id %>" method="POST" style="display:inline" onsubmit="return confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')">
+                      <button type="submit" class="btn btn-delete btn-xs">🗑 Sil</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- ── Feedbacks (Geri Bildirimler) Panel ── -->
+    <div class="admin-panel" id="tab-feedbacks" role="tabpanel" hidden>
+      <% if (feedbacks.length === 0) { %>
+        <div class="empty-state empty-state-sm">
+          <div class="empty-icon">💬</div>
+          <h3>Henüz geri bildirim gelmemiş</h3>
+          <p>Kullanıcılar form doldurdukça burada listelenecek.</p>
+        </div>
+      <% } else { %>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Gönderen</th>
+                <th>E-posta</th>
+                <th>Mesaj / Geri Bildirim</th>
+                <th>Tarih</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% feedbacks.forEach(f => { %>
+                <tr class="admin-row">
+                  <td class="user-name-cell">
+                    <div class="user-avatar-mini"><%= (f.user_name || f.name || 'G').charAt(0).toUpperCase() %></div>
+                    <span><%= f.user_name || f.name || 'Ziyaretçi (Anonim)' %></span>
+                  </td>
+                  <td><%= f.user_email || f.email || '—' %></td>
+                  <td style="max-width: 400px; white-space: normal; word-break: break-word; font-size: 0.875rem; line-height: 1.5; padding: 1rem;"><%= f.message %></td>
+                  <td class="date-cell" style="font-size: 0.8rem; color: var(--text-muted);">
+                    <%= new Date(f.created_at).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+                  </td>
+                  <td class="action-cell">
+                    <form action="/admin/feedback/delete/<%= f.id %>" method="POST" style="display:inline" onsubmit="return confirm('Bu geri bildirimi silmek istediğinizden emin misiniz?')">
                       <button type="submit" class="btn btn-delete btn-xs">🗑 Sil</button>
                     </form>
                   </td>

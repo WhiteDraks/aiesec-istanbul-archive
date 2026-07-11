@@ -1,0 +1,61 @@
+<%- include('./layout/header', { currentPage: 'feedback' }) %>
+
+<section class="page-hero page-hero-sm">
+  <div class="page-hero-bg"></div>
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="/">Ana Sayfa</a>
+      <span>›</span>
+      <span>Geri Bildirim</span>
+    </div>
+    <h1 class="page-hero-title">Geri Bildirim Formu</h1>
+    <p class="page-hero-sub">Sitemiz hakkındaki görüş, öneri ve geri dönüşlerinizi bizimle paylaşın.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container" style="max-width: 600px;">
+    
+    <% if (success && success.length > 0) { %>
+      <div class="alert alert-success" style="background: rgba(34, 197, 94, 0.1); border: 1px solid var(--green-500); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; color: #fff;">
+        <%= success %>
+      </div>
+    <% } %>
+
+    <% if (error && error.length > 0) { %>
+      <div class="alert alert-danger" style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--red-500); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; color: #fff;">
+        <%= error %>
+      </div>
+    <% } %>
+
+    <form action="/feedback" method="POST" class="profile-card" style="padding: 2.5rem;">
+      <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem; color: var(--white);">Görüşleriniz Bizim İçin Değerli</h3>
+
+      <% if (!currentUser) { %>
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label for="name" class="form-label">Ad Soyad (Opsiyonel)</label>
+          <input type="text" id="name" name="name" class="form-input" placeholder="Adınız">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label for="email" class="form-label">E-posta (Opsiyonel)</label>
+          <input type="email" id="email" name="email" class="form-input" placeholder="ornek@email.com">
+        </div>
+      <% } else { %>
+        <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 1.5rem; font-size: 0.875rem;">
+          <strong><%= currentUser.name %></strong> olarak geri bildirim gönderiyorsunuz. (<%= currentUser.email %>)
+        </div>
+      <% } %>
+
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label for="message" class="form-label">Geri Bildirim / Mesajınız</label>
+        <textarea id="message" name="message" class="form-input" rows="6" required placeholder="Sitenin tasarımı, özellikleri veya yaşadığınız teknik sorunlar hakkındaki görüşlerinizi yazın..."></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">Geri Bildirimi Gönder</button>
+    </form>
+
+  </div>
+</section>
+
+<%- include('./layout/footer') %>

@@ -9,14 +9,17 @@ const { sendApprovalEmail } = require('../utils/email');
 // All admin routes require login + admin role
 router.use(isLoggedIn, isAdmin);
 
+const Feedback = require('../models/Feedback');
+
 // GET /admin - Admin paneli
 router.get('/', async (req, res) => {
   try {
-    const [pendingUsers, approvedUsers, rejectedUsers, totalUsers] = await Promise.all([
+    const [pendingUsers, approvedUsers, rejectedUsers, totalUsers, feedbacks] = await Promise.all([
       User.findAllByStatus('pending'),
       User.findAllByStatus('approved'),
       User.findAllByStatus('rejected'),
       User.countByRole('user'),
+      Feedback.findAll(),
     ]);
 
     res.render('admin/panel', {
@@ -25,6 +28,7 @@ router.get('/', async (req, res) => {
       approvedUsers,
       rejectedUsers,
       totalUsers,
+      feedbacks,
       stats: {
         pending: pendingUsers.length,
         approved: approvedUsers.length,
@@ -37,6 +41,18 @@ router.get('/', async (req, res) => {
     req.flash('error', 'Admin paneli yüklenirken bir hata oluştu.');
     res.redirect('/');
   }
+});
+
+// POST /admin/feedback/delete/:id - Geri bildirimi sil
+router.post('/feedback/delete/:id', async (req, res) => {
+  try {
+    await Feedback.delete(req.params.id);
+    req.flash('success', 'Geri bildirim silindi.');
+  } catch (err) {
+    console.error('Failed to delete feedback:', err);
+    req.flash('error', 'Geri bildirim silinirken bir hata oluştu.');
+  }
+  res.redirect('/admin');
 });
 
 // POST /admin/approve/:id - Kullanıcı onayla
