@@ -15,8 +15,12 @@ async function sendApprovalEmail(email, name) {
   }
 
   try {
+    const SiteSetting = require('../models/SiteSetting');
+    const settings = await SiteSetting.getAll();
+    const fromEmail = settings.email_from || 'AIESEC Alumni <onboarding@resend.dev>';
+
     const { data, error } = await resend.emails.send({
-      from: 'AIESEC Alumni <onboarding@resend.dev>', // Resend test email
+      from: fromEmail,
       to: [email],
       subject: 'AIESEC İstanbul Alumni Archive - Hesabınız Onaylandı! 🎉',
       html: `

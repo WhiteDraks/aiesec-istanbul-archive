@@ -195,7 +195,7 @@ router.post('/settings', upload.fields([
     const fields = [
       'theme_primary', 'theme_secondary', 'theme_background', 'theme_surface',
       'site_title', 'site_logo_emblem', 'site_logo_text', 'site_logo_sub', 'footer_credit',
-      'footer_credit_color', 'footer_credit_effect'
+      'footer_credit_color', 'footer_credit_effect', 'email_from'
     ];
 
     for (const field of fields) {
@@ -247,7 +247,8 @@ router.post('/settings/reset', async (req, res) => {
       { key: 'footer_credit_color', value: '#ffffff' },
       { key: 'footer_credit_effect', value: 'none' },
       { key: 'hero_bg_image', value: '' },
-      { key: 'site_logo_image', value: '' }
+      { key: 'site_logo_image', value: '' },
+      { key: 'email_from', value: 'AIESEC Alumni <onboarding@resend.dev>' }
     ];
 
     for (const d of defaults) {

@@ -153,7 +153,8 @@ async function initDB() {
       { key: 'site_logo_sub', value: 'İstanbul' },
       { key: 'footer_credit', value: 'Geçmiş liderlik deneyimlerini onurlandırmak için 26.27 LCVP F&L Elif Kurnaz tarafından yapıldı.' },
       { key: 'footer_credit_color', value: '#ffffff' },
-      { key: 'footer_credit_effect', value: 'none' }
+      { key: 'footer_credit_effect', value: 'none' },
+      { key: 'email_from', value: 'AIESEC Alumni <onboarding@resend.dev>' }
     ];
     for (const d of defaults) {
       await sql`INSERT INTO site_settings (key, value) VALUES (${d.key}, ${d.value})`;

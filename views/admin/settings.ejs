@@ -144,6 +144,22 @@
 
       <div class="form-divider" style="margin: 2rem 0; border-top: 1px dashed var(--border);"></div>
 
+      <!-- E-posta Gönderici Ayarı (Email Sender Settings) -->
+      <div class="form-section">
+        <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">E-posta Gönderim Ayarları</h3>
+        <p class="form-hint" style="margin-bottom: 1.5rem;">Üyeler onaylandığında gönderilecek olan onay e-postasının gönderici adresini belirleyin.</p>
+        
+        <div class="form-group">
+          <label for="email_from" class="form-label">Gönderici Adresi (Resend 'From')</label>
+          <input type="text" id="email_from" name="email_from" class="form-input" value="<%= settings.email_from || 'AIESEC Alumni <onboarding@resend.dev>' %>" required placeholder="AIESEC İstanbul <arsiv@aiesec-istanbul.com>">
+          <p class="form-hint" style="margin-top: 0.5rem;">
+            ⚠️ Resend üzerinde kendi alan adınızı (domain) doğrulamadıysanız bu değerin sonu <strong>&lt;onboarding@resend.dev&gt;</strong> ile bitmelidir. Doğrulanmış alan adınız olduğunda <strong>AIESEC İstanbul &lt;arsiv@domaininiz.com&gt;</strong> formatında yazabilirsiniz.
+          </p>
+        </div>
+      </div>
+
+      <div class="form-divider" style="margin: 2rem 0; border-top: 1px dashed var(--border);"></div>
+
       <!-- Alt Bilgi (Footer) -->
       <div class="form-section" style="margin-bottom: 2rem;">
         <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Alt Bilgi (Footer) Özelleştirme</h3>
