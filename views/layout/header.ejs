@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="AIESEC İstanbul Executive Board Arşivi - Geçmiş EB dönemlerini, üyelerini ve hikayelerini keşfedin." />
+  <title><%= title || 'AIESEC İstanbul Alumni Archive' %></title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav class="navbar" id="navbar">
+  <div class="container nav-inner">
+    <!-- Logo -->
+    <a href="/" class="nav-logo" id="nav-logo">
+      <div class="logo-emblem">A</div>
+      <span class="logo-text">
+        <strong>AIESEC</strong> İstanbul
+        <small>Alumni Archive</small>
+      </span>
+    </a>
+
+    <!-- Hamburger (mobile) -->
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Menüyü aç/kapat" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <!-- Nav Links -->
+    <ul class="nav-links" id="nav-links">
+      <li><a href="/" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'home' ? 'active' : '' %>">Ana Sayfa</a></li>
+      <li><a href="/eb" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'eb' ? 'active' : '' %>">EB Takımları</a></li>
+      <li><a href="/eb/2026-2027" class="nav-link nav-link-highlight">26.27 EB</a></li>
+
+      <% if (currentUser) { %>
+        <% if (isAdmin) { %>
+          <li><a href="/admin" class="nav-link nav-link-admin" id="nav-admin-link">
+            <span class="admin-dot"></span>Admin
+          </a></li>
+        <% } %>
+        <li>
+          <a href="/auth/logout" class="btn btn-outline btn-sm">Çıkış (<%= currentUser.name.split(' ')[0] %>)</a>
+        </li>
+      <% } else { %>
+        <li><a href="/auth/register" class="nav-link">Kayıt Ol</a></li>
+        <li><a href="/auth/login" class="btn btn-primary btn-sm" id="nav-login-btn">Giriş Yap</a></li>
+      <% } %>
+    </ul>
+  </div>
+</nav>
+
+<!-- ── Flash Messages ── -->
+<% if (success && success.length > 0) { %>
+  <div class="flash flash-success" role="alert">
+    <span class="flash-icon">✓</span>
+    <% success.forEach(msg => { %><span><%= msg %></span><% }) %>
+    <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+  </div>
+<% } %>
+<% if (error && error.length > 0) { %>
+  <div class="flash flash-error" role="alert">
+    <span class="flash-icon">!</span>
+    <% error.forEach(msg => { %><span><%= msg %></span><% }) %>
+    <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+  </div>
+<% } %>
+
+<main id="main-content">

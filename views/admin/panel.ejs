@@ -1,0 +1,195 @@
+<%- include('../layout/header', { currentPage: 'admin' }) %>
+
+<section class="page-hero page-hero-sm page-hero-admin">
+  <div class="page-hero-bg"></div>
+  <div class="container">
+    <h1 class="page-hero-title">Admin Paneli</h1>
+    <p class="page-hero-sub">AIESEC İstanbul Alumni Archive Yönetimi</p>
+  </div>
+</section>
+
+<section class="section section-admin">
+  <div class="container">
+
+    <!-- Stats Row -->
+    <div class="admin-stats">
+      <div class="admin-stat admin-stat-pending">
+        <span class="admin-stat-num"><%= stats.pending %></span>
+        <span class="admin-stat-label">Bekleyen</span>
+      </div>
+      <div class="admin-stat admin-stat-approved">
+        <span class="admin-stat-num"><%= stats.approved %></span>
+        <span class="admin-stat-label">Onaylı</span>
+      </div>
+      <div class="admin-stat admin-stat-rejected">
+        <span class="admin-stat-num"><%= stats.rejected %></span>
+        <span class="admin-stat-label">Reddedilen</span>
+      </div>
+      <div class="admin-stat admin-stat-total">
+        <span class="admin-stat-num"><%= stats.total %></span>
+        <span class="admin-stat-label">Toplam Üye</span>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="admin-tabs" role="tablist">
+      <button class="admin-tab active" data-tab="pending" role="tab" aria-selected="true">
+        Bekleyenler
+        <% if (stats.pending > 0) { %><span class="tab-badge tab-badge-pending"><%= stats.pending %></span><% } %>
+      </button>
+      <button class="admin-tab" data-tab="approved" role="tab" aria-selected="false">
+        Onaylılar
+        <span class="tab-badge tab-badge-approved"><%= stats.approved %></span>
+      </button>
+      <button class="admin-tab" data-tab="rejected" role="tab" aria-selected="false">
+        Reddedilenler
+        <span class="tab-badge tab-badge-rejected"><%= stats.rejected %></span>
+      </button>
+    </div>
+
+    <!-- ── Pending Users ── -->
+    <div class="admin-panel" id="tab-pending" role="tabpanel">
+      <% if (pendingUsers.length === 0) { %>
+        <div class="empty-state empty-state-sm">
+          <div class="empty-icon">✅</div>
+          <h3>Bekleyen kayıt yok</h3>
+          <p>Tüm kayıtlar işlendi.</p>
+        </div>
+      <% } else { %>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Ad Soyad</th>
+                <th>E-posta</th>
+                <th>Üniversite</th>
+                <th>EB Dönemi</th>
+                <th>Kayıt Tarihi</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% pendingUsers.forEach(u => { %>
+                <tr class="admin-row">
+                  <td class="user-name-cell">
+                    <div class="user-avatar-mini"><%= u.name.charAt(0).toUpperCase() %></div>
+                    <span><%= u.name %></span>
+                  </td>
+                  <td><a href="mailto:<%= u.email %>" class="table-link"><%= u.email %></a></td>
+                  <td><%= u.school || '—' %></td>
+                  <td><%= u.ebYear || '—' %></td>
+                  <td class="date-cell">
+                    <%= new Date(u.createdAt).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+                  </td>
+                  <td class="action-cell">
+                    <form action="/admin/approve/<%= u._id %>" method="POST" style="display:inline">
+                      <button type="submit" class="btn btn-approve btn-xs">✓ Onayla</button>
+                    </form>
+                    <form action="/admin/reject/<%= u._id %>" method="POST" style="display:inline">
+                      <button type="submit" class="btn btn-reject btn-xs">✕ Reddet</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- ── Approved Users ── -->
+    <div class="admin-panel" id="tab-approved" role="tabpanel" hidden>
+      <% if (approvedUsers.length === 0) { %>
+        <div class="empty-state empty-state-sm">
+          <div class="empty-icon">👥</div>
+          <h3>Henüz onaylı kullanıcı yok</h3>
+        </div>
+      <% } else { %>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Ad Soyad</th>
+                <th>E-posta</th>
+                <th>Üniversite</th>
+                <th>EB Dönemi</th>
+                <th>Onay Tarihi</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% approvedUsers.forEach(u => { %>
+                <tr class="admin-row admin-row-approved">
+                  <td class="user-name-cell">
+                    <div class="user-avatar-mini user-avatar-approved"><%= u.name.charAt(0).toUpperCase() %></div>
+                    <span><%= u.name %></span>
+                  </td>
+                  <td><a href="mailto:<%= u.email %>" class="table-link"><%= u.email %></a></td>
+                  <td><%= u.school || '—' %></td>
+                  <td><%= u.ebYear || '—' %></td>
+                  <td class="date-cell">
+                    <%= u.approvedAt ? new Date(u.approvedAt).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }) : '—' %>
+                  </td>
+                  <td class="action-cell">
+                    <form action="/admin/reject/<%= u._id %>" method="POST" style="display:inline">
+                      <button type="submit" class="btn btn-reject btn-xs">✕ İptal</button>
+                    </form>
+                    <form action="/admin/delete/<%= u._id %>" method="POST" style="display:inline" onsubmit="return confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')">
+                      <button type="submit" class="btn btn-delete btn-xs">🗑 Sil</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- ── Rejected Users ── -->
+    <div class="admin-panel" id="tab-rejected" role="tabpanel" hidden>
+      <% if (rejectedUsers.length === 0) { %>
+        <div class="empty-state empty-state-sm">
+          <div class="empty-icon">📋</div>
+          <h3>Reddedilen kullanıcı yok</h3>
+        </div>
+      <% } else { %>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Ad Soyad</th>
+                <th>E-posta</th>
+                <th>Üniversite</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% rejectedUsers.forEach(u => { %>
+                <tr class="admin-row admin-row-rejected">
+                  <td class="user-name-cell">
+                    <div class="user-avatar-mini user-avatar-rejected"><%= u.name.charAt(0).toUpperCase() %></div>
+                    <span><%= u.name %></span>
+                  </td>
+                  <td><%= u.email %></td>
+                  <td><%= u.school || '—' %></td>
+                  <td class="action-cell">
+                    <form action="/admin/reset/<%= u._id %>" method="POST" style="display:inline">
+                      <button type="submit" class="btn btn-approve btn-xs">↺ Tekrar Değerlendir</button>
+                    </form>
+                    <form action="/admin/delete/<%= u._id %>" method="POST" style="display:inline" onsubmit="return confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')">
+                      <button type="submit" class="btn btn-delete btn-xs">🗑 Sil</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+
+  </div>
+</section>
+
+<%- include('../layout/footer') %>

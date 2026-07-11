@@ -1,0 +1,21 @@
+<%- include('./layout/header') %>
+
+<div class="error-page">
+  <div class="container error-content">
+    <div class="error-code"><%= statusCode || '404' %></div>
+    <h1 class="error-title">
+      <% if (statusCode === 404) { %>
+        Sayfa Bulunamadı
+      <% } else { %>
+        Sunucu Hatası
+      <% } %>
+    </h1>
+    <p class="error-message"><%= message || 'Bir şeyler ters gitti.' %></p>
+    <div class="error-actions">
+      <a href="/" class="btn btn-primary">Ana Sayfaya Dön</a>
+      <a href="/eb" class="btn btn-outline">EB Takımları</a>
+    </div>
+  </div>
+</div>
+
+<%- include('./layout/footer') %>

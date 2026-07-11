@@ -1,0 +1,79 @@
+<%- include('../layout/header') %>
+
+<div class="auth-page">
+  <div class="auth-container auth-container-login">
+    <!-- Left Panel -->
+    <div class="auth-panel auth-panel-left">
+      <div class="auth-brand">
+        <div class="logo-emblem logo-emblem-lg">A</div>
+        <h2>AIESEC İstanbul</h2>
+        <p>Alumni Archive</p>
+      </div>
+      <div class="auth-panel-quote">
+        <blockquote>
+          "Geçmiş, geleceğe rehberlik eder."
+        </blockquote>
+        <cite>— AIESEC İstanbul</cite>
+      </div>
+      <div class="auth-panel-orb auth-orb-1"></div>
+      <div class="auth-panel-orb auth-orb-2"></div>
+    </div>
+
+    <!-- Right Panel: Form -->
+    <div class="auth-panel auth-panel-right">
+      <div class="auth-form-wrap">
+        <div class="auth-form-header">
+          <h1>Giriş Yap</h1>
+          <p>AIESEC İstanbul Alumni Archive'e hoş geldin.</p>
+        </div>
+
+        <form action="/auth/login" method="POST" class="auth-form" id="login-form">
+          <div class="form-group">
+            <label for="email" class="form-label">E-posta</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-input"
+              placeholder="ornek@email.com"
+              required
+              autocomplete="email"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="form-label">Şifre</label>
+            <div class="input-wrap">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-input"
+                placeholder="Şifreniz"
+                required
+                autocomplete="current-password"
+              />
+              <button type="button" class="input-eye" onclick="togglePassword('password')" aria-label="Şifreyi göster/gizle">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="login-submit">
+            Giriş Yap
+          </button>
+        </form>
+
+        <p class="auth-switch">
+          Hesabın yok mu? <a href="/auth/register">Kayıt Ol</a>
+        </p>
+
+        <div class="auth-info-box">
+          <p>⏳ Kayıt olduktan sonra admin onayını beklemen gerekiyor. Onay sonrası EB detaylarına erişebilirsin.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../layout/footer') %>

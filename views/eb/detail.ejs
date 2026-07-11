@@ -1,0 +1,171 @@
+<%- include('../layout/header', { currentPage: 'eb' }) %>
+
+<!-- ── EB Detail Hero ── -->
+<section class="eb-detail-hero">
+  <div class="eb-hero-cover">
+    <img
+      src="<%= team.coverImage || '/images/default-cover.jpg' %>"
+      alt="<%= team.title %>"
+      class="eb-hero-img"
+      fetchpriority="high"
+    />
+    <div class="eb-hero-overlay"></div>
+  </div>
+  <div class="container eb-hero-content">
+    <div class="breadcrumb breadcrumb-light">
+      <a href="/">Ana Sayfa</a>
+      <span>›</span>
+      <a href="/eb">EB Takımları</a>
+      <span>›</span>
+      <span><%= team.year %></span>
+    </div>
+    <div class="eb-year-badge"><%= team.year %></div>
+    <h1 class="eb-hero-title"><%= team.title %></h1>
+    <% if (team.description) { %>
+      <p class="eb-hero-desc"><%= team.description %></p>
+    <% } %>
+  </div>
+</section>
+
+<!-- ── Group Photo (if available) ── -->
+<% if (team.groupPhoto) { %>
+<section class="section section-sm">
+  <div class="container">
+    <div class="group-photo-wrap">
+      <img src="<%= team.groupPhoto %>" alt="<%= team.year %> EB Grup Fotoğrafı" class="group-photo" loading="lazy" />
+      <div class="group-photo-caption">
+        <span><%= team.year %> Executive Board – Grup Fotoğrafı</span>
+      </div>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- ── Achievements (if any) ── -->
+<% if (team.achievements && team.achievements.length > 0) { %>
+<section class="section section-sm section-achievements">
+  <div class="container">
+    <h2 class="section-title-sm">Dönem Başarıları</h2>
+    <div class="achievements-list">
+      <% team.achievements.forEach(a => { %>
+        <div class="achievement-item">
+          <span class="achievement-icon">🏆</span>
+          <span><%= a %></span>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- ── Members Section ── -->
+<section class="section section-members" id="members">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Ekip</span>
+      <h2 class="section-title">EB Üyeleri</h2>
+      <p class="section-desc"><%= team.year %> döneminde AIESEC İstanbul'u yöneten liderler.</p>
+    </div>
+
+    <% if (members && members.length > 0) { %>
+      <div class="members-grid" id="members-grid">
+        <% members.forEach((member, i) => { %>
+          <article class="member-card" style="--card-delay: <%= i * 0.07 %>s" id="member-<%= member._id %>">
+            <div class="member-card-inner">
+              <!-- Front face -->
+              <div class="member-front">
+                <div class="member-photo-wrap">
+                  <img
+                    src="<%= member.photo || '/images/default-avatar.svg' %>"
+                    alt="<%= member.name %>"
+                    class="member-photo"
+                    loading="lazy"
+                    onerror="this.src='/images/default-avatar.svg'"
+                  />
+                  <div class="member-photo-ring"></div>
+                </div>
+                <div class="member-info">
+                  <h3 class="member-name"><%= member.name %></h3>
+                  <span class="member-role"><%= member.role %></span>
+                  <% if (member.department) { %>
+                    <span class="member-dept"><%= member.department %></span>
+                  <% } %>
+                  <% if (member.school) { %>
+                    <div class="member-meta">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                      <%= member.school %>
+                    </div>
+                  <% } %>
+                </div>
+                <div class="member-card-actions">
+                  <button class="btn-details" onclick="toggleMemberDetails('<%= member._id %>')" aria-expanded="false">
+                    Detayları Gör ↓
+                  </button>
+                </div>
+              </div>
+
+              <!-- Expandable Details -->
+              <div class="member-details" id="details-<%= member._id %>" hidden>
+                <% if (member.bio) { %>
+                  <div class="detail-section">
+                    <h4>Biyografi</h4>
+                    <p><%= member.bio %></p>
+                  </div>
+                <% } %>
+                <% if (member.aiesecJourney) { %>
+                  <div class="detail-section">
+                    <h4>AIESEC Yolculuğu</h4>
+                    <p><%= member.aiesecJourney %></p>
+                  </div>
+                <% } %>
+                <div class="detail-links">
+                  <% if (member.email) { %>
+                    <a href="mailto:<%= member.email %>" class="detail-link detail-link-email">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                      E-posta
+                    </a>
+                  <% } %>
+                  <% if (member.linkedin) { %>
+                    <a href="<%= member.linkedin %>" target="_blank" rel="noopener" class="detail-link detail-link-linkedin">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+                      LinkedIn
+                    </a>
+                  <% } %>
+                </div>
+                <button class="btn-details btn-details-close" onclick="toggleMemberDetails('<%= member._id %>')">
+                  Kapat ↑
+                </button>
+              </div>
+            </div>
+          </article>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="empty-state">
+        <div class="empty-icon">👥</div>
+        <h3>Henüz üye eklenmemiş</h3>
+        <p>Bu döneme ait üyeler yakında eklenecek.</p>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<!-- ── Gallery Section (future) ── -->
+<section class="section section-sm section-gallery-placeholder">
+  <div class="container">
+    <div class="gallery-coming-soon">
+      <span class="gallery-icon">🖼️</span>
+      <h3>Galeri</h3>
+      <p>Bu döneme ait fotoğraf galerisi yakında eklenecek.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Back Navigation ── -->
+<section class="section section-xs">
+  <div class="container">
+    <a href="/eb" class="btn btn-outline">← Tüm EB Takımlarına Dön</a>
+  </div>
+</section>
+
+<%- include('../layout/footer') %>

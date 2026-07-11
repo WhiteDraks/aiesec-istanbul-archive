@@ -1,0 +1,60 @@
+</main>
+
+<!-- ── Footer ── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <!-- Brand -->
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="logo-emblem logo-emblem-sm">A</div>
+          <span><strong>AIESEC</strong> İstanbul</span>
+        </div>
+        <p class="footer-tagline">Liderlik deneyimini paylaş,<br />geleceği birlikte inşa et.</p>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="footer-col">
+        <h4 class="footer-heading">Hızlı Erişim</h4>
+        <ul class="footer-links">
+          <li><a href="/">Ana Sayfa</a></li>
+          <li><a href="/eb">EB Takımları</a></li>
+          <li><a href="/eb/2026-2027">26.27 EB</a></li>
+        </ul>
+      </div>
+
+      <!-- Account -->
+      <div class="footer-col">
+        <h4 class="footer-heading">Hesap</h4>
+        <ul class="footer-links">
+          <% if (currentUser) { %>
+            <% if (isAdmin) { %><li><a href="/admin">Admin Paneli</a></li><% } %>
+            <li><a href="/auth/logout">Çıkış Yap</a></li>
+          <% } else { %>
+            <li><a href="/auth/register">Kayıt Ol</a></li>
+            <li><a href="/auth/login">Giriş Yap</a></li>
+          <% } %>
+        </ul>
+      </div>
+
+      <!-- AIESEC Info -->
+      <div class="footer-col">
+        <h4 class="footer-heading">AIESEC</h4>
+        <ul class="footer-links">
+          <li><a href="https://aiesec.org" target="_blank" rel="noopener">aiesec.org</a></li>
+          <li><a href="https://aiesec.org.tr" target="_blank" rel="noopener">aiesec.org.tr</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; <%= new Date().getFullYear() %> AIESEC İstanbul Alumni Archive. Tüm hakları saklıdır.</p>
+      <p class="footer-sub">Geçmiş liderlik deneyimlerini onurlandırmak için ❤️ ile yapıldı.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Main JS -->
+<script src="/js/main.js"></script>
+</body>
+</html>

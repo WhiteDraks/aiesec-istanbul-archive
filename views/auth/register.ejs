@@ -1,0 +1,142 @@
+<%- include('../layout/header') %>
+
+<div class="auth-page">
+  <div class="auth-container">
+    <!-- Left Panel -->
+    <div class="auth-panel auth-panel-left">
+      <div class="auth-brand">
+        <div class="logo-emblem logo-emblem-lg">A</div>
+        <h2>AIESEC İstanbul</h2>
+        <p>Alumni Archive</p>
+      </div>
+      <div class="auth-panel-quote">
+        <blockquote>
+          "Liderlik bir pozisyon değil, bir sorumluluktur."
+        </blockquote>
+        <cite>— AIESEC İlkesi</cite>
+      </div>
+      <div class="auth-panel-orb auth-orb-1"></div>
+      <div class="auth-panel-orb auth-orb-2"></div>
+    </div>
+
+    <!-- Right Panel: Form -->
+    <div class="auth-panel auth-panel-right">
+      <div class="auth-form-wrap">
+        <div class="auth-form-header">
+          <h1>Kayıt Ol</h1>
+          <p>Topluluğa katılmak için bilgilerini gir.</p>
+        </div>
+
+        <!-- Errors -->
+        <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+          <div class="form-errors" role="alert">
+            <% errors.forEach(e => { %><p>⚠ <%= e %></p><% }) %>
+          </div>
+        <% } %>
+
+        <form action="/auth/register" method="POST" class="auth-form" id="register-form" novalidate>
+          <div class="form-group">
+            <label for="name" class="form-label">Ad Soyad</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              class="form-input"
+              placeholder="Adın ve soyadın"
+              value="<%= typeof formData !== 'undefined' ? formData.name || '' : '' %>"
+              required
+              autocomplete="name"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">E-posta</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-input"
+              placeholder="ornek@email.com"
+              value="<%= typeof formData !== 'undefined' ? formData.email || '' : '' %>"
+              required
+              autocomplete="email"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="school" class="form-label">Üniversite <span class="form-optional">(opsiyonel)</span></label>
+            <input
+              type="text"
+              id="school"
+              name="school"
+              class="form-input"
+              placeholder="Üniversite adı"
+              value="<%= typeof formData !== 'undefined' ? formData.school || '' : '' %>"
+              autocomplete="organization"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="ebYear" class="form-label">EB Dönemi <span class="form-optional">(opsiyonel)</span></label>
+            <input
+              type="text"
+              id="ebYear"
+              name="ebYear"
+              class="form-input"
+              placeholder="Örn: 2026-2027"
+              value="<%= typeof formData !== 'undefined' ? formData.ebYear || '' : '' %>"
+            />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="password" class="form-label">Şifre</label>
+              <div class="input-wrap">
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  class="form-input"
+                  placeholder="En az 6 karakter"
+                  required
+                  autocomplete="new-password"
+                />
+                <button type="button" class="input-eye" onclick="togglePassword('password')" aria-label="Şifreyi göster/gizle">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="eye-password"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="passwordConfirm" class="form-label">Şifre Tekrar</label>
+              <div class="input-wrap">
+                <input
+                  type="password"
+                  id="passwordConfirm"
+                  name="passwordConfirm"
+                  class="form-input"
+                  placeholder="Şifreni tekrar gir"
+                  required
+                  autocomplete="new-password"
+                />
+              </div>
+            </div>
+          </div>
+
+          <p class="form-notice">
+            📋 Kaydın admin onayına tabi olacaktır. Onay sonrası EB detaylarına erişebilirsin.
+          </p>
+
+          <button type="submit" class="btn btn-primary btn-block" id="register-submit">
+            Kayıt Ol
+          </button>
+        </form>
+
+        <p class="auth-switch">
+          Zaten hesabın var mı? <a href="/auth/login">Giriş Yap</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../layout/footer') %>

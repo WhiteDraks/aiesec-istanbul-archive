@@ -1,0 +1,34 @@
+<%- include('../layout/header') %>
+
+<div class="auth-page">
+  <div class="auth-container auth-container-sm">
+    <div class="pending-card">
+      <div class="pending-icon">⏳</div>
+      <h1>Hesabın Onay Bekliyor</h1>
+      <p>
+        Merhaba <strong><%= currentUser ? currentUser.name : 'Kullanıcı' %></strong>,
+        kaydın başarıyla alındı! Hesabın şu an admin onayını bekliyor.
+      </p>
+      <p>
+        Admin onayından sonra AIESEC İstanbul Alumni Archive'deki tüm içeriklere erişebileceksin.
+      </p>
+      <div class="pending-steps">
+        <div class="pending-step pending-step-done">
+          <span class="step-icon">✓</span>
+          <span>Kayıt tamamlandı</span>
+        </div>
+        <div class="pending-step pending-step-active">
+          <span class="step-icon">⏳</span>
+          <span>Admin onayı bekleniyor</span>
+        </div>
+        <div class="pending-step">
+          <span class="step-icon">🔓</span>
+          <span>İçeriklere tam erişim</span>
+        </div>
+      </div>
+      <a href="/" class="btn btn-outline">Ana Sayfaya Dön</a>
+    </div>
+  </div>
+</div>
+
+<%- include('../layout/footer') %>
