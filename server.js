@@ -10,6 +10,9 @@ const { setLocals } = require('./middleware/auth');
 
 const app = express();
 
+// Trust proxy is required for secure cookies behind Vercel's reverse proxy
+app.set('trust proxy', 1);
+
 // ─── View Engine ─────────────────────────────────────────────────────────────
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
