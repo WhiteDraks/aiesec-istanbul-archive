@@ -11,7 +11,18 @@
     />
     <div class="eb-hero-overlay"></div>
   </div>
-  <div class="container eb-hero-content">
+  <div class="container eb-hero-content" style="position: relative;">
+    <% if (typeof canEditTeam !== 'undefined' && canEditTeam) { %>
+      <div style="position: absolute; right: var(--space-6); top: var(--space-6); z-index: 10;">
+        <form action="/eb/<%= encodeURIComponent(team.year) %>/cover" method="POST" enctype="multipart/form-data" id="cover-upload-form">
+          <label for="eb-cover-input" id="label-eb-cover" class="btn btn-outline btn-sm" style="background: rgba(4,13,26,0.6); backdrop-filter: blur(4px); cursor: pointer; border-color: rgba(255,255,255,0.4); color: #fff; font-size: 0.8rem; padding: 0.5rem 1rem;">
+            🖼️ Kapak Görselini Değiştir
+          </label>
+          <input type="file" id="eb-cover-input" name="cover_image" accept="image/*" style="display: none;" onchange="handleCoverUpload(event)">
+        </form>
+      </div>
+    <% } %>
+
     <div class="breadcrumb breadcrumb-light">
       <a href="/">Ana Sayfa</a>
       <span>›</span>
@@ -307,5 +318,37 @@ function toggleEditAchievementsForm() {
     const isHidden = formWrap.style.display === 'none';
     formWrap.style.display = isHidden ? 'block' : 'none';
   }
+}
+
+function handleCoverUpload(event) {
+  openCropper(event, 'eb-cover-input', '', '', 'label-eb-cover', 3/1);
+  
+  // Intercept Cropper saving logic to automatically submit the cover-upload-form
+  const originalSave = window.saveCroppedImage;
+  window.saveCroppedImage = function() {
+    if (!cropperInstance) return;
+
+    cropperInstance.getCroppedCanvas({
+      width: 1200,
+      height: 400,
+      imageSmoothingQuality: 'high'
+    }).toBlob((blob) => {
+      const croppedFile = new File([blob], 'cover_image.jpg', { type: 'image/jpeg' });
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(croppedFile);
+      
+      const fileInput = document.getElementById('eb-cover-input');
+      if (fileInput) fileInput.files = dataTransfer.files;
+
+      // Close modal and restore original save function
+      document.getElementById('cropper-modal').style.display = 'none';
+      cropperInstance.destroy();
+      cropperInstance = null;
+      window.saveCroppedImage = originalSave;
+
+      // Submit form
+      document.getElementById('cover-upload-form').submit();
+    }, 'image/jpeg', 0.9);
+  };
 }
 </script>

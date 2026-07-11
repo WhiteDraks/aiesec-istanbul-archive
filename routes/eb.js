@@ -250,4 +250,55 @@ router.post('/:year/achievements', isLoggedIn, isApproved, async (req, res) => {
   }
 });
 
+/**
+ * POST /eb/:year/cover
+ * Uploads a banner cover image for the EB period.
+ * Only the period's EB team members or admin can upload.
+ */
+router.post('/:year/cover', isLoggedIn, isApproved, upload.single('cover_image'), async (req, res) => {
+  try {
+    const { year } = req.params;
+
+    if (!req.file) {
+      req.flash('error', 'Lütfen bir görsel seçin.');
+      return res.redirect(`/eb/${encodeURIComponent(year)}`);
+    }
+
+    // Check authorization (admin or team member)
+    const sql = getSQL();
+    const isMember = await sql`
+      SELECT 1 FROM users
+      WHERE id = ${req.session.userId}
+        AND status = 'approved'
+        AND EXISTS (
+          SELECT 1
+          FROM jsonb_array_elements(
+            CASE WHEN roles_history IS NULL OR roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE roles_history END
+          ) AS role_entry
+          WHERE role_entry->>'year' = ${year}
+        )
+    `;
+
+    const canEdit = req.session.user?.role === 'admin' || isMember.length > 0;
+    if (!canEdit) {
+      req.flash('error', 'Bu dönemin kapak görselini değiştirme yetkiniz bulunmamaktadır.');
+      return res.redirect(`/eb/${encodeURIComponent(year)}`);
+    }
+
+    // Upload cover to Vercel Blob
+    const coverUrl = await uploadToBlob(req.file.buffer, req.file.originalname, `eb-covers/${year}/`);
+
+    // Find or create EBTeam meta record and update cover_image
+    const teamMeta = await EBTeam.findOrCreateByYear(year);
+    await EBTeam.update(teamMeta.id, { cover_image: coverUrl });
+
+    req.flash('success', 'Dönem kapak fotoğrafı başarıyla güncellendi!');
+    res.redirect(`/eb/${encodeURIComponent(year)}`);
+  } catch (err) {
+    console.error('Failed to update EB cover image:', err);
+    req.flash('error', 'Kapak fotoğrafı güncellenirken bir hata oluştu.');
+    res.redirect(`/eb/${encodeURIComponent(req.params.year)}`);
+  }
+});
+
 module.exports = router;
