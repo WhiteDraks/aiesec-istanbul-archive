@@ -55,6 +55,8 @@
       <li><a href="/" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'home' ? 'active' : '' %>">Ana Sayfa</a></li>
       <li><a href="/eb" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'eb' ? 'active' : '' %>">EB Takımları</a></li>
 
+      <li><a href="/feedback" class="nav-link nav-link-highlight <%= typeof currentPage !== 'undefined' && currentPage === 'feedback' ? 'active' : '' %>" style="color: var(--primary) !important; font-weight: 600;">Geri Bildirim 💬</a></li>
+
       <% if (currentUser) { %>
         <% if (isApproved || isAdmin) { %>
           <li><a href="/alumni" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'alumni' ? 'active' : '' %>">Alumni Rehberi</a></li>

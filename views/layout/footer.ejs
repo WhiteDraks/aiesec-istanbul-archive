@@ -103,12 +103,12 @@
 <!-- ── Homepage Floating Feedback Widget ── -->
 <% if (typeof currentPage !== 'undefined' && currentPage === 'home') { %>
   <!-- Floating Button -->
-  <button id="feedback-widget-trigger" onclick="toggleFeedbackWidget()" aria-label="Geri Bildirim Gönder" style="position: fixed; bottom: 2rem; right: 2rem; width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 15px rgba(3,126,243,0.3); z-index: 9999; cursor: pointer; border: none; font-size: 1.5rem; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s;">
+  <button id="feedback-widget-trigger" onclick="toggleFeedbackWidget()" aria-label="Geri Bildirim Gönder" style="position: fixed; top: 5.5rem; right: 2rem; width: 50px; height: 50px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 15px rgba(3,126,243,0.3); z-index: 9999; cursor: pointer; border: none; font-size: 1.3rem; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s;">
     💬
   </button>
 
   <!-- Feedback Overlay Card -->
-  <div id="feedback-widget-card" style="position: fixed; bottom: 6rem; right: 2rem; width: 340px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 9999; overflow: hidden; display: none; flex-direction: column; font-family: inherit;">
+  <div id="feedback-widget-card" style="position: fixed; top: 9.5rem; right: 2rem; width: 340px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 9999; overflow: hidden; display: none; flex-direction: column; font-family: inherit;">
     <div style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02);">
       <h4 style="margin: 0; font-size: 0.95rem; font-weight: 600; color: #fff;">Geri Bildirim Formu 💬</h4>
       <button type="button" onclick="toggleFeedbackWidget()" style="font-size: 1.25rem; color: var(--gray-400); cursor: pointer; border: none; background: none;">&times;</button>
