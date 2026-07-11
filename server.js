@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
+const { Pool } = require('pg');
 const methodOverride = require('method-override');
 const path = require('path');
 const { initDB, getSQL } = require('./config/database');
@@ -36,13 +37,23 @@ const sessionConfig = {
   },
 };
 
-// Use Postgres session store when DB is available
-const dbUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL;
-if (dbUrl) {
+// Use Postgres session store (non-pooling URL avoids pgbouncer issues)
+const sessionDbUrl =
+  process.env.POSTGRES_URL_NON_POOLING ||
+  process.env.DATABASE_URL_UNPOOLED ||
+  process.env.POSTGRES_URL ||
+  process.env.DATABASE_URL;
+
+if (sessionDbUrl) {
+  const sessionPool = new Pool({
+    connectionString: sessionDbUrl,
+    ssl: { rejectUnauthorized: false },
+    max: 2,
+  });
   sessionConfig.store = new pgSession({
-    conString: dbUrl,
+    pool: sessionPool,
     tableName: 'session',
-    createTableIfMissing: false, // we create it in initDB
+    createTableIfMissing: false,
   });
 }
 

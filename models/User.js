@@ -1,10 +1,19 @@
 const { getSQL } = require('../config/database');
 const bcrypt = require('bcryptjs');
 
+// Note: @neondatabase/serverless tagged template literals return rows directly (not {rows})
 const User = {
   async findByEmail(email) {
     const sql = getSQL();
-    const { rows } = await sql`
+    const rows = await sql`
+      SELECT * FROM users WHERE email = ${email.toLowerCase().trim()} LIMIT 1
+    `;
+    return rows[0] || null;
+  },
+
+  async findByEmailWithPassword(email) {
+    const sql = getSQL();
+    const rows = await sql`
       SELECT * FROM users WHERE email = ${email.toLowerCase().trim()} LIMIT 1
     `;
     return rows[0] || null;
@@ -12,7 +21,7 @@ const User = {
 
   async findById(id) {
     const sql = getSQL();
-    const { rows } = await sql`
+    const rows = await sql`
       SELECT id, name, email, role, status, school, eb_year, approved_at, created_at
       FROM users WHERE id = ${id} LIMIT 1
     `;
@@ -23,9 +32,9 @@ const User = {
     const sql = getSQL();
     const salt = await bcrypt.genSalt(12);
     const hashed = await bcrypt.hash(password, salt);
-    const { rows } = await sql`
+    const rows = await sql`
       INSERT INTO users (name, email, password, role, status, school, eb_year)
-      VALUES (${name.trim()}, ${email.toLowerCase().trim()}, ${hashed}, ${role}, ${status}, ${school}, ${eb_year})
+      VALUES (${name.trim()}, ${email.toLowerCase().trim()}, ${hashed}, ${role}, ${status}, ${school || null}, ${eb_year || null})
       RETURNING id, name, email, role, status, school, eb_year, created_at
     `;
     return rows[0];
@@ -37,9 +46,9 @@ const User = {
 
   async updateStatus(id, status, approvedBy = null) {
     const sql = getSQL();
-    const { rows } = await sql`
+    const rows = await sql`
       UPDATE users
-      SET status = ${status},
+      SET status      = ${status},
           approved_at = ${status === 'approved' ? new Date() : null},
           approved_by = ${approvedBy},
           updated_at  = NOW()
@@ -56,7 +65,7 @@ const User = {
 
   async findAllByStatus(status) {
     const sql = getSQL();
-    const { rows } = await sql`
+    const rows = await sql`
       SELECT id, name, email, role, status, school, eb_year, approved_at, created_at, updated_at
       FROM users
       WHERE role = 'user' AND status = ${status}
@@ -67,7 +76,7 @@ const User = {
 
   async countByRole(role = 'user') {
     const sql = getSQL();
-    const { rows } = await sql`SELECT COUNT(*) AS total FROM users WHERE role = ${role}`;
+    const rows = await sql`SELECT COUNT(*) AS total FROM users WHERE role = ${role}`;
     return parseInt(rows[0].total, 10);
   },
 };
