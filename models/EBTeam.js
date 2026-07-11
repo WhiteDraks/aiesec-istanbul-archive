@@ -29,6 +29,23 @@ const EBTeam = {
     return rows[0] || null;
   },
 
+  async findByYear(year) {
+    const sql = getSQL();
+    const rows = await sql`SELECT * FROM eb_teams WHERE year = ${year} LIMIT 1`;
+    return rows[0] || null;
+  },
+
+  /**
+   * EB dönemleri esasen users.roles_history'den türetiliyor; eb_teams satırı
+   * sadece admin bir dönemi (açıklama/başarı/galeri) zenginleştirdiğinde var olur.
+   * Admin bir döneme ilk kez girdiğinde satırı burada oluşturuyoruz.
+   */
+  async findOrCreateByYear(year) {
+    const existing = await this.findByYear(year);
+    if (existing) return existing;
+    return this.create({ year, title: `${year} Executive Board` });
+  },
+
   async create({ year, title, slug, description, coverImage, isPublic, achievements, order }) {
     const sql = getSQL();
     const rows = await sql`

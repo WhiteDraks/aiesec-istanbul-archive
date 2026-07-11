@@ -5,13 +5,39 @@ const EBMember = require('../models/EBMember');
 const upload = require('../middleware/upload');
 const { uploadToBlob } = require('../utils/blob');
 const { isLoggedIn, isAdmin } = require('../middleware/auth');
+const { getSQL } = require('../config/database');
 
 router.use(isLoggedIn, isAdmin);
 
 // GET /admin/eb - EB Takımları Listesi
+// Dönemler users.roles_history'den türetilir (bkz. routes/eb.js); eb_teams
+// tablosu sadece admin bir dönemi zenginleştirdiyse (açıklama/başarı/galeri) satır içerir.
 router.get('/', async (req, res) => {
   try {
-    const teams = await EBTeam.findAll();
+    const sql = getSQL();
+    const yearRows = await sql`
+      SELECT DISTINCT (role_entry->>'year') AS year, COUNT(*) AS member_count
+      FROM users,
+           LATERAL jsonb_array_elements(
+             CASE WHEN roles_history IS NULL OR roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE roles_history END
+           ) AS role_entry
+      WHERE status = 'approved'
+        AND (role_entry->>'year') IS NOT NULL
+        AND (role_entry->>'year') <> ''
+      GROUP BY (role_entry->>'year')
+      ORDER BY (role_entry->>'year') DESC
+    `;
+
+    const teamMetas = await EBTeam.findAll();
+    const metaByYear = {};
+    teamMetas.forEach(t => { metaByYear[t.year] = t; });
+
+    const teams = yearRows.map(row => ({
+      year: row.year,
+      member_count: parseInt(row.member_count, 10),
+      meta: metaByYear[row.year] || null,
+    }));
+
     res.render('admin/eb-list', {
       title: 'EB Yönetimi - Admin',
       teams,
@@ -20,6 +46,18 @@ router.get('/', async (req, res) => {
     console.error(err);
     req.flash('error', 'EB takımları yüklenirken hata oluştu.');
     res.redirect('/admin');
+  }
+});
+
+// GET /admin/eb/year/:year/edit - Dönem için eb_teams satırı yoksa oluşturup düzenleme formuna yönlendirir
+router.get('/year/:year/edit', async (req, res) => {
+  try {
+    const team = await EBTeam.findOrCreateByYear(req.params.year);
+    res.redirect(`/admin/eb/${team.id}/edit`);
+  } catch (err) {
+    console.error(err);
+    req.flash('error', 'Dönem oluşturulurken hata oluştu.');
+    res.redirect('/admin/eb');
   }
 });
 

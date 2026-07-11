@@ -18,6 +18,7 @@
             <tr>
               <th>Dönem</th>
               <th>Takım Adı</th>
+              <th>Üye Sayısı</th>
               <th>Durum</th>
               <th>Galeri Görseli</th>
               <th>İşlemler</th>
@@ -27,20 +28,25 @@
             <% teams.forEach(team => { %>
               <tr>
                 <td><strong><%= team.year %></strong></td>
-                <td><%= team.title %></td>
+                <td><%= team.meta?.title || `${team.year} Executive Board` %></td>
+                <td><%= team.member_count %></td>
                 <td>
-                  <span class="status-badge <%= team.is_public ? 'status-approved' : 'status-pending' %>">
-                    <%= team.is_public ? 'Yayında' : 'Gizli' %>
+                  <span class="status-badge <%= team.meta?.is_public ? 'status-approved' : 'status-pending' %>">
+                    <%= team.meta?.is_public ? 'Yayında' : 'Gizli' %>
                   </span>
                 </td>
-                <td><%= team.gallery_images ? team.gallery_images.length : 0 %> Fotoğraf</td>
+                <td><%= team.meta?.gallery_images ? team.meta.gallery_images.length : 0 %> Fotoğraf</td>
                 <td>
-                  <a href="/admin/eb/<%= team.id %>/edit" class="btn btn-sm btn-outline">Düzenle</a>
+                  <% if (team.meta) { %>
+                    <a href="/admin/eb/<%= team.meta.id %>/edit" class="btn btn-sm btn-outline">Düzenle</a>
+                  <% } else { %>
+                    <a href="/admin/eb/year/<%= team.year %>/edit" class="btn btn-sm btn-outline">Düzenle</a>
+                  <% } %>
                 </td>
               </tr>
             <% }) %>
             <% if (teams.length === 0) { %>
-              <tr><td colspan="5" style="text-align: center;">Kayıtlı EB takımı yok.</td></tr>
+              <tr><td colspan="6" style="text-align: center;">Henüz hiçbir kullanıcı bir EB dönemine kayıtlı değil.</td></tr>
             <% } %>
           </tbody>
         </table>
