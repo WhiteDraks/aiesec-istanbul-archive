@@ -9,7 +9,7 @@
       <span>EB Takımları</span>
     </div>
     <h1 class="page-hero-title">Executive Board Takımları</h1>
-    <p class="page-hero-sub">AIESEC İstanbul'un geçmiş dönem liderlik takımları</p>
+    <p class="page-hero-sub">AIESEC İstanbul'un geçmiş ve mevcut dönem liderlik takımları</p>
   </div>
 </section>
 
@@ -21,7 +21,7 @@
         <div class="access-notice-icon">🔒</div>
         <div>
           <h3>Detaylı Bilgiler için Giriş Gerekli</h3>
-          <p>EB takım detaylarını, üyeleri ve fotoğrafları görmek için kayıt olup admin onayı almanız gerekmektedir.</p>
+          <p>EB takım detaylarını ve üye bilgilerini görmek için kayıt olup admin onayı almanız gerekmektedir.</p>
           <div class="access-notice-actions">
             <a href="/auth/login" class="btn btn-primary btn-sm">Giriş Yap</a>
             <a href="/auth/register" class="btn btn-outline btn-sm">Kayıt Ol</a>
@@ -48,11 +48,15 @@
               <% if (team.description) { %>
                 <p class="year-card-desc"><%= team.description.substring(0, 120) %><%= team.description.length > 120 ? '...' : '' %></p>
               <% } %>
+              <p class="year-card-members-count" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <%= team.member_count %> üye
+              </p>
               <div class="year-card-footer">
                 <% if (currentUser && isApproved) { %>
-                  <a href="/eb/<%= team.slug %>" class="btn btn-primary">Dönemi İncele →</a>
+                  <a href="/eb/<%= encodeURIComponent(team.year) %>" class="btn btn-primary">Dönemi İncele →</a>
                 <% } else { %>
-                  <a href="/auth/login?redirect=/eb/<%= team.slug %>" class="btn btn-outline">
+                  <a href="/auth/login?redirect=/eb/<%= encodeURIComponent(team.year) %>" class="btn btn-outline">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                     Giriş Yap
                   </a>
@@ -65,8 +69,11 @@
     <% } else { %>
       <div class="empty-state">
         <div class="empty-icon">📋</div>
-        <h3>Henüz EB takımı eklenmemiş</h3>
-        <p>Yakında burada geçmiş dönemler yer alacak.</p>
+        <h3>Henüz EB dönemi yok</h3>
+        <p>Üyeler profil sayfalarından dönemlerini girdikçe burası otomatik dolacak.</p>
+        <% if (currentUser) { %>
+          <a href="/profile" class="btn btn-primary" style="margin-top: 1rem;">Profilimi Güncelle</a>
+        <% } %>
       </div>
     <% } %>
   </div>

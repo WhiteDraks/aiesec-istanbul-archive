@@ -86,7 +86,7 @@
                 </div>
                 <div class="member-info">
                   <h3 class="member-name"><%= member.name %></h3>
-                  <span class="member-role"><%= member.role %></span>
+                  <span class="member-role"><%= member.current_role || 'EB Üyesi' %></span>
                   <% if (member.department) { %>
                     <span class="member-dept"><%= member.department %></span>
                   <% } %>
@@ -94,6 +94,12 @@
                     <div class="member-meta">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
                       <%= member.school %>
+                    </div>
+                  <% } %>
+                  <% if (member.sector) { %>
+                    <div class="member-meta">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                      <%= member.sector %>
                     </div>
                   <% } %>
                 </div>
@@ -106,16 +112,25 @@
 
               <!-- Expandable Details -->
               <div class="member-details" id="details-<%= member.id %>" hidden>
-                <% if (member.bio) { %>
-                  <div class="detail-section">
-                    <h4>Biyografi</h4>
-                    <p><%= member.bio %></p>
-                  </div>
-                <% } %>
                 <% if (member.aiesec_journey) { %>
                   <div class="detail-section">
                     <h4>AIESEC Yolculuğu</h4>
                     <p><%= member.aiesec_journey %></p>
+                  </div>
+                <% } %>
+                <% 
+                  // Show all roles if user has multiple
+                  const allRoles = member.roles_history && Array.isArray(member.roles_history) ? member.roles_history : [];
+                  if (allRoles.length > 1) { 
+                %>
+                  <div class="detail-section">
+                    <h4>AIESEC Görevleri</h4>
+                    <% allRoles.forEach(r => { %>
+                      <div style="display: flex; gap: 0.5rem; margin-bottom: 0.25rem; font-size: 0.875rem;">
+                        <span class="member-role" style="font-size: 0.75rem; padding: 0.1rem 0.5rem;"><%= r.year %></span>
+                        <span><%= r.role %></span>
+                      </div>
+                    <% }) %>
                   </div>
                 <% } %>
                 <div class="detail-links">
@@ -143,8 +158,8 @@
     <% } else { %>
       <div class="empty-state">
         <div class="empty-icon">👥</div>
-        <h3>Henüz üye eklenmemiş</h3>
-        <p>Bu döneme ait üyeler yakında eklenecek.</p>
+        <h3>Bu döneme üye girilmemiş</h3>
+        <p>Üyeler profil sayfalarından görevlerini ekledikçe burada görünecekler.</p>
       </div>
     <% } %>
   </div>
@@ -160,7 +175,7 @@
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;">
       <% team.gallery_images.forEach(img => { %>
-        <img src="<%= img %>" alt="Gallery Image" style="width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <img src="<%= img %>" alt="Gallery Image" style="width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" loading="lazy">
       <% }) %>
     </div>
   </div>
@@ -175,3 +190,14 @@
 </section>
 
 <%- include('../layout/footer') %>
+
+<script>
+function toggleMemberDetails(id) {
+  const details = document.getElementById('details-' + id);
+  const btn = document.querySelector('#member-' + id + ' .btn-details:not(.btn-details-close)');
+  if (!details) return;
+  const isHidden = details.hidden;
+  details.hidden = !isHidden;
+  if (btn) btn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+}
+</script>
