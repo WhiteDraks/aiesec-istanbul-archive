@@ -24,9 +24,12 @@ async function uploadToBlob(buffer, originalName, prefix = 'uploads/') {
     return `/images/default-avatar.svg?error=no-blob-token`;
   }
 
-  // The store is public; private access is rejected by the Blob API
+  // Pass the token explicitly: this project has a second (private) Blob
+  // store connected whose OIDC binding otherwise takes priority over
+  // BLOB_READ_WRITE_TOKEN, routing uploads to the wrong store.
   const result = await put(filename, buffer, {
     access: 'public',
+    token: process.env.BLOB_READ_WRITE_TOKEN,
   });
 
   return result.url;
