@@ -65,7 +65,7 @@ const EBTeam = {
     return rows[0];
   },
 
-  async update(id, { year, title, description, isPublic, achievements, order, gallery_images }) {
+  async update(id, { year, title, description, isPublic, achievements, order, gallery_images, cover_image, group_photo }) {
     const sql = getSQL();
     // Use a single flat query - Neon driver does not support dynamic template composition
     const rows = await sql`
@@ -77,7 +77,9 @@ const EBTeam = {
         is_public   = COALESCE(${isPublic ?? null}, is_public),
         achievements = COALESCE(${achievements ?? null}, achievements),
         sort_order  = COALESCE(${order ?? null}, sort_order),
-        gallery_images = COALESCE(${gallery_images ?? null}, gallery_images)
+        gallery_images = COALESCE(${gallery_images ?? null}, gallery_images),
+        cover_image = COALESCE(${cover_image ?? null}, cover_image),
+        group_photo = COALESCE(${group_photo ?? null}, group_photo)
       WHERE id = ${id}
       RETURNING *
     `;
