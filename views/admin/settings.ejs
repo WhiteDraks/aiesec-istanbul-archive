@@ -1,0 +1,114 @@
+<%- include('../layout/header', { currentPage: 'admin' }) %>
+
+<section class="page-hero page-hero-sm page-hero-admin">
+  <div class="page-hero-bg"></div>
+  <div class="container">
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h1 class="page-hero-title">Site Ayarları (CMS)</h1>
+        <p class="page-hero-sub">Temalar, logolar ve global metinlerin yönetimi</p>
+      </div>
+      <a href="/admin" class="btn btn-outline">Panele Dön</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container" style="max-width: 800px;">
+    
+    <form action="/admin/settings" method="POST" class="profile-card" style="padding: 2.5rem;">
+      
+      <!-- Tema Renkleri -->
+      <div class="form-section">
+        <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Tema Renkleri</h3>
+        <p class="form-hint" style="margin-bottom: 1.5rem;">Sitenin kurumsal renk paletini buradan özelleştirebilirsiniz.</p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+          <div class="form-group">
+            <label for="theme_primary" class="form-label">Ana Renk (Primary)</label>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <input type="color" id="theme_primary_picker" value="<%= settings.theme_primary %>" style="width: 40px; height: 40px; border: none; border-radius: 6px; cursor: pointer;" oninput="document.getElementById('theme_primary').value = this.value">
+              <input type="text" id="theme_primary" name="theme_primary" class="form-input" value="<%= settings.theme_primary %>" required oninput="document.getElementById('theme_primary_picker').value = this.value">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="theme_secondary" class="form-label">İkincil Renk (Secondary)</label>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <input type="color" id="theme_secondary_picker" value="<%= settings.theme_secondary %>" style="width: 40px; height: 40px; border: none; border-radius: 6px; cursor: pointer;" oninput="document.getElementById('theme_secondary').value = this.value">
+              <input type="text" id="theme_secondary" name="theme_secondary" class="form-input" value="<%= settings.theme_secondary %>" required oninput="document.getElementById('theme_secondary_picker').value = this.value">
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+          <div class="form-group">
+            <label for="theme_background" class="form-label">Arka Plan (Background)</label>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <input type="color" id="theme_background_picker" value="<%= settings.theme_background %>" style="width: 40px; height: 40px; border: none; border-radius: 6px; cursor: pointer;" oninput="document.getElementById('theme_background').value = this.value">
+              <input type="text" id="theme_background" name="theme_background" class="form-input" value="<%= settings.theme_background %>" required oninput="document.getElementById('theme_background_picker').value = this.value">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="theme_surface" class="form-label">Yüzey Rengi (Surface)</label>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <input type="color" id="theme_surface_picker" value="<%= settings.theme_surface %>" style="width: 40px; height: 40px; border: none; border-radius: 6px; cursor: pointer;" oninput="document.getElementById('theme_surface').value = this.value">
+              <input type="text" id="theme_surface" name="theme_surface" class="form-input" value="<%= settings.theme_surface %>" required oninput="document.getElementById('theme_surface_picker').value = this.value">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-divider" style="margin: 2rem 0; border-top: 1px dashed var(--border);"></div>
+
+      <!-- Site Başlıkları & Logolar -->
+      <div class="form-section">
+        <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Logo & Markalama</h3>
+        <p class="form-hint" style="margin-bottom: 1.5rem;">Sitenin sol üstündeki logo alanını ve tarayıcı başlığını düzenleyebilirsiniz.</p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+          <div class="form-group">
+            <label for="site_logo_emblem" class="form-label">Logo Amblemi</label>
+            <input type="text" id="site_logo_emblem" name="site_logo_emblem" class="form-input" value="<%= settings.site_logo_emblem %>" required maxlength="5" placeholder="A">
+          </div>
+          
+          <div class="form-group">
+            <label for="site_logo_text" class="form-label">Logo Ana Metni</label>
+            <input type="text" id="site_logo_text" name="site_logo_text" class="form-input" value="<%= settings.site_logo_text %>" required placeholder="AIESEC">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+          <div class="form-group">
+            <label for="site_logo_sub" class="form-label">Logo Alt Metni</label>
+            <input type="text" id="site_logo_sub" name="site_logo_sub" class="form-input" value="<%= settings.site_logo_sub %>" required placeholder="İstanbul">
+          </div>
+
+          <div class="form-group">
+            <label for="site_title" class="form-label">Varsayılan Site Başlığı</label>
+            <input type="text" id="site_title" name="site_title" class="form-input" value="<%= settings.site_title %>" required placeholder="AIESEC İstanbul Alumni Archive">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-divider" style="margin: 2rem 0; border-top: 1px dashed var(--border);"></div>
+
+      <!-- Alt Bilgi (Footer) -->
+      <div class="form-section" style="margin-bottom: 2rem;">
+        <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Alt Bilgi (Footer) Metni</h3>
+        <p class="form-hint" style="margin-bottom: 1.5rem;">Sayfa altındaki imza / yapımcı bilgisini özelleştirin.</p>
+        
+        <div class="form-group">
+          <label for="footer_credit" class="form-label">Footer İmzası</label>
+          <input type="text" id="footer_credit" name="footer_credit" class="form-input" value="<%= settings.footer_credit %>" required placeholder="Geçmiş liderlik deneyimlerini onurlandırmak için 26.27 LCVP F&L Elif Kurnaz tarafından yapıldı.">
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">Ayarları Kaydet ve Uygula</button>
+    </form>
+
+  </div>
+</section>
+
+<%- include('../layout/footer') %>

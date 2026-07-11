@@ -7,12 +7,12 @@
       <!-- Brand -->
       <div class="footer-brand">
         <div class="footer-logo">
-          <div class="logo-emblem logo-emblem-sm">A</div>
-          <span><strong>AIESEC</strong> İstanbul</span>
+          <div class="logo-emblem logo-emblem-sm"><%= siteSettings.site_logo_emblem || 'A' %></div>
+          <span><strong><%= siteSettings.site_logo_text || 'AIESEC' %></strong> <%= siteSettings.site_logo_sub || 'İstanbul' %></span>
         </div>
         <p class="footer-tagline">Liderlik deneyimini paylaş,<br />geleceği birlikte inşa et.</p>
       </div>
-
+      
       <!-- Quick Links -->
       <div class="footer-col">
         <h4 class="footer-heading">Hızlı Erişim</h4>
@@ -28,7 +28,10 @@
         <h4 class="footer-heading">Hesap</h4>
         <ul class="footer-links">
           <% if (currentUser) { %>
-            <% if (isAdmin) { %><li><a href="/admin">Admin Paneli</a></li><% } %>
+            <% if (isAdmin) { %>
+              <li><a href="/admin">Admin Paneli</a></li>
+              <li><a href="/admin/settings" style="color: var(--primary);">Site Ayarları ⚙️</a></li>
+            <% } %>
             <li><a href="/auth/logout">Çıkış Yap</a></li>
           <% } else { %>
             <li><a href="/auth/register">Kayıt Ol</a></li>
@@ -48,8 +51,8 @@
     </div>
 
     <div class="footer-bottom">
-      <p>&copy; <%= new Date().getFullYear() %> AIESEC İstanbul Alumni Archive. Tüm hakları saklıdır.</p>
-      <p class="footer-sub" style="color: #ffffff; text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);">Geçmiş liderlik deneyimlerini onurlandırmak için <strong>26.27 LCVP F&L Elif Kurnaz</strong> tarafından yapıldı.</p>
+      <p>&copy; <%= new Date().getFullYear() %> <%= siteSettings.site_logo_text || 'AIESEC' %> <%= siteSettings.site_logo_sub || 'İstanbul' %> Alumni Archive. Tüm hakları saklıdır.</p>
+      <p class="footer-sub" style="color: #ffffff; text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);"><%= siteSettings.footer_credit || 'Geçmiş liderlik deneyimlerini onurlandırmak için 26.27 LCVP F&L Elif Kurnaz tarafından yapıldı.' %></p>
     </div>
   </div>
 </footer>

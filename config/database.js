@@ -118,6 +118,34 @@ async function initDB() {
     )
   `;
 
+  // Site settings table
+  await sql`
+    CREATE TABLE IF NOT EXISTS site_settings (
+      key         VARCHAR(100) PRIMARY KEY,
+      value       TEXT NOT NULL,
+      updated_at  TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  // Seed default settings if empty
+  const countRes = await sql`SELECT COUNT(*) FROM site_settings`;
+  if (parseInt(countRes[0].count, 10) === 0) {
+    const defaults = [
+      { key: 'theme_primary', value: '#037ef3' },
+      { key: 'theme_secondary', value: '#0a2540' },
+      { key: 'theme_background', value: '#090d16' },
+      { key: 'theme_surface', value: '#111827' },
+      { key: 'site_title', value: 'AIESEC İstanbul Alumni Archive' },
+      { key: 'site_logo_emblem', value: 'A' },
+      { key: 'site_logo_text', value: 'AIESEC' },
+      { key: 'site_logo_sub', value: 'İstanbul' },
+      { key: 'footer_credit', value: 'Geçmiş liderlik deneyimlerini onurlandırmak için 26.27 LCVP F&L Elif Kurnaz tarafından yapıldı.' }
+    ];
+    for (const d of defaults) {
+      await sql`INSERT INTO site_settings (key, value) VALUES (${d.key}, ${d.value})`;
+    }
+  }
+
   console.log('✅ Veritabanı tabloları hazır.');
 }
 

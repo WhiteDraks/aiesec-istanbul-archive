@@ -55,18 +55,26 @@ const isAdmin = (req, res, next) => {
   return res.status(403).redirect('/');
 };
 
+const SiteSetting = require('../models/SiteSetting');
+
 /**
  * setLocals - Sets res.locals for use in all EJS templates.
  * Must be applied globally in server.js AFTER the flash middleware.
  */
-const setLocals = (req, res, next) => {
+const setLocals = async (req, res, next) => {
   res.locals.currentUser = req.session.user || null;
   res.locals.isAdmin = req.session.user?.role === 'admin';
   res.locals.isApproved =
     req.session.user?.status === 'approved' ||
     req.session.user?.role === 'admin';
-  // Note: flash messages (res.locals.success / res.locals.error)
-  // are set by the flash middleware in server.js
+  
+  try {
+    res.locals.siteSettings = await SiteSetting.getAll();
+  } catch (err) {
+    console.error('Failed to load site settings:', err);
+    res.locals.siteSettings = {};
+  }
+  
   next();
 };
 

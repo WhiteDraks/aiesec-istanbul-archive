@@ -154,4 +154,43 @@ router.post('/reset/:id', async (req, res) => {
   res.redirect('/admin');
 });
 
+// GET /admin/settings - Site Ayarları Düzenleme Paneli
+const SiteSetting = require('../models/SiteSetting');
+router.get('/settings', async (req, res) => {
+  try {
+    const settings = await SiteSetting.getAll();
+    res.render('admin/settings', {
+      title: 'Site Ayarları - Admin Paneli',
+      settings,
+    });
+  } catch (err) {
+    console.error('Failed to load settings view:', err);
+    req.flash('error', 'Ayarlar yüklenirken bir hata oluştu.');
+    res.redirect('/admin');
+  }
+});
+
+// POST /admin/settings - Site Ayarları Kaydetme
+router.post('/settings', async (req, res) => {
+  try {
+    const fields = [
+      'theme_primary', 'theme_secondary', 'theme_background', 'theme_surface',
+      'site_title', 'site_logo_emblem', 'site_logo_text', 'site_logo_sub', 'footer_credit'
+    ];
+
+    for (const field of fields) {
+      if (req.body[field] !== undefined) {
+        await SiteSetting.update(field, req.body[field].trim());
+      }
+    }
+
+    req.flash('success', 'Site ayarları başarıyla güncellendi.');
+    res.redirect('/admin/settings');
+  } catch (err) {
+    console.error('Failed to save settings:', err);
+    req.flash('error', 'Ayarlar kaydedilirken bir hata oluştu.');
+    res.redirect('/admin/settings');
+  }
+});
+
 module.exports = router;

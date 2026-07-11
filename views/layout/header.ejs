@@ -14,8 +14,18 @@
   <!-- Main Stylesheet -->
   <link rel="stylesheet" href="/css/style.css" />
 
+  <!-- Dynamic Theme Settings -->
+  <style>
+    :root {
+      <% if (siteSettings.theme_primary) { %>--primary: <%= siteSettings.theme_primary %>; --primary-hover: <%= siteSettings.theme_primary %>ee;<% } %>
+      <% if (siteSettings.theme_background) { %>--background: <%= siteSettings.theme_background %>;<% } %>
+      <% if (siteSettings.theme_surface) { %>--surface: <%= siteSettings.theme_surface %>;<% } %>
+      <% if (siteSettings.theme_secondary) { %>--secondary: <%= siteSettings.theme_secondary %>;<% } %>
+    }
+  </style>
+
   <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+  <link class="favicon-icon" rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
 </head>
 <body>
 
@@ -24,10 +34,10 @@
   <div class="container nav-inner">
     <!-- Logo -->
     <a href="/" class="nav-logo" id="nav-logo">
-      <div class="logo-emblem">A</div>
+      <div class="logo-emblem"><%= siteSettings.site_logo_emblem || 'A' %></div>
       <span class="logo-text">
-        <strong>AIESEC</strong> İstanbul
-        <small>Alumni Archive</small>
+        <strong><%= siteSettings.site_logo_text || 'AIESEC' %></strong> <%= siteSettings.site_logo_sub || 'İstanbul' %>
+        <small><%= title || siteSettings.site_title || 'Alumni Archive' %></small>
       </span>
     </a>
 
