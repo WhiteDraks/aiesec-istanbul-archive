@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const EBTeam = require('../models/EBTeam');
+const Memory = require('../models/Memory');
+const upload = require('../middleware/upload');
+const { uploadToBlob } = require('../utils/blob');
 const { getSQL } = require('../config/database');
 const { isLoggedIn, isApproved } = require('../middleware/auth');
 
@@ -57,6 +60,7 @@ router.get('/', async (req, res) => {
 /**
  * GET /eb/:year
  * Shows all approved users who listed this year in their roles_history.
+ * Also shows memories uploaded by approved members.
  * Requires login + approval.
  */
 router.get('/:year', isLoggedIn, isApproved, async (req, res) => {
@@ -102,6 +106,9 @@ router.get('/:year', isLoggedIn, isApproved, async (req, res) => {
     const teamMetas = await EBTeam.findAll();
     const meta = teamMetas.find(t => t.year === year) || null;
 
+    // Get memories for this period
+    const memories = await Memory.findByYear(year);
+
     const team = {
       year,
       title: meta?.title || `${year} Executive Board`,
@@ -122,11 +129,67 @@ router.get('/:year', isLoggedIn, isApproved, async (req, res) => {
       title: `${team.title} - AIESEC İstanbul`,
       team,
       members,
+      memories,
     });
   } catch (err) {
     console.error(err);
     req.flash('error', 'Sayfa yüklenirken bir hata oluştu.');
     res.redirect('/eb');
+  }
+});
+
+/**
+ * POST /eb/:year/memories
+ * Uploads a memory photo for the given EB year.
+ * Requires login + approval.
+ */
+router.post('/:year/memories', isLoggedIn, isApproved, upload.single('photo'), async (req, res) => {
+  try {
+    const { year } = req.params;
+    const { caption } = req.body;
+
+    if (!req.file) {
+      req.flash('error', 'Lütfen bir fotoğraf seçin.');
+      return res.redirect(`/eb/${encodeURIComponent(year)}`);
+    }
+
+    // Upload to Vercel Blob
+    const photoUrl = await uploadToBlob(req.file.buffer, req.file.originalname, `memories/${year}/`);
+
+    // Create memory entry
+    await Memory.create({
+      team_year: year,
+      user_id: req.session.userId,
+      photo_url: photoUrl,
+      caption: caption ? caption.trim() : '',
+    });
+
+    req.flash('success', 'Anınız başarıyla eklendi!');
+    res.redirect(`/eb/${encodeURIComponent(year)}`);
+  } catch (err) {
+    console.error('Failed to upload memory:', err);
+    req.flash('error', 'Anı eklenirken bir hata oluştu.');
+    res.redirect(`/eb/${encodeURIComponent(req.params.year)}`);
+  }
+});
+
+/**
+ * POST /eb/:year/memories/:id/delete
+ * Deletes a memory. Only the owner or an admin can delete.
+ */
+router.post('/:year/memories/:id/delete', isLoggedIn, isApproved, async (req, res) => {
+  try {
+    const { year, id } = req.params;
+    const is_admin = req.session.user?.role === 'admin';
+
+    await Memory.delete(id, req.session.userId, is_admin);
+
+    req.flash('success', 'Anı başarıyla silindi.');
+    res.redirect(`/eb/${encodeURIComponent(year)}`);
+  } catch (err) {
+    console.error('Failed to delete memory:', err);
+    req.flash('error', 'Anı silinirken bir hata oluştu.');
+    res.redirect(`/eb/${encodeURIComponent(req.params.year)}`);
   }
 });
 

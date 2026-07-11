@@ -16,20 +16,16 @@ async function uploadToBlob(buffer, originalName, prefix = 'uploads/') {
   const uniqueId = crypto.randomBytes(8).toString('hex');
   const filename = `${prefix}${uniqueId}${ext}`;
 
-  // Check if BLOB_READ_WRITE_TOKEN is available
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    console.warn('⚠️ BLOB_READ_WRITE_TOKEN is not set. Saving to memory only (this will disappear!).');
-    // If running locally without blob token, just return a placeholder or handle locally
-    // Since we must return a URL, we will just return a placeholder.
+  const token = process.env.AIESEC_BLOB_TOKEN || process.env.BLOB_READ_WRITE_TOKEN;
+
+  if (!token) {
+    console.warn('⚠️ No blob token set. Saving to memory only.');
     return `/images/default-avatar.svg?error=no-blob-token`;
   }
 
-  // Pass the token explicitly: this project has a second (private) Blob
-  // store connected whose OIDC binding otherwise takes priority over
-  // BLOB_READ_WRITE_TOKEN, routing uploads to the wrong store.
   const result = await put(filename, buffer, {
     access: 'public',
-    token: process.env.BLOB_READ_WRITE_TOKEN,
+    token: token,
   });
 
   return result.url;

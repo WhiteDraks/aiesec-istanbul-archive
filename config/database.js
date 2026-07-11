@@ -106,6 +106,18 @@ async function initDB() {
   // Gallery images for EB teams
   await sql`ALTER TABLE eb_teams ADD COLUMN IF NOT EXISTS gallery_images TEXT[] DEFAULT '{}'`;
 
+  // EB Memories table (added by users)
+  await sql`
+    CREATE TABLE IF NOT EXISTS eb_memories (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      team_year   VARCHAR(20)   NOT NULL,
+      user_id     UUID          REFERENCES users(id) ON DELETE CASCADE,
+      photo_url   VARCHAR(500)  NOT NULL,
+      caption     VARCHAR(255),
+      created_at  TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+    )
+  `;
+
   console.log('✅ Veritabanı tabloları hazır.');
 }
 
