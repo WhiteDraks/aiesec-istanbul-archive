@@ -31,11 +31,13 @@ router.get('/', async (req, res) => {
 // POST /profile - Profili güncelleme
 router.post('/', upload.single('photo'), async (req, res) => {
   try {
-    const { name, school, department, linkedin, workplaces, sector, phone, aiesec_journey, role_years, role_titles } = req.body;
+    const { name, school, department, linkedin, workplaces, sector, phone, aiesec_journey, role_years, role_titles, remove_photo } = req.body;
     let photoUrl = null;
 
-    // Fotoğraf yüklendiyse Vercel Blob'a gönder
-    if (req.file) {
+    // Fotoğraf temizlendiyse veya yüklendiyse
+    if (remove_photo === 'true') {
+      photoUrl = '/images/default-avatar.svg';
+    } else if (req.file) {
       photoUrl = await uploadToBlob(req.file.buffer, req.file.originalname, 'avatars/');
     }
 

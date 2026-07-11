@@ -15,11 +15,18 @@
           <img src="<%= user.photo || '/images/default-avatar.svg' %>" alt="<%= user.name %>" id="photo-preview">
         </div>
         <div class="profile-photo-actions">
-          <label for="photo" class="btn btn-secondary">
-            Fotoğraf Seç
-          </label>
-          <input type="file" id="photo" name="photo" accept="image/*" style="display: none;" onchange="previewImage(event)">
-          <p class="form-hint">Maksimum 5MB. JPG, PNG veya WebP.</p>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <label for="photo" class="btn btn-secondary" style="margin-bottom: 0; cursor: pointer;">
+              Fotoğraf Seç
+            </label>
+            <input type="file" id="photo" name="photo" accept="image/*" style="display: none;" onchange="previewImage(event)">
+            
+            <button type="button" class="btn btn-outline btn-sm" id="btn-remove-photo" onclick="triggerRemovePhoto()" style="color: #ff4d4f; border-color: #ff4d4f; padding: 0.4rem 0.8rem; font-size: 0.85rem; display: <%= user.photo && user.photo !== '/images/default-avatar.svg' ? 'inline-block' : 'none' %>;">
+              Fotoğrafı Kaldır
+            </button>
+          </div>
+          <input type="hidden" name="remove_photo" id="remove-photo-input" value="false">
+          <p class="form-hint" style="margin-top: 0.5rem;">Maksimum 5MB. JPG, PNG veya WebP.</p>
         </div>
       </div>
 
@@ -200,8 +207,19 @@ function previewImage(event) {
     const reader = new FileReader();
     reader.onload = function(e) {
       document.getElementById('photo-preview').src = e.target.result;
+      document.getElementById('remove-photo-input').value = 'false';
+      document.getElementById('btn-remove-photo').style.display = 'inline-block';
     }
     reader.readAsDataURL(file);
+  }
+}
+
+function triggerRemovePhoto() {
+  if (confirm('Profil fotoğrafınızı kaldırmak istediğinizden emin misiniz?')) {
+    document.getElementById('photo-preview').src = '/images/default-avatar.svg';
+    document.getElementById('remove-photo-input').value = 'true';
+    document.getElementById('photo').value = ''; // clear any selected file
+    document.getElementById('btn-remove-photo').style.display = 'none';
   }
 }
 
