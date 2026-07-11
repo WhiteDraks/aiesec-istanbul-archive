@@ -70,14 +70,17 @@ const User = {
     `;
   },
 
-  async create({ name, email, password, role = 'user', status = 'pending', school = '', eb_year = '' }) {
+  async create({ name, email, password, role = 'user', status = 'pending', school = '', eb_year = '', eb_role = '' }) {
     const sql = getSQL();
     const salt = await bcrypt.genSalt(12);
     const hashed = await bcrypt.hash(password, salt);
+    // Kayıt sırasında girilen EB dönemi, kullanıcıyı otomatik olarak o dönemin
+    // EB takımına ekler (EB üyeliği roles_history üzerinden türetiliyor, bkz. routes/eb.js).
+    const roles_history = eb_year ? [{ year: eb_year, role: eb_role || '' }] : [];
     const rows = await sql`
-      INSERT INTO users (name, email, password, role, status, school, eb_year)
-      VALUES (${name.trim()}, ${email.toLowerCase().trim()}, ${hashed}, ${role}, ${status}, ${school || null}, ${eb_year || null})
-      RETURNING id, name, email, role, status, school, eb_year, created_at
+      INSERT INTO users (name, email, password, role, status, school, eb_year, roles_history)
+      VALUES (${name.trim()}, ${email.toLowerCase().trim()}, ${hashed}, ${role}, ${status}, ${school || null}, ${eb_year || null}, ${JSON.stringify(roles_history)}::jsonb)
+      RETURNING id, name, email, role, status, school, eb_year, roles_history, created_at
     `;
     return rows[0];
   },

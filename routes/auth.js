@@ -15,7 +15,7 @@ router.get('/register', (req, res) => {
 router.post('/register', async (req, res) => {
   if (req.session.userId) return res.redirect('/');
 
-  const { name, email, password, passwordConfirm, school, ebYear, kvkk } = req.body;
+  const { name, email, password, passwordConfirm, school, ebYear, ebRole, kvkk } = req.body;
 
   // Validation
   const errors = [];
@@ -29,7 +29,7 @@ router.post('/register', async (req, res) => {
     return res.render('auth/register', {
       title: 'Kayıt Ol - AIESEC İstanbul',
       errors,
-      formData: { name, email, school, ebYear },
+      formData: { name, email, school, ebYear, ebRole },
     });
   }
 
@@ -40,7 +40,7 @@ router.post('/register', async (req, res) => {
       return res.render('auth/register', {
         title: 'Kayıt Ol - AIESEC İstanbul',
         errors: ['Bu e-posta adresi zaten kayıtlıdır.'],
-        formData: { name, email, school, ebYear },
+        formData: { name, email, school, ebYear, ebRole },
       });
     }
 
@@ -50,6 +50,7 @@ router.post('/register', async (req, res) => {
       password,
       school: school ? school.trim() : '',
       eb_year: ebYear ? ebYear.trim() : '',
+      eb_role: ebRole ? ebRole.trim() : '',
       status: 'pending',
       role: 'user',
     });
@@ -61,7 +62,7 @@ router.post('/register', async (req, res) => {
     res.render('auth/register', {
       title: 'Kayıt Ol - AIESEC İstanbul',
       errors: ['Bir hata oluştu. Lütfen tekrar deneyin.'],
-      formData: { name, email, school, ebYear },
+      formData: { name, email, school, ebYear, ebRole },
     });
   }
 });
