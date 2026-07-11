@@ -1,0 +1,52 @@
+<%- include('../layout/header') %>
+
+<main class="page-container">
+  <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <h1 class="page-title">EB Yönetimi</h1>
+      <p class="page-subtitle">EB takımlarını, başarılarını ve fotoğraflarını yönetin.</p>
+    </div>
+    <a href="/admin" class="btn btn-outline">← Admin Paneline Dön</a>
+  </div>
+
+  <div class="admin-grid" style="grid-template-columns: 1fr;">
+    <div class="admin-card">
+      <h3 class="admin-card-title">Mevcut EB Takımları</h3>
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Dönem</th>
+              <th>Takım Adı</th>
+              <th>Durum</th>
+              <th>Galeri Görseli</th>
+              <th>İşlemler</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% teams.forEach(team => { %>
+              <tr>
+                <td><strong><%= team.year %></strong></td>
+                <td><%= team.title %></td>
+                <td>
+                  <span class="status-badge <%= team.is_public ? 'status-approved' : 'status-pending' %>">
+                    <%= team.is_public ? 'Yayında' : 'Gizli' %>
+                  </span>
+                </td>
+                <td><%= team.gallery_images ? team.gallery_images.length : 0 %> Fotoğraf</td>
+                <td>
+                  <a href="/admin/eb/<%= team.id %>/edit" class="btn btn-sm btn-outline">Düzenle</a>
+                </td>
+              </tr>
+            <% }) %>
+            <% if (teams.length === 0) { %>
+              <tr><td colspan="5" style="text-align: center;">Kayıtlı EB takımı yok.</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../layout/footer') %>

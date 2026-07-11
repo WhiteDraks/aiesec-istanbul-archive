@@ -1,0 +1,62 @@
+<%- include('../layout/header') %>
+
+<main class="page-container">
+  <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <h1 class="page-title"><%= team.year %> Düzenle</h1>
+      <p class="page-subtitle">Takım başarılarını ve galerisini yönetin.</p>
+    </div>
+    <a href="/admin/eb" class="btn btn-outline">← Geri</a>
+  </div>
+
+  <div class="admin-grid" style="grid-template-columns: 1fr 1fr; gap: 2rem;">
+    <!-- Bilgiler ve Başarılar -->
+    <div class="admin-card">
+      <h3 class="admin-card-title">Takım Bilgileri</h3>
+      <form action="/admin/eb/<%= team.id %>/edit" method="POST">
+        <div class="form-group">
+          <label class="form-label">Dönem (Örn: 26.27)</label>
+          <input type="text" name="year" class="form-input" value="<%= team.year %>" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Takım Adı / Sloganı</label>
+          <input type="text" name="title" class="form-input" value="<%= team.title %>" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kısa Açıklama</label>
+          <textarea name="description" class="form-input" rows="3"><%= team.description %></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Dönem Başarıları (Her satıra bir başarı yazın)</label>
+          <textarea name="achievements" class="form-input" rows="6" placeholder="- 1500 değişim hedefine ulaşıldı.&#10;- Finansal rekor kırıldı."><%= team.achievements ? team.achievements.join('\n') : '' %></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Bilgileri Güncelle</button>
+      </form>
+    </div>
+
+    <!-- Galeri Yönetimi -->
+    <div class="admin-card">
+      <h3 class="admin-card-title">Galeri Fotoğrafları</h3>
+      <form action="/admin/eb/<%= team.id %>/gallery" method="POST" enctype="multipart/form-data" style="margin-bottom: 2rem;">
+        <div class="form-group">
+          <label class="form-label">Yeni Fotoğraflar Ekle (Çoklu Seçim)</label>
+          <input type="file" name="photos" class="form-input" accept="image/*" multiple required>
+        </div>
+        <button type="submit" class="btn btn-secondary btn-block">Galeriye Yükle</button>
+      </form>
+
+      <h4 style="margin-bottom: 1rem;">Mevcut Fotoğraflar (<%= team.gallery_images ? team.gallery_images.length : 0 %>)</h4>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+        <% if (team.gallery_images && team.gallery_images.length > 0) { %>
+          <% team.gallery_images.forEach(img => { %>
+            <img src="<%= img %>" alt="Gallery image" style="width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px;">
+          <% }) %>
+        <% } else { %>
+          <p class="text-muted" style="grid-column: span 3;">Henüz fotoğraf yüklenmemiş.</p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../layout/footer') %>

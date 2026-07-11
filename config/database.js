@@ -101,6 +101,10 @@ async function initDB() {
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS sector VARCHAR(100)`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(50)`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS aiesec_journey TEXT`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS roles_history JSONB DEFAULT '[]'::jsonb`;
+
+  // Gallery images for EB teams
+  await sql`ALTER TABLE eb_teams ADD COLUMN IF NOT EXISTS gallery_images TEXT[] DEFAULT '{}'`;
 
   console.log('✅ Veritabanı tabloları hazır.');
 }

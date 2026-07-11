@@ -84,6 +84,7 @@ app.use('/',      require('./routes/index'));
 app.use('/auth',  require('./routes/auth'));
 app.use('/eb',    require('./routes/eb'));
 app.use('/admin', require('./routes/admin'));
+app.use('/admin/eb', require('./routes/admin-eb'));
 app.use('/profile', require('./routes/profile'));
 app.use('/alumni',  require('./routes/alumni'));
 

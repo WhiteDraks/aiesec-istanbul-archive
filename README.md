@@ -1,136 +1,68 @@
 # AIESEC İstanbul Alumni Archive
 
-AIESEC İstanbul Executive Board arşiv web sitesi. Geçmiş EB dönemlerini, üyelerini, görevlerini ve hikayelerini sergiliyor.
+AIESEC İstanbul mezunlarının (Alumni) geçmiş dönem yürütme kurullarını (Executive Board), mezunların nerede çalıştıklarını ve AIESEC geçmişlerini görebilecekleri, birbirleriyle etkileşimde bulunabilecekleri kapsamlı bir arşiv ve ağ uygulaması.
 
-## 🚀 Hızlı Başlangıç
+## 🚀 Teknolojiler (Tech Stack)
+*   **Backend:** Node.js, Express.js
+*   **Frontend:** Vanilla JS, HTML, CSS (EJS Template Engine)
+*   **Veritabanı:** PostgreSQL (Neon Serverless Postgres)
+*   **Dosya Depolama:** Vercel Blob (Fotoğraf ve galeri yüklemeleri için)
+*   **E-posta Servisi:** Resend (Onaylanan kullanıcılara otomatik e-posta gönderimi)
+*   **Oturum Yönetimi:** `express-session` & `connect-pg-simple`
+*   **Deploy (Sunucu):** Vercel Serverless Functions
 
-### 1. Bağımlılıkları Yükle
-```bash
-npm install
-```
+## 🌟 Özellikler
+1.  **Gelişmiş Profil Yönetimi:** Mezunlar kendi hesaplarını oluşturup fotoğraf, güncel iş yeri, sektör, LinkedIn adresi ve geçmişte aldıkları AIESEC rollerini (Çoklu Rol Desteği: 26.27 LCP, 25.26 LCVP vb.) ekleyebilirler.
+2.  **EB (Executive Board) Takımları:** Geçmiş dönem yürütme kurullarının listesi.
+    *   Yönetim panelinden EB takımlarının isimleri, açıklamaları ve **Dönem Başarıları** eklenebilir.
+    *   **EB Galerisi:** Her döneme ait grup veya anı fotoğrafları çoklu olarak eklenebilir.
+    *   Eğer EB takımı listesindeki bir kişi sisteme onaylı üye olarak kaydolmuşsa, sistem otomatik olarak o kişinin kendi yüklediği güncel profil fotoğrafını takımdaki yerine çeker.
+3.  **Alumni Rehberi (Dizin):** Sadece "Admin" tarafından onaylanmış üyeler diğer mezunları görebilir. Bu sayede AIESEC ağı korunur.
+    *   Kişiler güncel çalıştıkları "Sektör" bilgisine göre (Örn: Finans, Teknoloji, Pazarlama) filtrelenebilir.
+4.  **Admin Paneli:**
+    *   Yeni kayıt olan üyeleri onaylama, reddetme, tekrar beklemeye alma işlemleri.
+    *   Onaylanan üyelere otomatik **Hoş Geldin & Onay e-postası** gönderimi (Resend API).
+    *   EB takımlarını, dönem başarılarını ve EB galerisini yönetme paneli.
+5.  **KVKK ve Veri Güvenliği:** Kayıt esnasında Türkiye normlarına uygun zorunlu KVKK metni onayı. Şifreler `bcrypt` ile hashlenerek veritabanında tutulur.
 
-### 2. Environment Variables
-`.env.example` dosyasını `.env` olarak kopyala:
-```bash
-cp .env.example .env
-```
+## ⚙️ Kurulum ve Geliştirme Ortamı
 
-`.env` içeriği:
-```env
-POSTGRES_URL=postgres://user:password@host.neon.tech/dbname?sslmode=require
-SESSION_SECRET=uzun-ve-gizli-bir-anahtar-buraya
-PORT=3000
-NODE_ENV=development
-```
+Yerel makinenizde çalıştırmak veya başka bir AI asistanına projeyi devretmek için:
 
-### 3. Veritabanı — Vercel Postgres (Neon)
+1.  Repoyu klonlayın ve klasöre gidin:
+    ```bash
+    git clone https://github.com/WhiteDraks/aiesec-istanbul-archive.git
+    cd aiesec-istanbul-archive
+    ```
 
-**Vercel Dashboard üzerinden:**
-1. [vercel.com](https://vercel.com) → Projen → **Storage** sekmesi
-2. **Create Database** → **Postgres (Neon)** → Free tier seç
-3. Oluşturunca `.env.local` sekmesindeki `POSTGRES_URL` değerini kopyala
-4. `.env` dosyana yapıştır
+2.  Gereksinimleri yükleyin:
+    ```bash
+    npm install
+    ```
 
-**Veya Neon üzerinden doğrudan:**
-1. [neon.tech](https://neon.tech) → Free hesap
-2. New Project → Connection string (pooled) kopyala
+3.  `.env` dosyasını oluşturun ve aşağıdaki değişkenleri tanımlayın:
+    ```ini
+    # Veritabanı
+    DATABASE_URL="postgresql://kullanici:sifre@host/veritabani?sslmode=require"
+    
+    # Session (Herhangi gizli bir kelime olabilir)
+    SESSION_SECRET="super-gizli-aiesec-sifre"
 
-### 4. Demo Verileri Yükle
-```bash
-npm run seed
-```
-Bu komut:
-- Tüm tabloları oluşturur (users, eb_teams, eb_members, session)
-- Admin hesabı: `admin@aiesec-istanbul.com` / `Admin1234!`
-- 3 EB takımı (2022-23, 2024-25, 2026-27)
-- 2026-27 için 8 demo üye (Elif Kurnaz en sonda)
+    # Vercel Blob (Fotoğraflar için)
+    BLOB_READ_WRITE_TOKEN="vercel_blob_rw_12345abcde..."
 
-### 5. Uygulamayı Başlat
-```bash
-npm run dev    # geliştirme (nodemon)
-npm start      # production
-```
-→ http://localhost:3000
+    # Resend API (Otomatik Mail için)
+    RESEND_API_KEY="re_12345abcde..."
+    ```
 
----
+4.  Projeyi ayağa kaldırın:
+    ```bash
+    npm run dev
+    ```
 
-## 🏗 Proje Yapısı
+5.  Proje `http://localhost:3000` adresinde çalışacaktır. Veritabanı tabloları sunucu ilk çalıştığında otomatik olarak yaratılır.
 
-```
-├── server.js              # Express uygulama
-├── vercel.json            # Vercel deployment config
-├── config/
-│   └── database.js        # Mongoose serverless bağlantı
-├── models/
-│   ├── User.js            # Kullanıcı modeli
-│   ├── EBTeam.js          # EB takım modeli
-│   └── EBMember.js        # EB üyesi modeli
-├── routes/
-│   ├── index.js           # Ana sayfa
-│   ├── auth.js            # Kayıt/Giriş/Çıkış
-│   ├── eb.js              # EB sayfaları
-│   └── admin.js           # Admin paneli
-├── middleware/
-│   └── auth.js            # Auth middleware
-├── views/                 # EJS şablonları
-│   ├── layout/            # Header & Footer
-│   ├── eb/                # EB sayfaları
-│   ├── auth/              # Kayıt & Giriş
-│   └── admin/             # Admin paneli
-├── public/
-│   ├── css/style.css      # Tüm CSS
-│   ├── js/main.js         # Client-side JS
-│   └── images/            # Görseller
-└── seeds/seed.js          # Demo veriler
-```
-
----
-
-## 🌐 Vercel'e Deploy
-
-### 1. GitHub'a Push
-```bash
-git init
-git add .
-git commit -m "feat: AIESEC İstanbul Alumni Archive ilk sürüm"
-git remote add origin https://github.com/KULLANICI_ADI/aiesec-istanbul-archive.git
-git push -u origin main
-```
-
-### 2. Vercel'e Bağlan
-1. [vercel.com](https://vercel.com) → New Project
-2. GitHub reposunu seç
-3. **Environment Variables** ekle:
-   - `POSTGRES_URL` → Neon connection string
-   - `SESSION_SECRET` → Güçlü rastgele bir string
-   - `NODE_ENV` → `production`
-4. Deploy!
-
-### 3. Vercel Postgres (Neon) Ekle
-Vercel Dashboard → Projen → **Storage** → **Create Database** → **Postgres (Neon)** seç.
-Oluşturunca `POSTGRES_URL` otomatik olarak projenin env variables'ına eklenir.
-
----
-
-## 🔐 Kullanıcı Akışı
-
-```
-Kayıt Ol → Admin Onayı Bekle → Onay → EB Detaylarına Eriş
-```
-
-- **Herkes:** Ana sayfa, EB listesi (kart görseli + başlık)
-- **Onaylı kullanıcılar:** EB detay sayfası, üye bilgileri
-- **Admin:** Tüm içerik + kullanıcı yönetimi
-
-## 📦 Tech Stack
-
-- **Backend:** Node.js + Express
-- **Şablonlama:** EJS
-- **Veritabanı:** Vercel Postgres (Neon) — serverless SQL
-- **Auth:** express-session + connect-pg-simple
-- **Şifreleme:** bcryptjs
-- **Deploy:** Vercel (serverless)
-
----
-
-*AIESEC İstanbul Alumni Archive — Liderlik mirasını yaşatmak için* ❤️
+## 🤖 Gelecek Geliştirmeler İçin AI Notları
+*   Sistem **Vercel** ortamında çalışmak üzere tasarlandığı için dosya okuma/yazma (örn: `fs.writeFileSync`) işlemleri kalıcı değildir. Dosya yüklemeleri tamamen `multer` (memoryStorage) ile alınıp, `utils/blob.js` aracılığıyla `@vercel/blob` üzerine pushlanmaktadır.
+*   Admin rotaları `/admin` üzerinden yönetilmekte ve `isAdmin` middleware'i ile korunmaktadır.
+*   Tasarımlarda ve renk paletlerinde AIESEC'in global Blue (#037ef3) rengi kullanılmıştır. CSS yapılandırması `public/css/style.css` içerisinde native değişkenler (var(--primary)) ile kurgulanmıştır, Tailwind kullanılmamıştır.

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const { isLoggedIn, isAdmin } = require('../middleware/auth');
+const { sendApprovalEmail } = require('../utils/email');
 
 // All admin routes require login + admin role
 router.use(isLoggedIn, isAdmin);
@@ -39,7 +40,10 @@ router.get('/', async (req, res) => {
 // POST /admin/approve/:id - Kullanıcı onayla
 router.post('/approve/:id', async (req, res) => {
   try {
-    await User.updateStatus(req.params.id, 'approved', req.session.user.id);
+    const user = await User.updateStatus(req.params.id, 'approved', req.session.user.id);
+    if (user && user.email) {
+      await sendApprovalEmail(user.email, user.name);
+    }
     req.flash('success', 'Kullanıcı başarıyla onaylandı.');
   } catch (err) {
     console.error(err);

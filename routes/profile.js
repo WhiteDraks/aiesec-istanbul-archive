@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
 // POST /profile - Profili güncelleme
 router.post('/', upload.single('photo'), async (req, res) => {
   try {
-    const { name, school, department, eb_year, linkedin, workplaces, sector, phone, aiesec_journey } = req.body;
+    const { name, school, department, linkedin, workplaces, sector, phone, aiesec_journey, role_years, role_titles } = req.body;
     let photoUrl = null;
 
     // Fotoğraf yüklendiyse Vercel Blob'a gönder
@@ -39,12 +39,28 @@ router.post('/', upload.single('photo'), async (req, res) => {
       photoUrl = await uploadToBlob(req.file.buffer, req.file.originalname, 'avatars/');
     }
 
+    // Rolleri JSON objesine dönüştür
+    let roles_history = [];
+    if (role_years && role_titles) {
+      const years = Array.isArray(role_years) ? role_years : [role_years];
+      const titles = Array.isArray(role_titles) ? role_titles : [role_titles];
+      for (let i = 0; i < years.length; i++) {
+        if (years[i].trim() || titles[i].trim()) {
+          roles_history.push({ year: years[i].trim(), role: titles[i].trim() });
+        }
+      }
+    }
+
+    // Ana dönemi belirle (ilk eklenen rolü kabul edebiliriz)
+    const eb_year = roles_history.length > 0 ? roles_history[0].year : null;
+
     // Profil güncelleme objesi
     const updateData = {
       name: name?.trim(),
       school: school?.trim(),
       department: department?.trim(),
-      eb_year: eb_year?.trim(),
+      eb_year: eb_year, // geriye dönük uyumluluk
+      roles_history,
       linkedin: linkedin?.trim(),
       workplaces: workplaces?.trim(),
       sector: sector?.trim(),

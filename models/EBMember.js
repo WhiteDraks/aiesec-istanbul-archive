@@ -8,9 +8,13 @@ const EBMember = {
   async findByTeamId(teamId) {
     const sql = getSQL();
     return await sql`
-      SELECT * FROM eb_members
-      WHERE team_id = ${teamId}
-      ORDER BY is_pin_to_bottom ASC, sort_order ASC, name ASC
+      SELECT 
+        eb.*,
+        COALESCE(u.photo, eb.photo) AS photo
+      FROM eb_members eb
+      LEFT JOIN users u ON u.email = eb.email AND u.status = 'approved'
+      WHERE eb.team_id = ${teamId}
+      ORDER BY eb.is_pin_to_bottom ASC, eb.sort_order ASC, eb.name ASC
     `;
   },
 

@@ -23,7 +23,7 @@ const User = {
     const sql = getSQL();
     const rows = await sql`
       SELECT id, name, email, role, status, school, eb_year, approved_at, created_at,
-             photo, department, linkedin, workplaces, sector, phone, aiesec_journey
+             photo, department, linkedin, workplaces, sector, phone, aiesec_journey, roles_history
       FROM users WHERE id = ${id} LIMIT 1
     `;
     return rows[0] || null;
@@ -38,6 +38,7 @@ const User = {
         school = ${profileData.school || null},
         department = ${profileData.department || null},
         eb_year = ${profileData.eb_year || null},
+        roles_history = ${profileData.roles_history ? JSON.stringify(profileData.roles_history) : '[]'::jsonb},
         linkedin = ${profileData.linkedin || null},
         workplaces = ${profileData.workplaces || null},
         sector = ${profileData.sector || null},
@@ -55,14 +56,14 @@ const User = {
     const sql = getSQL();
     if (sector) {
       return await sql`
-        SELECT id, name, email, school, department, eb_year, photo, linkedin, workplaces, sector, aiesec_journey
+        SELECT id, name, email, school, department, eb_year, roles_history, photo, linkedin, workplaces, sector, aiesec_journey
         FROM users
         WHERE status = 'approved' AND sector = ${sector}
         ORDER BY name ASC
       `;
     }
     return await sql`
-      SELECT id, name, email, school, department, eb_year, photo, linkedin, workplaces, sector, aiesec_journey
+      SELECT id, name, email, school, department, eb_year, roles_history, photo, linkedin, workplaces, sector, aiesec_journey
       FROM users
       WHERE status = 'approved'
       ORDER BY name ASC
