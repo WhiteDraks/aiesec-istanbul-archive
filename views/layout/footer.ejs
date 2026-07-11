@@ -100,6 +100,116 @@
   </div>
 </footer>
 
+<!-- ── Homepage Floating Feedback Widget ── -->
+<% if (typeof currentPage !== 'undefined' && currentPage === 'home') { %>
+  <!-- Floating Button -->
+  <button id="feedback-widget-trigger" onclick="toggleFeedbackWidget()" aria-label="Geri Bildirim Gönder" style="position: fixed; bottom: 2rem; right: 2rem; width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 15px rgba(3,126,243,0.3); z-index: 9999; cursor: pointer; border: none; font-size: 1.5rem; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s;">
+    💬
+  </button>
+
+  <!-- Feedback Overlay Card -->
+  <div id="feedback-widget-card" style="position: fixed; bottom: 6rem; right: 2rem; width: 340px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 9999; overflow: hidden; display: none; flex-direction: column; font-family: inherit;">
+    <div style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02);">
+      <h4 style="margin: 0; font-size: 0.95rem; font-weight: 600; color: #fff;">Geri Bildirim Formu 💬</h4>
+      <button type="button" onclick="toggleFeedbackWidget()" style="font-size: 1.25rem; color: var(--gray-400); cursor: pointer; border: none; background: none;">&times;</button>
+    </div>
+    
+    <form id="feedback-widget-form" onsubmit="submitWidgetFeedback(event)" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+      <div id="widget-feedback-alert" style="display: none; padding: 0.75rem; border-radius: 6px; font-size: 0.8rem; font-weight: 500;"></div>
+      
+      <% if (!currentUser) { %>
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="font-size: 0.75rem; margin-bottom: 0.25rem;">Ad Soyad (Opsiyonel)</label>
+          <input type="text" name="name" class="form-input" placeholder="Adınız" style="padding: 0.5rem; font-size: 0.85rem;">
+        </div>
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="font-size: 0.75rem; margin-bottom: 0.25rem;">E-posta (Opsiyonel)</label>
+          <input type="email" name="email" class="form-input" placeholder="ornek@email.com" style="padding: 0.5rem; font-size: 0.85rem;">
+        </div>
+      <% } else { %>
+        <div style="font-size: 0.75rem; color: var(--text-muted); background: rgba(255,255,255,0.02); padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--border);">
+          <strong><%= currentUser.name %></strong> olarak gönderiyorsunuz.
+        </div>
+      <% } %>
+      
+      <div class="form-group" style="margin: 0;">
+        <label class="form-label" style="font-size: 0.75rem; margin-bottom: 0.25rem;">Mesajınız</label>
+        <textarea name="message" class="form-input" rows="4" required placeholder="Görüş ve önerilerinizi buraya yazın..." style="padding: 0.5rem; font-size: 0.85rem; resize: none;"></textarea>
+      </div>
+      
+      <button type="submit" id="widget-submit-btn" class="btn btn-primary btn-sm" style="width: 100%; padding: 0.6rem;">Gönder</button>
+    </form>
+  </div>
+
+  <script>
+  function toggleFeedbackWidget() {
+    const card = document.getElementById('feedback-widget-card');
+    const trigger = document.getElementById('feedback-widget-trigger');
+    if (!card) return;
+    
+    const isHidden = card.style.display === 'none';
+    card.style.display = isHidden ? 'flex' : 'none';
+    
+    if (isHidden) {
+      trigger.style.transform = 'scale(0.9) rotate(-15deg)';
+    } else {
+      trigger.style.transform = 'none';
+    }
+  }
+
+  async function submitWidgetFeedback(event) {
+    event.preventDefault();
+    const form = event.target;
+    const submitBtn = document.getElementById('widget-submit-btn');
+    const alertBox = document.getElementById('widget-feedback-alert');
+    
+    submitBtn.disabled = true;
+    submitBtn.innerText = 'Gönderiliyor...';
+    
+    const data = {
+      message: form.message.value
+    };
+    if (form.name) data.name = form.name.value;
+    if (form.email) data.email = form.email.value;
+    
+    try {
+      const response = await fetch('/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      
+      if (response.ok) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = 'rgba(34, 197, 94, 0.1)';
+        alertBox.style.border = '1px solid var(--green-500)';
+        alertBox.style.color = '#fff';
+        alertBox.innerText = 'Geri bildiriminiz için teşekkürler! ❤️';
+        form.reset();
+        
+        setTimeout(() => {
+          toggleFeedbackWidget();
+          alertBox.style.display = 'none';
+        }, 2000);
+      } else {
+        throw new Error('Submit failed');
+      }
+    } catch (err) {
+      alertBox.style.display = 'block';
+      alertBox.style.background = 'rgba(239, 68, 68, 0.1)';
+      alertBox.style.border = '1px solid var(--red-500)';
+      alertBox.style.color = '#fff';
+      alertBox.innerText = 'Geri bildirim gönderilemedi.';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerText = 'Gönder';
+    }
+  }
+  </script>
+<% } %>
+
 <!-- Main JS -->
 <script src="/js/main.js"></script>
 
