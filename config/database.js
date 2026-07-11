@@ -1,41 +1,99 @@
-const mongoose = require('mongoose');
+const { neon } = require('@neondatabase/serverless');
 
-// Serverless-safe connection caching
-// This prevents creating multiple connections on each Vercel invocation
-let cached = global.mongooseCache;
+// Neon serverless connection
+// POSTGRES_URL or DATABASE_URL env var is used automatically
+let _sql = null;
 
-if (!cached) {
-  cached = global.mongooseCache = { conn: null, promise: null };
+function getSQL() {
+  if (!_sql) {
+    const dbUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL;
+    if (!dbUrl) {
+      throw new Error('POSTGRES_URL veya DATABASE_URL environment variable bulunamadı.');
+    }
+    _sql = neon(dbUrl);
+  }
+  return _sql;
 }
 
-async function connectDB() {
-  if (cached.conn) {
-    return cached.conn;
-  }
+/**
+ * Initialize all tables if they don't exist.
+ * Called once on server startup.
+ */
+async function initDB() {
+  const sql = getSQL();
 
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-      maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
-    };
+  // Enable UUID extension
+  await sql`CREATE EXTENSION IF NOT EXISTS "pgcrypto"`;
 
-    cached.promise = mongoose
-      .connect(process.env.MONGODB_URI, opts)
-      .then((mongoose) => {
-        console.log('✅ MongoDB bağlantısı kuruldu');
-        return mongoose;
-      })
-      .catch((err) => {
-        console.error('❌ MongoDB bağlantı hatası:', err);
-        cached.promise = null;
-        throw err;
-      });
-  }
+  // Users table
+  await sql`
+    CREATE TABLE IF NOT EXISTS users (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      name        VARCHAR(100)  NOT NULL,
+      email       VARCHAR(255)  UNIQUE NOT NULL,
+      password    VARCHAR(255)  NOT NULL,
+      role        VARCHAR(20)   NOT NULL DEFAULT 'user',
+      status      VARCHAR(20)   NOT NULL DEFAULT 'pending',
+      school      VARCHAR(255),
+      eb_year     VARCHAR(50),
+      approved_at TIMESTAMPTZ,
+      approved_by UUID REFERENCES users(id),
+      created_at  TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
+      updated_at  TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+    )
+  `;
 
-  cached.conn = await cached.promise;
-  return cached.conn;
+  // EB Teams table
+  await sql`
+    CREATE TABLE IF NOT EXISTS eb_teams (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      year        VARCHAR(20)   UNIQUE NOT NULL,
+      title       VARCHAR(255)  NOT NULL,
+      slug        VARCHAR(100)  UNIQUE NOT NULL,
+      description TEXT,
+      cover_image VARCHAR(500)  DEFAULT '/images/default-cover.jpg',
+      group_photo VARCHAR(500),
+      is_public   BOOLEAN       NOT NULL DEFAULT FALSE,
+      achievements TEXT[]       DEFAULT '{}',
+      sort_order  INTEGER       NOT NULL DEFAULT 0,
+      created_at  TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  // EB Members table
+  await sql`
+    CREATE TABLE IF NOT EXISTS eb_members (
+      id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      team_id          UUID REFERENCES eb_teams(id) ON DELETE CASCADE,
+      name             VARCHAR(100)  NOT NULL,
+      role             VARCHAR(255)  NOT NULL,
+      department       VARCHAR(255),
+      school           VARCHAR(255),
+      email            VARCHAR(255),
+      linkedin         VARCHAR(500),
+      aiesec_journey   TEXT,
+      bio              TEXT,
+      photo            VARCHAR(500)  DEFAULT '/images/default-avatar.svg',
+      is_pin_to_bottom BOOLEAN       NOT NULL DEFAULT FALSE,
+      sort_order       INTEGER       NOT NULL DEFAULT 100,
+      created_at       TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  // Sessions table (for connect-pg-simple)
+  await sql`
+    CREATE TABLE IF NOT EXISTS "session" (
+      "sid"    VARCHAR NOT NULL COLLATE "default",
+      "sess"   JSON    NOT NULL,
+      "expire" TIMESTAMP(6) NOT NULL,
+      CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE
+    )
+  `;
+  await sql`
+    CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire")
+  `;
+
+  console.log('✅ Veritabanı tabloları hazır.');
 }
 
-module.exports = connectDB;
+module.exports = { getSQL, initDB };

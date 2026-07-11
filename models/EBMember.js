@@ -1,80 +1,39 @@
-const mongoose = require('mongoose');
+const { getSQL } = require('../config/database');
 
-const EBMemberSchema = new mongoose.Schema(
-  {
-    team: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'EBTeam',
-      required: true,
-    },
-    name: {
-      type: String,
-      required: [true, 'Üye adı gereklidir'],
-      trim: true,
-    },
-    role: {
-      type: String,
-      required: [true, 'Görev gereklidir'],
-      trim: true,
-      // e.g. "Local Committee President", "VP of Outgoing Global Talent"
-    },
-    department: {
-      type: String,
-      trim: true,
-      // e.g. "Outgoing Global Talent", "Marketing"
-    },
-    school: {
-      type: String,
-      trim: true,
-    },
-    email: {
-      type: String,
-      trim: true,
-      lowercase: true,
-    },
-    linkedin: {
-      type: String,
-      trim: true,
-    },
-    aiesecJourney: {
-      type: String,
-      trim: true,
-      // Short description of their AIESEC journey
-    },
-    bio: {
-      type: String,
-      trim: true,
-      // Short biography
-    },
-    photo: {
-      type: String,
-      default: '/images/default-avatar.svg',
-    },
-    // Special ordering: Elif Kurnaz always appears last
-    isPinToBottom: {
-      type: Boolean,
-      default: false,
-    },
-    order: {
-      type: Number,
-      default: 100,
-      // Lower = appears first
-    },
-    // Gallery images for this member (optional)
-    gallery: [
-      {
-        url: String,
-        caption: String,
-      },
-    ],
+const EBMember = {
+  /**
+   * Returns all members for a team.
+   * Normal members ordered by sort_order ASC first,
+   * then pinned-to-bottom members (Elif Kurnaz always last).
+   */
+  async findByTeamId(teamId) {
+    const sql = getSQL();
+    const { rows } = await sql`
+      SELECT * FROM eb_members
+      WHERE team_id = ${teamId}
+      ORDER BY is_pin_to_bottom ASC, sort_order ASC, name ASC
+    `;
+    return rows;
   },
-  {
-    timestamps: true,
-  }
-);
 
-// Compound index for efficient team+order queries
-EBMemberSchema.index({ team: 1, order: 1, isPinToBottom: 1 });
+  async create({
+    teamId, name, role, department, school, email,
+    linkedin, aiesecJourney, bio, photo, isPinToBottom, order,
+  }) {
+    const sql = getSQL();
+    const { rows } = await sql`
+      INSERT INTO eb_members
+        (team_id, name, role, department, school, email, linkedin,
+         aiesec_journey, bio, photo, is_pin_to_bottom, sort_order)
+      VALUES
+        (${teamId}, ${name}, ${role}, ${department || null}, ${school || null},
+         ${email || null}, ${linkedin || null}, ${aiesecJourney || null},
+         ${bio || null}, ${photo || '/images/default-avatar.svg'},
+         ${isPinToBottom || false}, ${order || 100})
+      RETURNING *
+    `;
+    return rows[0];
+  },
+};
 
-module.exports =
-  mongoose.models.EBMember || mongoose.model('EBMember', EBMemberSchema);
+module.exports = EBMember;

@@ -1,82 +1,75 @@
-const mongoose = require('mongoose');
+const { getSQL } = require('../config/database');
 const bcrypt = require('bcryptjs');
 
-const UserSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: [true, 'Ad Soyad gereklidir'],
-      trim: true,
-      minlength: [2, 'Ad en az 2 karakter olmalıdır'],
-      maxlength: [100, 'Ad en fazla 100 karakter olabilir'],
-    },
-    email: {
-      type: String,
-      required: [true, 'E-posta gereklidir'],
-      unique: true,
-      trim: true,
-      lowercase: true,
-      match: [/^\S+@\S+\.\S+$/, 'Geçerli bir e-posta adresi giriniz'],
-    },
-    password: {
-      type: String,
-      required: [true, 'Şifre gereklidir'],
-      minlength: [6, 'Şifre en az 6 karakter olmalıdır'],
-      select: false, // Don't return password by default
-    },
-    role: {
-      type: String,
-      enum: ['user', 'admin'],
-      default: 'user',
-    },
-    status: {
-      type: String,
-      enum: ['pending', 'approved', 'rejected'],
-      default: 'pending',
-    },
-    approvedAt: {
-      type: Date,
-    },
-    approvedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    },
-    // Optional profile info
-    school: {
-      type: String,
-      trim: true,
-    },
-    ebYear: {
-      type: String,
-      trim: true,
-    },
+const User = {
+  async findByEmail(email) {
+    const sql = getSQL();
+    const { rows } = await sql`
+      SELECT * FROM users WHERE email = ${email.toLowerCase().trim()} LIMIT 1
+    `;
+    return rows[0] || null;
   },
-  {
-    timestamps: true,
-  }
-);
 
-// Hash password before saving
-UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
-  const salt = await bcrypt.genSalt(12);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
+  async findById(id) {
+    const sql = getSQL();
+    const { rows } = await sql`
+      SELECT id, name, email, role, status, school, eb_year, approved_at, created_at
+      FROM users WHERE id = ${id} LIMIT 1
+    `;
+    return rows[0] || null;
+  },
 
-// Compare password method
-UserSchema.methods.comparePassword = async function (candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+  async create({ name, email, password, role = 'user', status = 'pending', school = '', eb_year = '' }) {
+    const sql = getSQL();
+    const salt = await bcrypt.genSalt(12);
+    const hashed = await bcrypt.hash(password, salt);
+    const { rows } = await sql`
+      INSERT INTO users (name, email, password, role, status, school, eb_year)
+      VALUES (${name.trim()}, ${email.toLowerCase().trim()}, ${hashed}, ${role}, ${status}, ${school}, ${eb_year})
+      RETURNING id, name, email, role, status, school, eb_year, created_at
+    `;
+    return rows[0];
+  },
+
+  async comparePassword(plainText, hash) {
+    return bcrypt.compare(plainText, hash);
+  },
+
+  async updateStatus(id, status, approvedBy = null) {
+    const sql = getSQL();
+    const { rows } = await sql`
+      UPDATE users
+      SET status = ${status},
+          approved_at = ${status === 'approved' ? new Date() : null},
+          approved_by = ${approvedBy},
+          updated_at  = NOW()
+      WHERE id = ${id}
+      RETURNING id, name, email, role, status
+    `;
+    return rows[0];
+  },
+
+  async delete(id) {
+    const sql = getSQL();
+    await sql`DELETE FROM users WHERE id = ${id}`;
+  },
+
+  async findAllByStatus(status) {
+    const sql = getSQL();
+    const { rows } = await sql`
+      SELECT id, name, email, role, status, school, eb_year, approved_at, created_at, updated_at
+      FROM users
+      WHERE role = 'user' AND status = ${status}
+      ORDER BY created_at DESC
+    `;
+    return rows;
+  },
+
+  async countByRole(role = 'user') {
+    const sql = getSQL();
+    const { rows } = await sql`SELECT COUNT(*) AS total FROM users WHERE role = ${role}`;
+    return parseInt(rows[0].total, 10);
+  },
 };
 
-// Virtual for display status in Turkish
-UserSchema.virtual('statusLabel').get(function () {
-  const labels = {
-    pending: 'Onay Bekliyor',
-    approved: 'Onaylı',
-    rejected: 'Reddedildi',
-  };
-  return labels[this.status] || this.status;
-});
-
-module.exports = mongoose.models.User || mongoose.model('User', UserSchema);
+module.exports = User;

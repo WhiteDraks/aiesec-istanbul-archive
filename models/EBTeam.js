@@ -1,67 +1,41 @@
-const mongoose = require('mongoose');
+const { getSQL } = require('../config/database');
 
-const EBTeamSchema = new mongoose.Schema(
-  {
-    year: {
-      type: String,
-      required: [true, 'EB yılı gereklidir'],
-      unique: true,
-      trim: true,
-      // e.g. "2026-2027"
-    },
-    title: {
-      type: String,
-      required: [true, 'EB başlığı gereklidir'],
-      trim: true,
-      // e.g. "AIESEC İstanbul 26.27 EB"
-    },
-    slug: {
-      type: String,
-      unique: true,
-      trim: true,
-      lowercase: true,
-      // e.g. "2026-2027"
-    },
-    description: {
-      type: String,
-      trim: true,
-    },
-    coverImage: {
-      type: String,
-      default: '/images/default-cover.jpg',
-    },
-    groupPhoto: {
-      type: String,
-      default: null,
-    },
-    isPublic: {
-      type: Boolean,
-      default: false,
-      // false = only approved users can view details
-    },
-    achievements: [
-      {
-        type: String,
-        trim: true,
-      },
-    ],
-    order: {
-      type: Number,
-      default: 0,
-      // Higher = shows first (newest first)
-    },
+const EBTeam = {
+  async findAll() {
+    const sql = getSQL();
+    const { rows } = await sql`
+      SELECT * FROM eb_teams ORDER BY sort_order DESC, created_at DESC
+    `;
+    return rows;
   },
-  {
-    timestamps: true,
-  }
-);
 
-// Auto-generate slug from year before save
-EBTeamSchema.pre('save', function (next) {
-  if (!this.slug) {
-    this.slug = this.year.replace(/\s+/g, '-').toLowerCase();
-  }
-  next();
-});
+  async findBySlug(slug) {
+    const sql = getSQL();
+    const { rows } = await sql`
+      SELECT * FROM eb_teams WHERE slug = ${slug} LIMIT 1
+    `;
+    return rows[0] || null;
+  },
 
-module.exports = mongoose.models.EBTeam || mongoose.model('EBTeam', EBTeamSchema);
+  async findLatest(limit = 6) {
+    const sql = getSQL();
+    const { rows } = await sql`
+      SELECT * FROM eb_teams ORDER BY sort_order DESC, created_at DESC LIMIT ${limit}
+    `;
+    return rows;
+  },
+
+  async create({ year, title, slug, description, coverImage, isPublic, achievements, order }) {
+    const sql = getSQL();
+    const { rows } = await sql`
+      INSERT INTO eb_teams (year, title, slug, description, cover_image, is_public, achievements, sort_order)
+      VALUES (${year}, ${title}, ${slug || year.replace(/\s+/g, '-').toLowerCase()},
+              ${description || ''}, ${coverImage || '/images/default-cover.jpg'},
+              ${isPublic || false}, ${achievements || []}, ${order || 0})
+      RETURNING *
+    `;
+    return rows[0];
+  },
+};
+
+module.exports = EBTeam;

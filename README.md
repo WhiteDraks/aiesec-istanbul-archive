@@ -10,43 +10,47 @@ npm install
 ```
 
 ### 2. Environment Variables
-`.env.example` dosyasını `.env` olarak kopyala ve doldur:
+`.env.example` dosyasını `.env` olarak kopyala:
 ```bash
 cp .env.example .env
 ```
 
 `.env` içeriği:
 ```env
-MONGODB_URI=mongodb+srv://<user>:<pass>@cluster0.xxxxx.mongodb.net/aiesec-istanbul
+POSTGRES_URL=postgres://user:password@host.neon.tech/dbname?sslmode=require
 SESSION_SECRET=uzun-ve-gizli-bir-anahtar-buraya
 PORT=3000
 NODE_ENV=development
 ```
 
-### 3. MongoDB Atlas Kurulumu
-1. [MongoDB Atlas](https://cloud.mongodb.com) üzerinde ücretsiz hesap aç
-2. Yeni bir **Free Cluster** oluştur
-3. **Database Access** > Yeni kullanıcı ekle
-4. **Network Access** > `0.0.0.0/0` ekle (Vercel için)
-5. **Connect** > "Connect your application" seçeneğiyle connection string al
+### 3. Veritabanı — Vercel Postgres (Neon)
+
+**Vercel Dashboard üzerinden:**
+1. [vercel.com](https://vercel.com) → Projen → **Storage** sekmesi
+2. **Create Database** → **Postgres (Neon)** → Free tier seç
+3. Oluşturunca `.env.local` sekmesindeki `POSTGRES_URL` değerini kopyala
+4. `.env` dosyana yapıştır
+
+**Veya Neon üzerinden doğrudan:**
+1. [neon.tech](https://neon.tech) → Free hesap
+2. New Project → Connection string (pooled) kopyala
 
 ### 4. Demo Verileri Yükle
 ```bash
 npm run seed
 ```
 Bu komut:
-- Admin hesabı oluşturur: `admin@aiesec-istanbul.com` / `Admin1234!`
-- 3 EB takımı ekler (2022-23, 2024-25, 2026-27)
-- 2026-27 için 8 demo üye ekler (Elif Kurnaz en sonda)
+- Tüm tabloları oluşturur (users, eb_teams, eb_members, session)
+- Admin hesabı: `admin@aiesec-istanbul.com` / `Admin1234!`
+- 3 EB takımı (2022-23, 2024-25, 2026-27)
+- 2026-27 için 8 demo üye (Elif Kurnaz en sonda)
 
 ### 5. Uygulamayı Başlat
 ```bash
-npm run dev    # geliştirme (nodemon ile)
-# veya
+npm run dev    # geliştirme (nodemon)
 npm start      # production
 ```
-
-Uygulama: http://localhost:3000
+→ http://localhost:3000
 
 ---
 
@@ -97,13 +101,14 @@ git push -u origin main
 1. [vercel.com](https://vercel.com) → New Project
 2. GitHub reposunu seç
 3. **Environment Variables** ekle:
-   - `MONGODB_URI` → Atlas connection string
+   - `POSTGRES_URL` → Neon connection string
    - `SESSION_SECRET` → Güçlü rastgele bir string
    - `NODE_ENV` → `production`
 4. Deploy!
 
-### 3. MongoDB Atlas Network Access
-Vercel'in IP'lerini whitelist etmek yerine `0.0.0.0/0` (tüm IP) izni ver.
+### 3. Vercel Postgres (Neon) Ekle
+Vercel Dashboard → Projen → **Storage** → **Create Database** → **Postgres (Neon)** seç.
+Oluşturunca `POSTGRES_URL` otomatik olarak projenin env variables'ına eklenir.
 
 ---
 
@@ -121,8 +126,8 @@ Kayıt Ol → Admin Onayı Bekle → Onay → EB Detaylarına Eriş
 
 - **Backend:** Node.js + Express
 - **Şablonlama:** EJS
-- **Veritabanı:** MongoDB + Mongoose
-- **Auth:** express-session + connect-mongo
+- **Veritabanı:** Vercel Postgres (Neon) — serverless SQL
+- **Auth:** express-session + connect-pg-simple
 - **Şifreleme:** bcryptjs
 - **Deploy:** Vercel (serverless)
 
