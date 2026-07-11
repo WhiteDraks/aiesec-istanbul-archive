@@ -64,6 +64,41 @@
             <input type="url" id="linkedin" name="linkedin" class="form-input" value="<%= user.linkedin || '' %>" placeholder="https://linkedin.com/in/...">
           </div>
         </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="city" class="form-label">Şehir</label>
+            <input type="text" id="city" name="city" class="form-input" value="<%= user.city || '' %>" placeholder="Örn: İstanbul">
+          </div>
+          <div class="form-group">
+            <label for="country" class="form-label">Ülke</label>
+            <input type="text" id="country" name="country" class="form-input" value="<%= user.country || '' %>" placeholder="Örn: Türkiye">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <!-- Mentorluk -->
+      <div class="form-section">
+        <h3>Mentorluk Programı</h3>
+        <p class="form-hint" style="margin-bottom: 1.5rem;">AIESEC ağında diğer mezunlara mentorluk yapabilir ya da mentorluk desteği talep edebilirsiniz.</p>
+        
+        <div style="display: flex; gap: 2rem; margin-bottom: 1.5rem;">
+          <label style="display: inline-flex; align-items: center; gap: 0.5rem; color: #fff; cursor: pointer;">
+            <input type="checkbox" name="is_mentor" value="true" <%= user.is_mentor ? 'checked' : '' %> style="width: 18px; height: 18px;">
+            🌟 Mentor olmak istiyorum
+          </label>
+          <label style="display: inline-flex; align-items: center; gap: 0.5rem; color: #fff; cursor: pointer;">
+            <input type="checkbox" name="is_mentee" value="true" <%= user.is_mentee ? 'checked' : '' %> style="width: 18px; height: 18px;">
+            🎓 Mentorluk desteği almak istiyorum (Mentee)
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label for="mentorship_details" class="form-label">Mentorluk Uzmanlık Alanları / Talepleriniz</label>
+          <textarea id="mentorship_details" name="mentorship_details" class="form-input" rows="3" placeholder="Örn: Pazarlama alanında kariyer, Girişimcilik, Yurt dışı stajları..."><%= user.mentorship_details || '' %></textarea>
+        </div>
       </div>
 
       <div class="form-divider"></div>

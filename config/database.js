@@ -102,9 +102,52 @@ async function initDB() {
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(50)`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS aiesec_journey TEXT`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS roles_history JSONB DEFAULT '[]'::jsonb`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS city VARCHAR(100)`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS country VARCHAR(100)`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_mentor BOOLEAN DEFAULT FALSE`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_mentee BOOLEAN DEFAULT FALSE`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS mentorship_details TEXT`;
 
   // Gallery images for EB teams
   await sql`ALTER TABLE eb_teams ADD COLUMN IF NOT EXISTS gallery_images TEXT[] DEFAULT '{}'`;
+
+  // Jobs (Kariyer İlanları) table
+  await sql`
+    CREATE TABLE IF NOT EXISTS jobs (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id     UUID REFERENCES users(id) ON DELETE CASCADE,
+      title       VARCHAR(255)  NOT NULL,
+      company     VARCHAR(255)  NOT NULL,
+      location    VARCHAR(255),
+      type        VARCHAR(100)  NOT NULL,
+      description TEXT          NOT NULL,
+      link        VARCHAR(500),
+      created_at  TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  // Events (Etkinlikler) table
+  await sql`
+    CREATE TABLE IF NOT EXISTS events (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      title       VARCHAR(255)  NOT NULL,
+      description TEXT          NOT NULL,
+      event_date  TIMESTAMPTZ   NOT NULL,
+      location    VARCHAR(255)  NOT NULL,
+      link        VARCHAR(500),
+      created_by  UUID REFERENCES users(id) ON DELETE CASCADE,
+      created_at  TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  // Event attendees junction table
+  await sql`
+    CREATE TABLE IF NOT EXISTS event_attendees (
+      event_id    UUID REFERENCES events(id) ON DELETE CASCADE,
+      user_id     UUID REFERENCES users(id) ON DELETE CASCADE,
+      PRIMARY KEY (event_id, user_id)
+    )
+  `;
 
   // EB Memories table (added by users)
   await sql`

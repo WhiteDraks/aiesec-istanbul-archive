@@ -88,6 +88,8 @@ app.use('/admin/eb', require('./routes/admin-eb'));
 app.use('/profile', require('./routes/profile'));
 app.use('/alumni',  require('./routes/alumni'));
 app.use('/feedback', require('./routes/feedback'));
+app.use('/jobs', require('./routes/jobs'));
+app.use('/events', require('./routes/events'));
 
 // ─── 404 Handler ──────────────────────────────────────────────────────────────
 app.use((req, res) => {

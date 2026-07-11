@@ -269,4 +269,25 @@ router.post('/settings/reset', async (req, res) => {
   }
 });
 
+// POST /admin/digest/trigger - Haftalık Özet Bültenini Manüel Tetikleme
+router.post('/digest/trigger', async (req, res) => {
+  try {
+    const { sendWeeklyDigest } = require('../utils/digest');
+    const result = await sendWeeklyDigest();
+    if (result.success) {
+      if (result.sent > 0) {
+        req.flash('success', `Haftalık özet bülteni başarıyla gönderildi. Toplam Gönderim: ${result.sent} üye.`);
+      } else {
+        req.flash('info', `Bülten gönderimi tetiklendi: Gönderilecek yeni içerik bulunamadı (${result.reason}).`);
+      }
+    } else {
+      req.flash('error', `Bülten gönderimi başarısız oldu: ${result.reason || 'Bilinmeyen hata'}`);
+    }
+  } catch (err) {
+    console.error('Digest manual trigger error:', err);
+    req.flash('error', 'Bülten gönderilirken sistemsel bir hata oluştu.');
+  }
+  res.redirect('/admin');
+});
+
 module.exports = router;

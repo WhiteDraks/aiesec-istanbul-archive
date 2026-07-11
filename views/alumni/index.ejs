@@ -15,31 +15,91 @@
 
 <main class="container" style="margin-top: 3rem; margin-bottom: 5rem;">
 
-  <!-- Sektör Filtreleri -->
-  <div class="alumni-filters">
-    <a href="/alumni" class="filter-btn <%= !activeSector ? 'active' : '' %>">Tümü</a>
-    <% sectors.forEach(sector => { %>
-      <a href="/alumni?sector=<%= encodeURIComponent(sector) %>" class="filter-btn <%= activeSector === sector ? 'active' : '' %>">
-        <%= sector %>
-      </a>
-    <% }) %>
-  </div>
+  <!-- Gelişmiş Filtreleme & Arama Formu -->
+  <form action="/alumni" method="GET" style="background: var(--surface); border: 1px solid var(--border); padding: 1.5rem; border-radius: 16px; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 1rem;">
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; flex-wrap: wrap;">
+      
+      <!-- Text Search -->
+      <div class="form-group" style="margin: 0;">
+        <input type="text" name="query" class="form-input" placeholder="İsim, Şirket, Okul veya Departman Ara..." value="<%= activeQuery %>" style="padding: 0.65rem 1rem;">
+      </div>
+
+      <!-- Sector Filter -->
+      <div class="form-group" style="margin: 0;">
+        <select name="sector" class="form-input" style="padding: 0.65rem 1rem;">
+          <option value="">Tüm Sektörler</option>
+          <% sectors.forEach(sector => { %>
+            <option value="<%= sector %>" <%= activeSector === sector ? 'selected' : '' %>><%= sector %></option>
+          <% }) %>
+        </select>
+      </div>
+
+      <!-- City Filter -->
+      <div class="form-group" style="margin: 0;">
+        <select name="city" class="form-input" style="padding: 0.65rem 1rem;">
+          <option value="">Tüm Şehirler</option>
+          <% cities.forEach(city => { %>
+            <option value="<%= city %>" <%= activeCity === city ? 'selected' : '' %>><%= city %></option>
+          <% }) %>
+        </select>
+      </div>
+
+      <!-- Country Filter -->
+      <div class="form-group" style="margin: 0;">
+        <select name="country" class="form-input" style="padding: 0.65rem 1rem;">
+          <option value="">Tüm Ülkeler</option>
+          <% countries.forEach(country => { %>
+            <option value="<%= country %>" <%= activeCountry === country ? 'selected' : '' %>><%= country %></option>
+          <% }) %>
+        </select>
+      </div>
+
+    </div>
+
+    <!-- Bottom Filters (Mentorship + Buttons) -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <label style="display: inline-flex; align-items: center; gap: 0.5rem; color: #fff; cursor: pointer; font-size: 0.9rem;">
+        <input type="checkbox" name="is_mentor" value="true" <%= isMentorOnly ? 'checked' : '' %> style="width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); cursor: pointer;">
+        🌟 Sadece Mentor Olmak İsteyenleri Göster
+      </label>
+
+      <div style="display: flex; gap: 0.5rem;">
+        <a href="/alumni" class="btn btn-outline btn-sm">Temizle</a>
+        <button type="submit" class="btn btn-primary btn-sm">Filtrele / Ara</button>
+      </div>
+    </div>
+  </form>
 
   <% if (alumni.length === 0) { %>
-    <div class="empty-state">
-      <div class="empty-icon">👥</div>
+    <div class="empty-state" style="background: var(--surface); border: 1px solid var(--border); padding: 4rem 2rem; border-radius: 16px; text-align: center;">
+      <div class="empty-icon" style="font-size: 3rem; margin-bottom: 1rem;">👥</div>
       <h2>Kayıt Bulunamadı</h2>
-      <p>Bu sektörde henüz mezun kaydı bulunmamaktadır.</p>
+      <p style="color: var(--text-muted); max-width: 400px; margin: 0 auto;">Arama kriterlerine uygun mezun kaydı bulunamadı. Lütfen filtreleri kontrol edin.</p>
     </div>
   <% } else { %>
     <div class="alumni-grid">
       <% alumni.forEach(person => { %>
-        <div class="alumni-card">
+        <div class="alumni-card" style="position: relative;">
+          
+          <!-- Mentor Badge -->
+          <% if (person.is_mentor) { %>
+            <span style="position: absolute; right: 1rem; top: 1rem; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #f59e0b; font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 20px; font-weight: 600; display: inline-flex; align-items: center; gap: 0.2rem; z-index: 10;">
+              🌟 MENTOR
+            </span>
+          <% } %>
+
           <div class="alumni-header">
             <img src="<%= person.photo || '/images/default-avatar.svg' %>" alt="<%= person.name %>" class="alumni-avatar">
             <div class="alumni-title">
               <h3><%= person.name %></h3>
-              <span class="alumni-eb-year">EB <%= person.eb_year || 'Bilinmiyor' %></span>
+              <div style="display: flex; gap: 0.25rem; flex-wrap: wrap;">
+                <span class="alumni-eb-year">EB <%= person.eb_year || 'Bilinmiyor' %></span>
+                <% if (person.city) { %>
+                  <span style="font-size: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-muted); padding: 0.15rem 0.4rem; border-radius: 4px;">
+                    📍 <%= person.city %><%= person.country ? ', ' + person.country : '' %>
+                  </span>
+                <% } %>
+              </div>
             </div>
           </div>
           
@@ -69,6 +129,14 @@
               <div class="alumni-info-item journey-item">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
                 <span><%= person.aiesec_journey %></span>
+              </div>
+            <% } %>
+
+            <% if (person.is_mentor && person.mentorship_details) { %>
+              <div class="alumni-info-item" style="background: rgba(245, 158, 11, 0.05); border-left: 3px solid #f59e0b; padding: 0.5rem; border-radius: 4px;">
+                <span style="font-size: 0.85rem; color: #f59e0b; line-height: 1.4;">
+                  💡 <strong>Mentorluk Odağı:</strong> <%= person.mentorship_details %>
+                </span>
               </div>
             <% } %>
           </div>

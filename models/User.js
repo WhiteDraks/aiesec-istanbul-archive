@@ -23,7 +23,8 @@ const User = {
     const sql = getSQL();
     const rows = await sql`
       SELECT id, name, email, role, status, school, eb_year, approved_at, created_at,
-             photo, department, linkedin, workplaces, sector, phone, aiesec_journey, roles_history
+             photo, department, linkedin, workplaces, sector, phone, aiesec_journey, roles_history,
+             city, country, is_mentor, is_mentee, mentorship_details
       FROM users WHERE id = ${id} LIMIT 1
     `;
     return rows[0] || null;
@@ -45,6 +46,11 @@ const User = {
         phone = ${profileData.phone || null},
         aiesec_journey = ${profileData.aiesec_journey || null},
         photo = COALESCE(${profileData.photo || null}, photo),
+        city = ${profileData.city || null},
+        country = ${profileData.country || null},
+        is_mentor = ${profileData.is_mentor || false},
+        is_mentee = ${profileData.is_mentee || false},
+        mentorship_details = ${profileData.mentorship_details || null},
         updated_at = NOW()
       WHERE id = ${id}
       RETURNING *
@@ -56,16 +62,38 @@ const User = {
     const sql = getSQL();
     if (sector) {
       return await sql`
-        SELECT id, name, email, school, department, eb_year, roles_history, photo, linkedin, workplaces, sector, aiesec_journey
+        SELECT id, name, email, school, department, eb_year, roles_history, photo, linkedin, workplaces, sector, aiesec_journey, city, country, is_mentor, is_mentee, mentorship_details, phone
         FROM users
         WHERE status = 'approved' AND sector = ${sector}
         ORDER BY name ASC
       `;
     }
     return await sql`
-      SELECT id, name, email, school, department, eb_year, roles_history, photo, linkedin, workplaces, sector, aiesec_journey
+      SELECT id, name, email, school, department, eb_year, roles_history, photo, linkedin, workplaces, sector, aiesec_journey, city, country, is_mentor, is_mentee, mentorship_details, phone
       FROM users
       WHERE status = 'approved'
+      ORDER BY name ASC
+    `;
+  },
+
+  async searchApproved({ query, sector, city, country, is_mentor }) {
+    const sql = getSQL();
+    const q = query ? `%${query.trim()}%` : null;
+    const sect = sector ? sector.trim() : null;
+    const c = city ? city.trim() : null;
+    const co = country ? country.trim() : null;
+    const mentorOnly = is_mentor === 'true';
+
+    // Query filters
+    return await sql`
+      SELECT id, name, email, school, department, eb_year, roles_history, photo, linkedin, workplaces, sector, aiesec_journey, city, country, is_mentor, is_mentee, mentorship_details, phone
+      FROM users
+      WHERE status = 'approved'
+        AND (${q}::text IS NULL OR name ILIKE ${q} OR workplaces ILIKE ${q} OR department ILIKE ${q} OR school ILIKE ${q})
+        AND (${sect}::text IS NULL OR sector = ${sect})
+        AND (${c}::text IS NULL OR city = ${c})
+        AND (${co}::text IS NULL OR country = ${co})
+        AND (${mentorOnly}::boolean = FALSE OR is_mentor = TRUE)
       ORDER BY name ASC
     `;
   },

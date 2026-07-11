@@ -3,12 +3,18 @@
 <section class="page-hero page-hero-sm page-hero-admin">
   <div class="page-hero-bg"></div>
   <div class="container">
-    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
       <div>
         <h1 class="page-hero-title">Admin Paneli</h1>
         <p class="page-hero-sub">AIESEC İstanbul Alumni Archive Yönetimi</p>
       </div>
-      <a href="/admin/eb" class="btn btn-primary">EB Takımlarını Yönet</a>
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <form action="/admin/digest/trigger" method="POST" style="margin: 0;">
+          <button type="submit" class="btn btn-outline" style="border-color: rgba(245, 158, 11, 0.4); color: #f59e0b; background: rgba(245, 158, 11, 0.05);">📰 Bülten Gönder (Haftalık Özet)</button>
+        </form>
+        <a href="/admin/settings" class="btn btn-outline">⚙ Site Ayarları</a>
+        <a href="/admin/eb" class="btn btn-primary">EB Takımlarını Yönet</a>
+      </div>
     </div>
   </div>
 </section>

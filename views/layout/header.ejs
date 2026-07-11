@@ -64,6 +64,8 @@
       <% if (currentUser) { %>
         <% if (isApproved || isAdmin) { %>
           <li><a href="/alumni" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'alumni' ? 'active' : '' %>">Alumni Rehberi</a></li>
+          <li><a href="/jobs" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'jobs' ? 'active' : '' %>">Kariyer Panosu 💼</a></li>
+          <li><a href="/events" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'events' ? 'active' : '' %>">Etkinlikler 📅</a></li>
         <% } %>
         <li><a href="/profile" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'profile' ? 'active' : '' %>">Profilim</a></li>
         <% if (isAdmin) { %>

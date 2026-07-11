@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
 // POST /profile - Profili güncelleme
 router.post('/', upload.single('photo'), async (req, res) => {
   try {
-    const { name, school, department, linkedin, workplaces, sector, phone, aiesec_journey, role_years, role_titles, remove_photo } = req.body;
+    const { name, school, department, linkedin, workplaces, sector, phone, aiesec_journey, role_years, role_titles, remove_photo, city, country, is_mentor, is_mentee, mentorship_details } = req.body;
     let photoUrl = null;
 
     // Fotoğraf temizlendiyse veya yüklendiyse
@@ -69,6 +69,11 @@ router.post('/', upload.single('photo'), async (req, res) => {
       phone: phone?.trim(),
       aiesec_journey: aiesec_journey?.trim(),
       photo: photoUrl,
+      city: city?.trim(),
+      country: country?.trim(),
+      is_mentor: is_mentor === 'true',
+      is_mentee: is_mentee === 'true',
+      mentorship_details: mentorship_details?.trim(),
     };
 
     const updatedUser = await User.updateProfile(req.session.userId, updateData);
