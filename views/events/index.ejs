@@ -1,6 +1,6 @@
 <%- include('../layout/header', { currentPage: 'events' }) %>
 
-<section class="page-hero page-hero-sm">
+<section class="page-hero page-hero-sm" style="margin-bottom: 2rem;">
   <div class="page-hero-bg"></div>
   <div class="container">
     <div class="breadcrumb">
@@ -9,143 +9,175 @@
       <span>Etkinlikler</span>
     </div>
     <h1 class="page-hero-title">Mezun Buluşmaları</h1>
-    <p class="page-hero-sub">AIESEC İstanbul mezun buluşmaları, webinarlar ve sosyal etkinlikler.</p>
+    <p class="page-hero-sub">AIESEC İstanbul mezun buluşmaları, webinarlar ve sosyal buluşmalar.</p>
   </div>
 </section>
 
-<main class="container" style="margin-top: 3rem; margin-bottom: 5rem;">
-  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2.5rem; align-items: start;">
-    
-    <!-- Left: Events List -->
-    <div>
-      <h2 style="font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-        📅 Yaklaşan Etkinlikler 
-        <span style="font-size: 0.9rem; background: var(--primary); padding: 0.2rem 0.6rem; border-radius: 20px; font-weight: 500;"><%= events.length %></span>
-      </h2>
+<main class="container" style="max-width: 900px; margin: 0 auto 5rem auto; padding: 0 1rem;">
+  
+  <!-- Header Actions -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem;">
+    <h2 style="font-size: 1.6rem; font-weight: 700; color: #fff; margin: 0; display: flex; align-items: center; gap: 0.6rem;">
+      📅 Yaklaşan Etkinlikler 
+      <span style="font-size: 0.95rem; background: var(--primary); padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;"><%= events.length %></span>
+    </h2>
+    <button onclick="openEventModal()" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.4rem; border-radius: 10px; font-weight: 600; box-shadow: 0 4px 12px rgba(3, 126, 243, 0.3);">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Yeni Buluşma Düzenle
+    </button>
+  </div>
 
-      <% if (events.length === 0) { %>
-        <div class="empty-state" style="background: var(--surface); border: 1px solid var(--border); padding: 4rem 2rem; border-radius: 16px; text-align: center;">
-          <div class="empty-icon" style="font-size: 3rem; margin-bottom: 1rem;">📅</div>
-          <h3 style="font-size: 1.25rem; font-weight: 600; color: #fff; margin-bottom: 0.5rem;">Henüz etkinlik planlanmamış</h3>
-          <p style="color: var(--text-muted); max-width: 400px; margin: 0 auto;">İlk etkinliği sağ taraftaki formu kullanarak siz oluşturun!</p>
-        </div>
-      <% } else { %>
-        <div style="display: flex; flex-direction: column; gap: 1.75rem;">
-          <% events.forEach(event => { %>
-            <div class="profile-card" style="padding: 2.25rem; display: flex; gap: 1.5rem; position: relative; flex-wrap: wrap;">
-              
-              <!-- Date Badge -->
-              <div style="flex-shrink: 0; width: 75px; height: 80px; border-radius: 12px; background: rgba(3, 126, 243, 0.1); border: 1px solid rgba(3, 126, 243, 0.3); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff;">
-                <span style="font-size: 1.5rem; font-weight: 800; line-height: 1; color: var(--primary);">
-                  <%= new Date(event.event_date).toLocaleDateString('tr-TR', { day: '2-digit' }) %>
-                </span>
-                <span style="font-size: 0.775rem; text-transform: uppercase; font-weight: 600; margin-top: 0.25rem; color: var(--text-lighter);">
-                  <%= new Date(event.event_date).toLocaleDateString('tr-TR', { month: 'short' }) %>
-                </span>
-              </div>
-
-              <!-- Content details -->
-              <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 0.75rem;">
-                
-                <!-- Title & Delete -->
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
-                  <div>
-                    <h3 style="font-size: 1.35rem; font-weight: 700; color: #fff; margin: 0;"><%= event.title %></h3>
-                    <div style="font-size: 0.8rem; color: var(--text-muted); display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.25rem;">
-                      <span>🕒 <%= new Date(event.event_date).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) %></span>
-                      <span>📍 <%= event.location %></span>
-                      <span>👤 Düzenleyen: <%= event.creator_name %></span>
-                    </div>
-                  </div>
-                  <% if (currentUser && (currentUser.role === 'admin' || event.created_by === currentUser.id)) { %>
-                    <form action="/events/delete/<%= event.id %>" method="POST" style="margin: 0;" onsubmit="return confirm('Bu etkinliği silmek istediğinizden emin misiniz?')">
-                      <button type="submit" class="btn btn-delete btn-xs" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">🗑 Sil</button>
-                    </form>
-                  <% } %>
-                </div>
-
-                <p style="color: var(--text-muted); font-size: 0.925rem; line-height: 1.6; white-space: pre-line; margin: 0;"><%= event.description %></p>
-
-                <!-- Attendee List -->
-                <% if (event.attendees && event.attendees.length > 0) { %>
-                  <div style="border-top: 1px dashed var(--border); padding-top: 1rem; margin-top: 0.5rem;">
-                    <h4 style="font-size: 0.8rem; font-weight: 600; color: #fff; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.25rem;">
-                      👥 Katılacaklar (<%= event.attendee_count %>):
-                    </h4>
-                    <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; align-items: center;">
-                      <% event.attendees.forEach(att => { %>
-                        <div style="display: inline-flex; align-items: center; background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 0.25rem 0.5rem; border-radius: 20px; gap: 0.35rem; font-size: 0.75rem; color: var(--text-lighter);">
-                          <img src="<%= att.photo || '/images/default-avatar.svg' %>" alt="<%= att.name %>" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover;">
-                          <span><%= att.name %></span>
-                        </div>
-                      <% }) %>
-                    </div>
-                  </div>
-                <% } %>
-
-                <!-- Action Button -->
-                <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-                  <% if (event.attending) { %>
-                    <form action="/events/<%= event.id %>/leave" method="POST" style="margin: 0;">
-                      <button type="submit" class="btn btn-outline btn-sm" style="border-color: #ff4d4f; color: #ff4d4f; background: rgba(255,77,79,0.05);">Katılmaktan Vazgeç ❌</button>
-                    </form>
-                  <% } else { %>
-                    <form action="/events/<%= event.id %>/attend" method="POST" style="margin: 0;">
-                      <button type="submit" class="btn btn-primary btn-sm">Etkinliğe Katıl 🎉</button>
-                    </form>
-                  <% } %>
-                  
-                  <% if (event.link) { %>
-                    <a href="<%= event.link %>" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="font-size: 0.8rem;">Etkinlik Sayfası / Harita Linki 🔗</a>
-                  <% } %>
-                </div>
-
-              </div>
-
-            </div>
-          <% }) %>
-        </div>
-      <% } %>
+  <!-- Listings -->
+  <% if (events.length === 0) { %>
+    <div class="empty-state" style="background: var(--surface); border: 1px solid var(--border); padding: 5rem 2rem; border-radius: 16px; text-align: center;">
+      <div class="empty-icon" style="font-size: 3.5rem; margin-bottom: 1rem;">📅</div>
+      <h3 style="font-size: 1.4rem; font-weight: 600; color: #fff; margin-bottom: 0.5rem;">Henüz etkinlik planlanmamış</h3>
+      <p style="color: var(--text-muted); max-width: 450px; margin: 0 auto; line-height: 1.6;">Topluluğa özel ilk mezun buluşmasını veya online etkinliği siz planlayın!</p>
     </div>
+  <% } else { %>
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+      <% events.forEach(event => { %>
+        <div class="profile-card" style="padding: 2.5rem; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.15); display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start;">
+          
+          <!-- Date badge -->
+          <div style="flex-shrink: 0; width: 85px; height: 90px; border-radius: 14px; background: rgba(3, 126, 243, 0.08); border: 1px solid rgba(3, 126, 243, 0.25); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+            <span style="font-size: 1.8rem; font-weight: 800; line-height: 1; color: var(--primary);">
+              <%= new Date(event.event_date).toLocaleDateString('tr-TR', { day: '2-digit' }) %>
+            </span>
+            <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 600; margin-top: 0.35rem; color: var(--text-lighter); letter-spacing: 0.5px;">
+              <%= new Date(event.event_date).toLocaleDateString('tr-TR', { month: 'short' }) %>
+            </span>
+          </div>
 
-    <!-- Right: Add Event Form -->
-    <div class="profile-card" style="padding: 2.25rem; position: sticky; top: 6rem;">
-      <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
-        ➕ Buluşma Düzenle
-      </h3>
-      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem;">AIESEC İstanbul mezunları için yeni bir etkinlik oluşturun.</p>
+          <!-- Content Details -->
+          <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 1rem;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+              <div>
+                <h3 style="font-size: 1.45rem; font-weight: 700; color: #fff; margin: 0;"><%= event.title %></h3>
+                <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.35rem;">
+                  <span>🕒 <%= new Date(event.event_date).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) %></span>
+                  <span>📍 <%= event.location %></span>
+                  <span>👤 Düzenleyen: <%= event.creator_name %></span>
+                </div>
+              </div>
+              <% if (currentUser && (currentUser.role === 'admin' || event.created_by === currentUser.id)) { %>
+                <form action="/events/delete/<%= event.id %>" method="POST" style="margin: 0;" onsubmit="return confirm('Bu etkinliği silmek istediğinizden emin misiniz?')">
+                  <button type="submit" class="btn btn-delete btn-xs" style="padding: 0.45rem 0.9rem; font-size: 0.75rem; border-radius: 6px; background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">🗑 Sil</button>
+                </form>
+              <% } %>
+            </div>
 
-      <form action="/events" method="POST" style="display: flex; flex-direction: column; gap: 1.25rem;">
-        <div class="form-group" style="margin: 0;">
-          <label for="title" class="form-label" style="font-size: 0.775rem;">Etkinlik Başlığı *</label>
-          <input type="text" id="title" name="title" class="form-input" required placeholder="Örn: 2026 Geleneksel Mezun Buluşması">
+            <p style="color: var(--text-lighter); font-size: 0.975rem; line-height: 1.7; white-space: pre-line; margin: 0;"><%= event.description %></p>
+
+            <!-- Attendee count and avatars -->
+            <% if (event.attendees && event.attendees.length > 0) { %>
+              <div style="border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 1.25rem; margin-top: 0.5rem;">
+                <h4 style="font-size: 0.825rem; font-weight: 600; color: #fff; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.35rem;">
+                  👥 Katılacak Üyelerimiz (<%= event.attendee_count %>):
+                </h4>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+                  <% event.attendees.forEach(att => { %>
+                    <div style="display: inline-flex; align-items: center; background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 0.3rem 0.65rem; border-radius: 20px; gap: 0.4rem; font-size: 0.775rem; color: var(--text-lighter); transition: transform 0.2s;">
+                      <img src="<%= att.photo || '/images/default-avatar.svg' %>" alt="<%= att.name %>" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">
+                      <span><%= att.name %></span>
+                    </div>
+                  <% }) %>
+                </div>
+              </div>
+            <% } %>
+
+            <!-- Action buttons -->
+            <div style="margin-top: 0.75rem; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1.25rem;">
+              <% if (event.attending) { %>
+                <form action="/events/<%= event.id %>/leave" method="POST" style="margin: 0;">
+                  <button type="submit" class="btn btn-outline btn-sm" style="border-color: #ff4d4f; color: #ff4d4f; background: rgba(255,77,79,0.05); border-radius: 8px;">Katılmaktan Vazgeç ❌</button>
+                </form>
+              <% } else { %>
+                <form action="/events/<%= event.id %>/attend" method="POST" style="margin: 0;">
+                  <button type="submit" class="btn btn-primary btn-sm" style="border-radius: 8px;">Buluşmaya Katıl 🎉</button>
+                </form>
+              <% } %>
+              
+              <% if (event.link) { %>
+                <a href="<%= event.link %>" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="font-size: 0.85rem; border-radius: 8px; display: inline-flex; align-items: center; gap: 0.25rem;">
+                  Katılım Linki / Harita 🔗
+                </a>
+              <% } %>
+            </div>
+
+          </div>
+
         </div>
+      <% }) %>
+    </div>
+  <% } %>
+</main>
 
+<!-- Glassmorphic Modal Form -->
+<div id="eventModal" style="display: none; position: fixed; inset: 0; background: rgba(4, 13, 26, 0.7); backdrop-filter: blur(10px); z-index: 1000; align-items: center; justify-content: center; padding: 1.5rem; opacity: 0; transition: opacity 0.3s ease;">
+  <div style="background: var(--surface); border: 1px solid var(--border); width: 100%; max-width: 600px; border-radius: 20px; padding: 2.5rem; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.5); transform: translateY(-20px); transition: transform 0.3s ease;" id="eventModalContainer">
+    
+    <!-- Close button -->
+    <button onclick="closeEventModal()" style="position: absolute; right: 1.5rem; top: 1.5rem; background: none; border: none; color: var(--text-muted); font-size: 1.75rem; cursor: pointer; line-height: 1;">&times;</button>
+    
+    <h3 style="font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+      📅 Yeni Buluşma / Etkinlik Oluştur
+    </h3>
+    <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 2rem;">AIESEC İstanbul mezunları için planladığınız buluşmanın tüm detaylarını girin.</p>
+
+    <form action="/events" method="POST" style="display: flex; flex-direction: column; gap: 1.25rem;">
+      <div class="form-group" style="margin: 0;">
+        <label for="title" class="form-label">Etkinlik Başlığı *</label>
+        <input type="text" id="title" name="title" class="form-input" required placeholder="Örn: AIESEC İstanbul Yaz Pikniği">
+      </div>
+
+      <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 0;">
         <div class="form-group" style="margin: 0;">
-          <label for="event_date" class="form-label" style="font-size: 0.775rem;">Tarih & Saat *</label>
+          <label for="event_date" class="form-label">Tarih & Saat *</label>
           <input type="datetime-local" id="event_date" name="event_date" class="form-input" required>
         </div>
-
         <div class="form-group" style="margin: 0;">
-          <label for="location" class="form-label" style="font-size: 0.775rem;">Mekan / Lokasyon *</label>
-          <input type="text" id="location" name="location" class="form-input" required placeholder="Örn: Google Meet / Kadıköy Starbucks">
+          <label for="location" class="form-label">Mekan / Konum *</label>
+          <input type="text" id="location" name="location" class="form-input" required placeholder="Örn: Google Meet / Belgrad Ormanı">
         </div>
+      </div>
 
-        <div class="form-group" style="margin: 0;">
-          <label for="description" class="form-label" style="font-size: 0.775rem;">Açıklama / Detaylar *</label>
-          <textarea id="description" name="description" class="form-input" rows="4" required placeholder="Buluşma gündemi, organizasyon detayları..."></textarea>
-        </div>
+      <div class="form-group" style="margin: 0;">
+        <label for="description" class="form-label">Etkinlik Açıklaması *</label>
+        <textarea id="description" name="description" class="form-input" rows="4" required placeholder="Buluşma detayları, ortak planlar..."></textarea>
+      </div>
 
-        <div class="form-group" style="margin: 0;">
-          <label for="link" class="form-label" style="font-size: 0.775rem;">Online Görüşme / Lokasyon Linki (Opsiyonel)</label>
-          <input type="url" id="link" name="link" class="form-input" placeholder="https://meet.google.com/...">
-        </div>
+      <div class="form-group" style="margin: 0;">
+        <label for="link" class="form-label">Online Görüşme / Konum Linki (Opsiyonel)</label>
+        <input type="url" id="link" name="link" class="form-input" placeholder="https://meet.google.com/... veya harita adresi">
+      </div>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; font-weight: 600; margin-top: 0.5rem;">Etkinlik Oluştur</button>
-      </form>
-    </div>
-
+      <button type="submit" class="btn btn-primary" style="padding: 0.85rem; font-weight: 600; margin-top: 1rem; border-radius: 10px;">Etkinliği Oluştur</button>
+    </form>
   </div>
-</main>
+</div>
+
+<script>
+  function openEventModal() {
+    const modal = document.getElementById('eventModal');
+    const container = document.getElementById('eventModalContainer');
+    modal.style.display = 'flex';
+    setTimeout(() => {
+      modal.style.opacity = '1';
+      container.style.transform = 'translateY(0)';
+    }, 10);
+  }
+
+  function closeEventModal() {
+    const modal = document.getElementById('eventModal');
+    const container = document.getElementById('eventModalContainer');
+    modal.style.opacity = '0';
+    container.style.transform = 'translateY(-20px)';
+    setTimeout(() => {
+      modal.style.display = 'none';
+    }, 300);
+  }
+</script>
 
 <%- include('../layout/footer') %>
