@@ -1,31 +1,44 @@
 <%- include('../layout/header', { currentPage: 'jobs' }) %>
 
-<section class="page-hero page-hero-sm" style="margin-bottom: 2rem;">
+<section class="page-hero page-hero-sm" style="padding-bottom: 2rem; margin-bottom: 3rem;">
   <div class="page-hero-bg"></div>
   <div class="container">
-    <div class="breadcrumb">
-      <a href="/">Ana Sayfa</a>
-      <span>›</span>
-      <span>Kariyer Panosu</span>
+    
+    <!-- Glassmorphic Dashboard Header Card -->
+    <div style="background: rgba(17, 24, 39, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 2.25rem; backdrop-filter: blur(12px); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; margin-top: 1rem;">
+      
+      <!-- Left Info -->
+      <div>
+        <div class="breadcrumb" style="margin-bottom: 0.5rem; opacity: 0.85;">
+          <a href="/">Ana Sayfa</a>
+          <span style="margin: 0 0.4rem;">›</span>
+          <span style="color: var(--primary); font-weight: 500;">Kariyer Panosu</span>
+        </div>
+        <h1 class="page-hero-title" style="margin: 0; font-size: 2.2rem; background: linear-gradient(135deg, #fff, #9ca3af); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Kariyer Fırsatları</h1>
+        <p style="margin: 0.5rem 0 0 0; color: var(--text-muted); font-size: 0.95rem; max-width: 480px;">AIESEC İstanbul mezunları arasında paylaşılan güncel iş ve staj ilanları.</p>
+      </div>
+
+      <!-- Right Controls / Stats & Action -->
+      <div style="display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap;">
+        
+        <!-- Premium Mini Stat Card -->
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); padding: 0.6rem 1.25rem; border-radius: 12px; text-align: center; min-width: 100px;">
+          <div style="font-size: 0.775rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; font-weight: 600;">Aktif İlan</div>
+          <div style="font-size: 1.35rem; font-weight: 800; color: var(--primary); margin-top: 0.15rem;"><%= jobs.length %></div>
+        </div>
+
+        <button onclick="openJobModal()" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.6rem; border-radius: 12px; font-weight: 700; box-shadow: 0 4px 20px rgba(3, 126, 243, 0.4); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: transform 0.2s;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Yeni İlan Yayınla
+        </button>
+
+      </div>
     </div>
-    <h1 class="page-hero-title">Kariyer Fırsatları</h1>
-    <p class="page-hero-sub">AIESEC İstanbul mezunları arasında iş, staj ve iş birliği ilanları.</p>
+
   </div>
 </section>
 
 <main class="container" style="max-width: 900px; margin: 0 auto 5rem auto; padding: 0 1rem;">
-  
-  <!-- Header Actions -->
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem;">
-    <h2 style="font-size: 1.6rem; font-weight: 700; color: #fff; margin: 0; display: flex; align-items: center; gap: 0.6rem;">
-      💼 Aktif İlanlar 
-      <span style="font-size: 0.95rem; background: var(--primary); padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;"><%= jobs.length %></span>
-    </h2>
-    <button onclick="openJobModal()" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.4rem; border-radius: 10px; font-weight: 600; box-shadow: 0 4px 12px rgba(3, 126, 243, 0.3);">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Yeni İlan Yayınla
-    </button>
-  </div>
 
   <!-- Listings -->
   <% if (jobs.length === 0) { %>
