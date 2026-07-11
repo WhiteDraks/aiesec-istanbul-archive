@@ -117,7 +117,7 @@
           <article class="team-card" style="--card-delay: <%= i * 0.1 %>s">
             <div class="team-card-cover">
               <img
-                src="<%= team.coverImage || '/images/default-cover.jpg' %>"
+                src="<%= team.cover_image || '/images/default-cover.jpg' %>"
                 alt="<%= team.title %> kapak fotoğrafı"
                 loading="<%= i < 2 ? 'eager' : 'lazy' %>"
               />

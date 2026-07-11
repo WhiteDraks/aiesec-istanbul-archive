@@ -50,25 +50,20 @@ const EBTeam = {
 
   async update(id, { year, title, description, isPublic, achievements, order, gallery_images }) {
     const sql = getSQL();
-    
-    let query = sql`
+    // Use a single flat query - Neon driver does not support dynamic template composition
+    const rows = await sql`
       UPDATE eb_teams
-      SET 
-        year = COALESCE(${year}, year),
-        title = COALESCE(${title}, title),
-        description = COALESCE(${description}, description),
-        is_public = COALESCE(${isPublic}, is_public),
-        achievements = COALESCE(${achievements}, achievements),
-        sort_order = COALESCE(${order}, sort_order)
+      SET
+        year        = COALESCE(${year ?? null}, year),
+        title       = COALESCE(${title ?? null}, title),
+        description = COALESCE(${description ?? null}, description),
+        is_public   = COALESCE(${isPublic ?? null}, is_public),
+        achievements = COALESCE(${achievements ?? null}, achievements),
+        sort_order  = COALESCE(${order ?? null}, sort_order),
+        gallery_images = COALESCE(${gallery_images ?? null}, gallery_images)
+      WHERE id = ${id}
+      RETURNING *
     `;
-
-    if (gallery_images !== undefined) {
-      query = sql`${query}, gallery_images = ${gallery_images}`;
-    }
-
-    query = sql`${query} WHERE id = ${id} RETURNING *`;
-    
-    const rows = await query;
     return rows[0];
   },
 };

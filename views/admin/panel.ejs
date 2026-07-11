@@ -82,9 +82,9 @@
                   </td>
                   <td><a href="mailto:<%= u.email %>" class="table-link"><%= u.email %></a></td>
                   <td><%= u.school || '—' %></td>
-                  <td><%= u.ebYear || '—' %></td>
+                  <td><%= u.eb_year || '—' %></td>
                   <td class="date-cell">
-                    <%= new Date(u.createdAt).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+                    <%= new Date(u.created_at).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }) %>
                   </td>
                   <td class="action-cell">
                     <form action="/admin/approve/<%= u.id %>" method="POST" style="display:inline">
@@ -131,9 +131,9 @@
                   </td>
                   <td><a href="mailto:<%= u.email %>" class="table-link"><%= u.email %></a></td>
                   <td><%= u.school || '—' %></td>
-                  <td><%= u.ebYear || '—' %></td>
+                  <td><%= u.eb_year || '—' %></td>
                   <td class="date-cell">
-                    <%= u.approvedAt ? new Date(u.approvedAt).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }) : '—' %>
+                    <%= u.approved_at ? new Date(u.approved_at).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }) : '—' %>
                   </td>
                   <td class="action-cell">
                     <form action="/admin/reject/<%= u.id %>" method="POST" style="display:inline">

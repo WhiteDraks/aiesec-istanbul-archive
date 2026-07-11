@@ -4,7 +4,7 @@
 <section class="eb-detail-hero">
   <div class="eb-hero-cover">
     <img
-      src="<%= team.coverImage || '/images/default-cover.jpg' %>"
+      src="<%= team.cover_image || '/images/default-cover.jpg' %>"
       alt="<%= team.title %>"
       class="eb-hero-img"
       fetchpriority="high"
@@ -28,11 +28,11 @@
 </section>
 
 <!-- ── Group Photo (if available) ── -->
-<% if (team.groupPhoto) { %>
+<% if (team.group_photo) { %>
 <section class="section section-sm">
   <div class="container">
     <div class="group-photo-wrap">
-      <img src="<%= team.groupPhoto %>" alt="<%= team.year %> EB Grup Fotoğrafı" class="group-photo" loading="lazy" />
+      <img src="<%= team.group_photo %>" alt="<%= team.year %> EB Grup Fotoğrafı" class="group-photo" loading="lazy" />
       <div class="group-photo-caption">
         <span><%= team.year %> Executive Board – Grup Fotoğrafı</span>
       </div>
@@ -70,7 +70,7 @@
     <% if (members && members.length > 0) { %>
       <div class="members-grid" id="members-grid">
         <% members.forEach((member, i) => { %>
-          <article class="member-card" style="--card-delay: <%= i * 0.07 %>s" id="member-<%= member._id %>">
+          <article class="member-card" style="--card-delay: <%= i * 0.07 %>s" id="member-<%= member.id %>">
             <div class="member-card-inner">
               <!-- Front face -->
               <div class="member-front">
@@ -98,24 +98,24 @@
                   <% } %>
                 </div>
                 <div class="member-card-actions">
-                  <button class="btn-details" onclick="toggleMemberDetails('<%= member._id %>')" aria-expanded="false">
+                  <button class="btn-details" onclick="toggleMemberDetails('<%= member.id %>')" aria-expanded="false">
                     Detayları Gör ↓
                   </button>
                 </div>
               </div>
 
               <!-- Expandable Details -->
-              <div class="member-details" id="details-<%= member._id %>" hidden>
+              <div class="member-details" id="details-<%= member.id %>" hidden>
                 <% if (member.bio) { %>
                   <div class="detail-section">
                     <h4>Biyografi</h4>
                     <p><%= member.bio %></p>
                   </div>
                 <% } %>
-                <% if (member.aiesecJourney) { %>
+                <% if (member.aiesec_journey) { %>
                   <div class="detail-section">
                     <h4>AIESEC Yolculuğu</h4>
-                    <p><%= member.aiesecJourney %></p>
+                    <p><%= member.aiesec_journey %></p>
                   </div>
                 <% } %>
                 <div class="detail-links">
@@ -132,7 +132,7 @@
                     </a>
                   <% } %>
                 </div>
-                <button class="btn-details btn-details-close" onclick="toggleMemberDetails('<%= member._id %>')">
+                <button class="btn-details btn-details-close" onclick="toggleMemberDetails('<%= member.id %>')">
                   Kapat ↑
                 </button>
               </div>
