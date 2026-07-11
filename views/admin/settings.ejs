@@ -16,7 +16,7 @@
 <section class="section">
   <div class="container" style="max-width: 800px;">
     
-    <form action="/admin/settings" method="POST" class="profile-card" style="padding: 2.5rem;">
+    <form action="/admin/settings" method="POST" enctype="multipart/form-data" class="profile-card" style="padding: 2.5rem; margin-bottom: 2rem;">
       
       <!-- Tema Renkleri -->
       <div class="form-section">
@@ -94,6 +94,31 @@
 
       <div class="form-divider" style="margin: 2rem 0; border-top: 1px dashed var(--border);"></div>
 
+      <!-- Homepage Hero Background Image -->
+      <div class="form-section">
+        <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Ana Sayfa Arka Plan Görseli</h3>
+        <p class="form-hint" style="margin-bottom: 1.5rem;">Ana sayfadaki hero bölümünün arka planında görünecek görseli belirleyebilirsiniz.</p>
+        
+        <div style="display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap;">
+          <div style="width: 160px; height: 100px; border-radius: 8px; overflow: hidden; background: #000; border: 1px solid var(--border);">
+            <img id="hero-bg-preview" src="<%= settings.hero_bg_image || '/images/default-cover.jpg' %>" alt="Hero Background Preview" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div style="flex: 1; min-width: 250px;">
+            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
+              <label for="hero_bg_image" class="btn btn-secondary" style="margin: 0; cursor: pointer;">Görsel Seç</label>
+              <input type="file" id="hero_bg_image" name="hero_bg_image" accept="image/*" style="display: none;" onchange="previewHeroBg(event)">
+              <% if (settings.hero_bg_image) { %>
+                <button type="button" class="btn btn-outline" style="color: #ff4d4f; border-color: #ff4d4f;" onclick="removeHeroBg()">Görseli Kaldır</button>
+              <% } %>
+            </div>
+            <input type="hidden" name="remove_hero_bg" id="remove-hero-bg" value="false">
+            <p class="form-hint">Maksimum 5MB. Tavsiye edilen: Yatay, 1920x1080 çözünürlükte.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-divider" style="margin: 2rem 0; border-top: 1px dashed var(--border);"></div>
+
       <!-- Alt Bilgi (Footer) -->
       <div class="form-section" style="margin-bottom: 2rem;">
         <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Alt Bilgi (Footer) Metni</h3>
@@ -108,7 +133,34 @@
       <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">Ayarları Kaydet ve Uygula</button>
     </form>
 
+    <!-- Restore Defaults Form -->
+    <form action="/admin/settings/reset" method="POST" onsubmit="return confirm('Tüm ayarları varsayılan renklere ve logolara döndürmek istediğinizden emin misiniz?')" style="text-align: center; margin-bottom: 3rem;">
+      <button type="submit" class="btn btn-outline" style="color: #ff4d4f; border-color: rgba(255,77,79,0.3); padding: 0.75rem 2rem;">
+        ⚙️ Tüm Ayarları Varsayılana Döndür
+      </button>
+    </form>
+
   </div>
 </section>
+
+<script>
+function previewHeroBg(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('hero-bg-preview').src = e.target.result;
+      document.getElementById('remove-hero-bg').value = 'false';
+    }
+    reader.readAsDataURL(file);
+  }
+}
+
+function removeHeroBg() {
+  document.getElementById('hero-bg-preview').src = '/images/default-cover.jpg';
+  document.getElementById('remove-hero-bg').value = 'true';
+  document.getElementById('hero_bg_image').value = '';
+}
+</script>
 
 <%- include('../layout/footer') %>

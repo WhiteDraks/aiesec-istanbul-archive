@@ -171,7 +171,7 @@ router.get('/settings', async (req, res) => {
 });
 
 // POST /admin/settings - Site Ayarları Kaydetme
-router.post('/settings', async (req, res) => {
+router.post('/settings', upload.single('hero_bg_image'), async (req, res) => {
   try {
     const fields = [
       'theme_primary', 'theme_secondary', 'theme_background', 'theme_surface',
@@ -184,11 +184,48 @@ router.post('/settings', async (req, res) => {
       }
     }
 
+    // Handle background image upload
+    if (req.file) {
+      const url = await uploadToBlob(req.file.buffer, req.file.originalname, 'branding/');
+      await SiteSetting.update('hero_bg_image', url);
+    } else if (req.body.remove_hero_bg === 'true') {
+      await SiteSetting.update('hero_bg_image', '');
+    }
+
     req.flash('success', 'Site ayarları başarıyla güncellendi.');
     res.redirect('/admin/settings');
   } catch (err) {
     console.error('Failed to save settings:', err);
     req.flash('error', 'Ayarlar kaydedilirken bir hata oluştu.');
+    res.redirect('/admin/settings');
+  }
+});
+
+// POST /admin/settings/reset - Site Ayarlarını Varsayılana Döndürme
+router.post('/settings/reset', async (req, res) => {
+  try {
+    const defaults = [
+      { key: 'theme_primary', value: '#037ef3' },
+      { key: 'theme_secondary', value: '#0a2540' },
+      { key: 'theme_background', value: '#090d16' },
+      { key: 'theme_surface', value: '#111827' },
+      { key: 'site_title', value: 'AIESEC İstanbul Alumni Archive' },
+      { key: 'site_logo_emblem', value: 'A' },
+      { key: 'site_logo_text', value: 'AIESEC' },
+      { key: 'site_logo_sub', value: 'İstanbul' },
+      { key: 'footer_credit', value: 'Geçmiş liderlik deneyimlerini onurlandırmak için 26.27 LCVP F&L Elif Kurnaz tarafından yapıldı.' },
+      { key: 'hero_bg_image', value: '' }
+    ];
+
+    for (const d of defaults) {
+      await SiteSetting.update(d.key, d.value);
+    }
+
+    req.flash('success', 'Tüm ayarlar başarıyla varsayılan değerlere döndürüldü.');
+    res.redirect('/admin/settings');
+  } catch (err) {
+    console.error('Failed to reset settings:', err);
+    req.flash('error', 'Ayarlar sıfırlanırken bir hata oluştu.');
     res.redirect('/admin/settings');
   }
 });
