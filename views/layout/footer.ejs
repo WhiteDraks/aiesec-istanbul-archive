@@ -240,6 +240,7 @@ let currentFileInput = null;
 let currentPreviewImg = null;
 let currentRemoveInput = null;
 let currentLabel = null;
+let currentAspectRatio = 1;
 
 function openCropper(event, fileInputId, previewImgId, removeInputId, labelId, aspectRatio = 1) {
   const file = event.target.files[0];
@@ -249,6 +250,7 @@ function openCropper(event, fileInputId, previewImgId, removeInputId, labelId, a
   currentPreviewImg = document.getElementById(previewImgId);
   currentRemoveInput = document.getElementById(removeInputId);
   currentLabel = document.getElementById(labelId);
+  currentAspectRatio = aspectRatio;
 
   const reader = new FileReader();
   reader.onload = function(e) {
@@ -287,20 +289,56 @@ function closeCropperModal() {
 function saveCroppedImage() {
   if (!cropperInstance) return;
 
-  cropperInstance.getCroppedCanvas({
-    width: 800,
-    height: 800,
-    imageSmoothingQuality: 'high'
-  }).toBlob((blob) => {
+  // Calculate canvas dimensions dynamically to prevent image warp/stretching
+  const canvasOpts = { imageSmoothingQuality: 'high' };
+  if (currentAspectRatio) {
+    if (currentAspectRatio === 1) {
+      canvasOpts.width = 800;
+      canvasOpts.height = 800;
+    } else if (currentAspectRatio > 1) {
+      canvasOpts.width = 1200;
+      canvasOpts.height = Math.round(1200 / currentAspectRatio);
+    } else {
+      canvasOpts.height = 800;
+      canvasOpts.width = Math.round(800 * currentAspectRatio);
+    }
+  } else {
+    canvasOpts.width = 800;
+    canvasOpts.height = 800;
+  }
+
+  const croppedCanvas = cropperInstance.getCroppedCanvas(canvasOpts);
+  
+  // 1. Get base64 representation of the cropped image
+  const base64Data = croppedCanvas.toDataURL('image/jpeg', 0.92);
+
+  // 2. Set base64 input on the form as fallback (crucial for mobile Safari/Chrome)
+  if (currentFileInput && currentFileInput.form) {
+    const form = currentFileInput.form;
+    let hiddenInput = form.querySelector(`input[name="${currentFileInput.name}_base64"]`);
+    if (!hiddenInput) {
+      hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.name = `${currentFileInput.name}_base64`;
+      form.appendChild(hiddenInput);
+    }
+    hiddenInput.value = base64Data;
+  }
+
+  // 3. Try to update files array using DataTransfer
+  croppedCanvas.toBlob((blob) => {
     // Generate preview URL
     const croppedUrl = URL.createObjectURL(blob);
     if (currentPreviewImg) currentPreviewImg.src = croppedUrl;
 
-    // Replace files array in file input using DataTransfer
-    const croppedFile = new File([blob], 'cropped_image.jpg', { type: 'image/jpeg' });
-    const dataTransfer = new DataTransfer();
-    dataTransfer.items.add(croppedFile);
-    if (currentFileInput) currentFileInput.files = dataTransfer.files;
+    try {
+      const croppedFile = new File([blob], 'cropped_image.jpg', { type: 'image/jpeg' });
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(croppedFile);
+      if (currentFileInput) currentFileInput.files = dataTransfer.files;
+    } catch (e) {
+      console.warn('DataTransfer not supported by browser, falling back to base64 input fields:', e);
+    }
 
     // Reset status fields
     if (currentRemoveInput) currentRemoveInput.value = 'false';
