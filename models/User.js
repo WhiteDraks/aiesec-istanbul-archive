@@ -85,12 +85,17 @@ const User = {
     const co = country ? country.trim() : null;
     const mentorOnly = is_mentor === 'true';
 
-    // Query filters
+    // Query filters (searches name, workplaces, department, school, and AIESEC roles history)
     return await sql`
       SELECT id, name, email, school, department, eb_year, roles_history, photo, linkedin, workplaces, sector, aiesec_journey, city, country, is_mentor, is_mentee, mentorship_details, phone, show_phone
       FROM users
       WHERE status = 'approved'
-        AND (${q}::text IS NULL OR name ILIKE ${q} OR workplaces ILIKE ${q} OR department ILIKE ${q} OR school ILIKE ${q})
+        AND (${q}::text IS NULL OR 
+             name ILIKE ${q} OR 
+             workplaces ILIKE ${q} OR 
+             department ILIKE ${q} OR 
+             school ILIKE ${q} OR
+             roles_history::text ILIKE ${q})
         AND (${sect}::text IS NULL OR sector = ${sect})
         AND (${c}::text IS NULL OR city = ${c})
         AND (${co}::text IS NULL OR country = ${co})
