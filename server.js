@@ -88,48 +88,6 @@ if (sessionDbUrl) {
 
 app.use(session(sessionConfig));
 
-// ─── CSRF Protection ──────────────────────────────────────────────────────────
-const { doubleCsrf } = require('csrf-csrf');
-const doubleCsrfUtilities = doubleCsrf({
-  getSecret: (req) => req.session.secret || (req.session.secret = require('crypto').randomBytes(32).toString('hex')),
-  getSessionIdentifier: (req) => req.session.id,
-  cookieName: 'x-csrf-token',
-  cookieOptions: {
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-  },
-  getTokenFromRequest: (req) => {
-    // Hem form gövdesinden hem de HTTP header'larından okuyabil
-    return req.body?._csrf || req.headers['x-csrf-token'];
-  },
-});
-
-const generateToken = (req, res) => doubleCsrfUtilities.generateToken(req, res);
-const doubleCsrfProtection = doubleCsrfUtilities.doubleCsrfProtection;
-const invalidCsrfTokenError = doubleCsrfUtilities.invalidCsrfTokenError;
-
-// CSRF korumasını GET istekleri dışındaki tüm POST/PUT/DELETE rotaları için etkinleştir
-app.use((req, res, next) => {
-  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
-    return next();
-  }
-  doubleCsrfProtection(req, res, next);
-});
-
-// CSRF Hatası Yakalayıcı
-app.use((err, req, res, next) => {
-  if (err === invalidCsrfTokenError) {
-    res.status(403).render('error', {
-      title: '403 - Yetkisiz İstek',
-      statusCode: 403,
-      message: 'Güvenlik doğrulaması başarısız oldu (CSRF token geçersiz veya eksik). Lütfen sayfayı yenileyip tekrar deneyin.',
-    });
-  } else {
-    next(err);
-  }
-});
-
 // ─── Flash Messages ───────────────────────────────────────────────────────────
 app.use((req, res, next) => {
   if (!req.session.flash) req.session.flash = {};
@@ -145,11 +103,6 @@ app.use((req, res, next) => {
 });
 
 // ─── Global Template Locals ───────────────────────────────────────────────────
-app.use((req, res, next) => {
-  // CSRF token'ı şablonlarda kullanabilmek için yerel değişken olarak ekle
-  res.locals.csrfToken = generateToken(req, res);
-  next();
-});
 app.use(setLocals);
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
