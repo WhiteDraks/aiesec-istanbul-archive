@@ -95,6 +95,7 @@ const setLocals = async (req, res, next) => {
     res.locals.siteSettings = {};
   }
   
+  res.locals.appVersion = require('../package.json').version;
   next();
 };
 
