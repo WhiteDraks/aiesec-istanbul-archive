@@ -187,8 +187,8 @@
         <h3>AIESEC Kariyeri</h3>
         <p class="form-hint" style="margin-bottom: 1rem;">Geçmiş EB ve diğer AIESEC görevlerinizi ekleyebilirsiniz. Örn: 26.27 - LCP, 25.26 - LCVP B2C</p>
         <div id="roles-container">
-          <% const roles = (user.roles_history && Array.isArray(user.roles_history)) ? user.roles_history : [{year: '', role: ''}]; %>
-          <% roles.forEach((r, idx) => { %>
+          <% const roles = (user.roles_history && Array.isArray(user.roles_history) && user.roles_history.length > 0) ? user.roles_history : [{year: '', role: ''}]; %>
+          <% roles.forEach((r) => { %>
             <div class="role-row">
               <div class="form-group" style="flex: 1;">
                 <label class="form-label">Dönem</label>
@@ -198,11 +198,7 @@
                 <label class="form-label">Görev</label>
                 <input type="text" name="role_titles[]" class="form-input" value="<%= r.role %>" placeholder="Örn: Başkan (LCP)">
               </div>
-              <% if (idx > 0) { %>
-                <button type="button" class="btn btn-outline" style="align-self: flex-end; margin-bottom: 0.2rem;" onclick="this.parentElement.remove()">Sil</button>
-              <% } else { %>
-                <div style="width: 50px;"></div> <!-- placeholder -->
-              <% } %>
+              <button type="button" class="btn btn-outline" style="align-self: flex-end; margin-bottom: 0.2rem; color: #ff4d4f; border-color: rgba(255,77,79,0.4);" onclick="this.parentElement.remove()">Sil</button>
             </div>
           <% }) %>
         </div>
