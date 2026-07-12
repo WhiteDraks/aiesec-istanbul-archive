@@ -26,6 +26,69 @@
       <% if (siteSettings.theme_surface) { %>--surface: <%= siteSettings.theme_surface %>;<% } %>
       <% if (siteSettings.theme_secondary) { %>--secondary: <%= siteSettings.theme_secondary %>;<% } %>
     }
+
+    /* Modern Responsive Hover Dropdown */
+    .nav-item-dropdown {
+      position: relative;
+    }
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: rgba(17, 24, 39, 0.95);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 0.75rem;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+    }
+    .nav-item-dropdown:hover .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+    .dropdown-item {
+      color: var(--gray-300) !important;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+    }
+    .dropdown-item:hover {
+      background: rgba(3, 126, 243, 0.15);
+      color: #fff !important;
+      padding-left: 1.25rem;
+    }
+    @media (max-width: 991px) {
+      .dropdown-menu {
+        position: static;
+        transform: none;
+        background: rgba(255, 255, 255, 0.02);
+        border: none;
+        box-shadow: none;
+        padding: 0.5rem 0 0.5rem 1rem;
+        opacity: 1;
+        visibility: visible;
+        display: flex;
+      }
+      .nav-item-dropdown:hover .dropdown-menu {
+        transform: none;
+      }
+    }
   </style>
 
   <!-- Favicon -->
@@ -63,9 +126,17 @@
 
       <% if (currentUser) { %>
         <% if (isApproved || isAdmin) { %>
-          <li><a href="/alumni" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'alumni' ? 'active' : '' %>">Alumni Rehberi</a></li>
-          <li><a href="/jobs" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'jobs' ? 'active' : '' %>">Kariyer Panosu 💼</a></li>
-          <li><a href="/events" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'events' ? 'active' : '' %>">Etkinlikler 📅</a></li>
+          <li class="nav-item-dropdown">
+            <a href="#" class="nav-link <%= typeof currentPage !== 'undefined' && ['alumni', 'jobs', 'events'].includes(currentPage) ? 'active' : '' %>" style="display: flex; align-items: center; gap: 0.25rem;">
+              Topluluk 👥
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="margin-top: 2px;"><polyline points="6 9 12 15 18 9"/></svg>
+            </a>
+            <div class="dropdown-menu">
+              <a href="/alumni" class="dropdown-item <%= typeof currentPage !== 'undefined' && currentPage === 'alumni' ? 'active' : '' %>">👥 Alumni Rehberi</a>
+              <a href="/jobs" class="dropdown-item <%= typeof currentPage !== 'undefined' && currentPage === 'jobs' ? 'active' : '' %>">💼 Kariyer Panosu</a>
+              <a href="/events" class="dropdown-item <%= typeof currentPage !== 'undefined' && currentPage === 'events' ? 'active' : '' %>">📅 Etkinlikler</a>
+            </div>
+          </li>
         <% } %>
         <li><a href="/profile" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'profile' ? 'active' : '' %>">Profilim</a></li>
         <% if (isAdmin) { %>
