@@ -127,16 +127,16 @@ app.use((req, res, next) => {
     if (origin) {
       try {
         const originUrl = new URL(origin);
-        // Compare origin host with server host
-        isValid = originUrl.host === host;
+        const originHost = originUrl.host;
+        isValid = originHost === host || originHost === req.headers['x-forwarded-host'] || originHost.endsWith('.vercel.app');
       } catch (e) {
         isValid = false;
       }
     } else if (referer) {
       try {
         const refererUrl = new URL(referer);
-        // Compare referer host with server host
-        isValid = refererUrl.host === host;
+        const refererHost = refererUrl.host;
+        isValid = refererHost === host || refererHost === req.headers['x-forwarded-host'] || refererHost.endsWith('.vercel.app');
       } catch (e) {
         isValid = false;
       }
