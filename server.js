@@ -90,13 +90,14 @@ app.use(session(sessionConfig));
 
 // ─── Flash Messages ───────────────────────────────────────────────────────────
 app.use((req, res, next) => {
-  if (!req.session.flash) req.session.flash = {};
   req.flash = (type, message) => {
+    if (!req.session) return;
+    if (!req.session.flash) req.session.flash = {};
     if (!req.session.flash[type]) req.session.flash[type] = [];
     req.session.flash[type].push(message);
   };
-  const flash = req.session.flash;
-  req.session.flash = {};
+  const flash = req.session && req.session.flash ? req.session.flash : {};
+  if (req.session) req.session.flash = {};
   res.locals.success = flash.success || [];
   res.locals.error   = flash.error   || [];
   next();
