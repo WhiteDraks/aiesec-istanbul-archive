@@ -1,34 +1,36 @@
-const { put } = require('@vercel/blob');
-const crypto = require('crypto');
+const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 /**
- * Uploads a file buffer to Vercel Blob and returns the public URL.
+ * Uploads a file buffer locally to the public/uploads/ folder and returns the relative public URL.
  * 
  * @param {Buffer} buffer - The file buffer
  * @param {string} originalName - Original file name
  * @param {string} prefix - Optional folder prefix (e.g., 'avatars/')
- * @returns {Promise<string>} The public URL of the uploaded blob
+ * @returns {Promise<string>} The public URL of the uploaded file
  */
 async function uploadToBlob(buffer, originalName, prefix = 'uploads/') {
   // Generate a unique filename
   const ext = path.extname(originalName);
   const uniqueId = crypto.randomBytes(8).toString('hex');
-  const filename = `${prefix}${uniqueId}${ext}`;
+  const filename = `${uniqueId}${ext}`;
 
-  const token = process.env.AIESEC_BLOB_TOKEN || process.env.BLOB_READ_WRITE_TOKEN;
+  // Target directory in public folder
+  const targetDir = path.join(process.cwd(), 'public', 'uploads', prefix);
 
-  if (!token) {
-    console.warn('⚠️ No blob token set. Saving to memory only.');
-    return `/images/default-avatar.svg?error=no-blob-token`;
+  // Ensure directory exists
+  if (!fs.existsSync(targetDir)) {
+    fs.mkdirSync(targetDir, { recursive: true });
   }
 
-  const result = await put(filename, buffer, {
-    access: 'public',
-    token: token,
-  });
+  const targetPath = path.join(targetDir, filename);
 
-  return result.url;
+  // Write file to disk
+  fs.writeFileSync(targetPath, buffer);
+
+  // Return the relative web path
+  return `/uploads/${prefix}${filename}`;
 }
 
 module.exports = { uploadToBlob };

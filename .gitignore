@@ -1,24 +1,2 @@
-# Dependencies
-node_modules/
-
-# Environment variables
-.env
-
-# Logs
-logs/
-*.log
-npm-debug.log*
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Build artifacts
-dist/
-.vercel/
-
-# IDE
-.vscode/
-.idea/
-.vercel
-.env*
+public/uploads/*
+!public/uploads/.gitkeep
