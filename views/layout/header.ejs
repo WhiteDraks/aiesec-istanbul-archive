@@ -21,10 +21,25 @@
   <!-- Dynamic Theme Settings -->
   <style>
     :root {
-      <% if (siteSettings.theme_primary) { %>--primary: <%= siteSettings.theme_primary %>; --primary-hover: <%= siteSettings.theme_primary %>ee;<% } %>
-      <% if (siteSettings.theme_background) { %>--background: <%= siteSettings.theme_background %>;<% } %>
-      <% if (siteSettings.theme_surface) { %>--surface: <%= siteSettings.theme_surface %>;<% } %>
-      <% if (siteSettings.theme_secondary) { %>--secondary: <%= siteSettings.theme_secondary %>;<% } %>
+      <% if (siteSettings.theme_primary) { %>
+        --blue-500: <%= siteSettings.theme_primary %>;
+        --blue-600: <%= siteSettings.theme_primary %>dd;
+        --blue-700: <%= siteSettings.theme_primary %>bb;
+        --primary: <%= siteSettings.theme_primary %>;
+        --primary-hover: <%= siteSettings.theme_primary %>ee;
+      <% } %>
+      <% if (siteSettings.theme_background) { %>
+        --navy-900: <%= siteSettings.theme_background %>;
+        --background: <%= siteSettings.theme_background %>;
+      <% } %>
+      <% if (siteSettings.theme_surface) { %>
+        --navy-800: <%= siteSettings.theme_surface %>;
+        --surface: <%= siteSettings.theme_surface %>;
+      <% } %>
+      <% if (siteSettings.theme_secondary) { %>
+        --navy-700: <%= siteSettings.theme_secondary %>;
+        --secondary: <%= siteSettings.theme_secondary %>;
+      <% } %>
     }
 
     /* Modern Responsive Hover Dropdown */
