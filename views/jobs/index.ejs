@@ -35,7 +35,7 @@
             <div style="display: flex; gap: 0.75rem; align-items: center;">
               <img src="<%= job.user_photo || '/images/default-avatar.svg' %>" alt="<%= job.user_name %>" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border);">
               <div>
-                <h4 style="font-size: 0.95rem; font-weight: 600; color: #fff; margin: 0;"><%= job.user_name %></h4>
+                <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--white); margin: 0;"><%= job.user_name %></h4>
                 <span style="font-size: 0.8rem; color: var(--text-muted);">
                   <%= new Date(job.created_at).toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' }) %>
                 </span>
@@ -51,7 +51,7 @@
           <!-- Job Details -->
           <div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
-              <h3 style="font-size: 1.5rem; font-weight: 700; color: #fff; margin: 0;"><%= job.title %></h3>
+              <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--white); margin: 0;"><%= job.title %></h3>
               <span style="font-size: 0.8rem; background: rgba(3, 126, 243, 0.1); color: var(--primary); padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 600; border: 1px solid rgba(3, 126, 243, 0.2);">
                 <%= job.type %>
               </span>

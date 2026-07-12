@@ -22,7 +22,7 @@
   <% if (events.length === 0) { %>
     <div class="empty-state" style="background: var(--surface); border: 1px solid var(--border); padding: 5rem 2rem; border-radius: 16px; text-align: center;">
       <div class="empty-icon" style="font-size: 3.5rem; margin-bottom: 1rem;">📅</div>
-      <h3 style="font-size: 1.4rem; font-weight: 600; color: #fff; margin-bottom: 0.5rem;">Henüz etkinlik planlanmamış</h3>
+      <h3 style="font-size: 1.4rem; font-weight: 600; color: var(--white); margin-bottom: 0.5rem;">Henüz etkinlik planlanmamış</h3>
       <p style="color: var(--text-muted); max-width: 450px; margin: 0 auto; line-height: 1.6;">Topluluğa özel ilk mezun buluşmasını veya online etkinliği siz planlayın!</p>
     </div>
   <% } else { %>
@@ -31,7 +31,7 @@
         <div class="profile-card" style="padding: 2.5rem; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.15); display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start;">
           
           <!-- Date badge -->
-          <div style="flex-shrink: 0; width: 85px; height: 90px; border-radius: 14px; background: rgba(3, 126, 243, 0.08); border: 1px solid rgba(3, 126, 243, 0.25); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+          <div style="flex-shrink: 0; width: 85px; height: 90px; border-radius: 14px; background: rgba(3, 126, 243, 0.08); border: 1px solid rgba(3, 126, 243, 0.25); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text); box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
             <span style="font-size: 1.8rem; font-weight: 800; line-height: 1; color: var(--primary);">
               <%= new Date(event.event_date).toLocaleDateString('tr-TR', { day: '2-digit' }) %>
             </span>
@@ -45,7 +45,7 @@
             
             <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
               <div>
-                <h3 style="font-size: 1.45rem; font-weight: 700; color: #fff; margin: 0;"><%= event.title %></h3>
+                <h3 style="font-size: 1.45rem; font-weight: 700; color: var(--white); margin: 0;"><%= event.title %></h3>
                 <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.35rem;">
                   <span>🕒 <%= new Date(event.event_date).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) %></span>
                   <span>📍 <%= event.location %></span>
@@ -64,7 +64,7 @@
             <!-- Attendee count and avatars -->
             <% if (event.attendees && event.attendees.length > 0) { %>
               <div style="border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 1.25rem; margin-top: 0.5rem;">
-                <h4 style="font-size: 0.825rem; font-weight: 600; color: #fff; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.35rem;">
+                <h4 style="font-size: 0.825rem; font-weight: 600; color: var(--white); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.35rem;">
                   👥 Katılacak Üyelerimiz (<%= event.attendee_count %>):
                 </h4>
                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
