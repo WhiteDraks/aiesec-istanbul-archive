@@ -24,26 +24,21 @@ app.set('trust proxy', 1);
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: [
-        "'self'",
-        "'unsafe-inline'",                        // EJS inline scripts
-        'https://cdnjs.cloudflare.com',            // Cropper.js
-      ],
-      styleSrc: [
-        "'self'",
-        "'unsafe-inline'",
-        'https://fonts.googleapis.com',
-        'https://cdnjs.cloudflare.com',
-      ],
-      fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-      imgSrc: ["'self'", 'data:', 'blob:', 'https:'],  // https: = tüm HTTPS kaynaklarına izin ver (Vercel Blob CDN dahil)
-      connectSrc: ["'self'"],
-      frameSrc: ["'none'"],
-      objectSrc: ["'none'"],
+      defaultSrc:   ["'self'"],
+      scriptSrc:    ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com'],
+      scriptSrcAttr: ["'unsafe-inline'"],  // onclick/onchange gibi inline event handler'lara izin ver
+      styleSrc:     ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com'],
+      fontSrc:      ["'self'", 'https://fonts.gstatic.com'],
+      imgSrc:       ["'self'", 'data:', 'blob:', 'https:'],  // https: = tüm HTTPS görseller (Vercel Blob dahil)
+      connectSrc:   ["'self'"],
+      frameSrc:     ["'none'"],
+      objectSrc:    ["'none'"],
+      baseUri:      ["'self'"],
+      formAction:   ["'self'"],
     },
   },
-  crossOriginEmbedderPolicy: false, // Needed for Vercel Blob images
+  crossOriginResourcePolicy:  { policy: 'cross-origin' }, // Vercel Blob CDN'den görsel yüklenmesine izin ver
+  crossOriginEmbedderPolicy:  false,
 }));
 
 // ─── Rate Limiting ────────────────────────────────────────────────────────────
