@@ -54,24 +54,17 @@
         </select>
       </div>
 
-      <!-- Start Year Filter -->
-      <div class="form-group" style="margin: 0;">
-        <select name="start_year" class="form-input" style="padding: 0.65rem 1rem;">
-          <option value="">Dönem Başlangıcı (En Eski)</option>
-          <% [...availableYears].reverse().forEach(year => { %>
-            <option value="<%= year %>" <%= start_year === year ? 'selected' : '' %>><%= year %></option>
-          <% }) %>
-        </select>
-      </div>
-
-      <!-- End Year Filter -->
-      <div class="form-group" style="margin: 0;">
-        <select name="end_year" class="form-input" style="padding: 0.65rem 1rem;">
-          <option value="">Dönem Bitişi (En Yeni)</option>
+      <!-- Years Checklist Filter -->
+      <div class="form-group" style="margin: 0; grid-column: 1 / -1; display: flex; flex-direction: column; gap: 0.5rem;">
+        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-lighter);">Dönem Filtrele (Yıllar):</span>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
           <% availableYears.forEach(year => { %>
-            <option value="<%= year %>" <%= end_year === year ? 'selected' : '' %>><%= year %></option>
+            <label class="btn btn-outline btn-xs" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; padding: 0.3rem 0.6rem; border-radius: 20px; font-weight: 500; cursor: pointer; color: var(--text); border-color: var(--border);">
+              <input type="checkbox" name="years[]" value="<%= year %>" <%= (typeof selectedYears !== 'undefined' && selectedYears.includes(year)) ? 'checked' : '' %> style="cursor: pointer; width: 13px; height: 13px; border-radius: 3px; accent-color: var(--primary);">
+              <%= year %>
+            </label>
           <% }) %>
-        </select>
+        </div>
       </div>
 
     </div>

@@ -16,33 +16,22 @@
 <section class="section">
   <div class="container">
 
-    <!-- Years Range Filter Bar -->
-    <div class="filter-bar" style="background: var(--surface); border: 1px solid var(--border); padding: 1.5rem; border-radius: 16px; margin-bottom: 2.5rem; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03); backdrop-filter: blur(5px);">
-      <form action="/eb" method="GET" style="display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-end; width: 100%;">
-        <div style="display: flex; flex-direction: column; gap: 0.5rem; min-width: 160px; flex: 1;">
-          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-lighter);">Başlangıç Dönemi</label>
-          <select name="start_year" class="form-input" style="height: auto; padding: 0.65rem 1rem; border-radius: 8px;">
-            <option value="">En Eski</option>
-            <% [...availableYears].reverse().forEach(year => { %>
-              <option value="<%= year %>" <%= start_year === year ? 'selected' : '' %>><%= year %></option>
-            <% }) %>
-          </select>
+    <!-- Years Checklist Filter Bar -->
+    <div class="filter-bar" style="background: var(--surface); border: 1px solid var(--border); padding: 1.5rem; border-radius: 16px; margin-bottom: 2.5rem; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);">
+      <form action="/eb" method="GET" style="display: flex; flex-direction: column; gap: 1rem; width: 100%;">
+        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-lighter);">Gösterilecek Yılları Seçin:</span>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+          <% availableYears.forEach(year => { %>
+            <label class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; padding: 0.4rem 0.8rem; border-radius: 20px; font-weight: 500; cursor: pointer; color: var(--text); border-color: var(--border);">
+              <input type="checkbox" name="years[]" value="<%= year %>" <%= (typeof selectedYears !== 'undefined' && selectedYears.includes(year)) ? 'checked' : '' %> style="cursor: pointer; width: 15px; height: 15px; border-radius: 3px; accent-color: var(--primary);">
+              <%= year %>
+            </label>
+          <% }) %>
         </div>
-        
-        <div style="display: flex; flex-direction: column; gap: 0.5rem; min-width: 160px; flex: 1;">
-          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-lighter);">Bitiş Dönemi</label>
-          <select name="end_year" class="form-input" style="height: auto; padding: 0.65rem 1rem; border-radius: 8px;">
-            <option value="">En Yeni</option>
-            <% availableYears.forEach(year => { %>
-              <option value="<%= year %>" <%= end_year === year ? 'selected' : '' %>><%= year %></option>
-            <% }) %>
-          </select>
-        </div>
-
-        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-          <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.4rem; font-size: 0.9rem; border-radius: 8px; font-weight: 600;">Filtrele 🔍</button>
-          <% if (start_year || end_year) { %>
-            <a href="/eb" class="btn btn-outline" style="padding: 0.65rem 1.4rem; font-size: 0.9rem; border-radius: 8px; font-weight: 600;">Temizle</a>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+          <button type="submit" class="btn btn-primary btn-sm" style="padding: 0.5rem 1.25rem; font-size: 0.85rem; border-radius: 8px; font-weight: 600;">Filtrele 🔍</button>
+          <% if (typeof selectedYears !== 'undefined' && selectedYears.length > 0) { %>
+            <a href="/eb" class="btn btn-outline btn-sm" style="padding: 0.5rem 1.25rem; font-size: 0.85rem; border-radius: 8px; font-weight: 600;">Temizle</a>
           <% } %>
         </div>
       </form>

@@ -9,25 +9,22 @@ router.use(isLoggedIn, isApproved);
 // GET /alumni - Mezunlar dizini
 router.get('/', async (req, res) => {
   try {
-    const { query, sector, city, country, is_mentor, start_year, end_year } = req.query;
+    const { query, sector, city, country, is_mentor } = req.query;
+    const selectedYears = req.query.years ? (Array.isArray(req.query.years) ? req.query.years : [req.query.years]) : [];
     const { getSQL } = require('../config/database');
     const sql = getSQL();
 
     // Fetch alumni using search helper
     const alumni = await User.searchApproved({ query, sector, city, country, is_mentor });
 
-    // Fetch all available EB team years for the range dropdown options
+    // Fetch all available EB team years for the dropdown options
     const EBTeam = require('../models/EBTeam');
     const teamMetas = await EBTeam.findAll();
     const availableYears = teamMetas.map(t => t.year).sort((a, b) => b.localeCompare(a));
 
-    // Filter alumni by year range (checks both primary eb_year and roles_history)
+    // Filter alumni by selected years checklist if specified
     let filteredAlumni = alumni;
-    if (start_year || end_year) {
-      const getYearStart = (y) => parseInt(y.split('-')[0], 10);
-      const startVal = start_year ? getYearStart(start_year) : null;
-      const endVal = end_year ? getYearStart(end_year) : null;
-
+    if (selectedYears.length > 0) {
       filteredAlumni = alumni.filter(person => {
         const personYears = new Set();
         if (person.eb_year && /^\d{4}-\d{4}$/.test(person.eb_year)) {
@@ -41,14 +38,7 @@ router.get('/', async (req, res) => {
           });
         }
 
-        if (personYears.size === 0) return false;
-
-        return Array.from(personYears).some(py => {
-          const yVal = getYearStart(py);
-          if (startVal && yVal < startVal) return false;
-          if (endVal && yVal > endVal) return false;
-          return true;
-        });
+        return Array.from(personYears).some(py => selectedYears.includes(py));
       });
     }
 
@@ -72,8 +62,7 @@ router.get('/', async (req, res) => {
       cities,
       countries,
       availableYears,
-      start_year: start_year || '',
-      end_year: end_year || '',
+      selectedYears,
       activeSector: sector || '',
       activeCity: city || '',
       activeCountry: country || '',

@@ -16,8 +16,6 @@ const { isLoggedIn, isApproved } = require('../middleware/auth');
 router.get('/', async (req, res) => {
   try {
     const sql = getSQL();
-    const start_year = req.query.start_year || '';
-    const end_year = req.query.end_year || '';
 
     // Fetch all admin-defined teams
     const teamMetas = await EBTeam.findAll();
@@ -49,27 +47,19 @@ router.get('/', async (req, res) => {
     // Sort periods descending by year: 2026-2027, 2025-2026...
     periods.sort((a, b) => b.year.localeCompare(a.year));
 
-    // Filter by year range if specified
-    let filteredPeriods = periods;
-    if (start_year || end_year) {
-      const getYearStart = (y) => parseInt(y.split('-')[0], 10);
-      const startVal = start_year ? getYearStart(start_year) : null;
-      const endVal = end_year ? getYearStart(end_year) : null;
+    // Filter by selected years checklist if specified
+    const selectedYears = req.query.years ? (Array.isArray(req.query.years) ? req.query.years : [req.query.years]) : [];
 
-      filteredPeriods = periods.filter(p => {
-        const yVal = getYearStart(p.year);
-        if (startVal && yVal < startVal) return false;
-        if (endVal && yVal > endVal) return false;
-        return true;
-      });
+    let filteredPeriods = periods;
+    if (selectedYears.length > 0) {
+      filteredPeriods = periods.filter(p => selectedYears.includes(p.year));
     }
 
     res.render('eb/index', {
       title: 'EB Takımları - AIESEC İstanbul',
       teams: filteredPeriods,
       availableYears,
-      start_year,
-      end_year
+      selectedYears
     });
   } catch (err) {
     console.error(err);
