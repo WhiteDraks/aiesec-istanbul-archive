@@ -97,11 +97,9 @@
                   <td class="action-cell">
                     <a href="/admin/user/<%= u.id %>/edit" class="btn btn-outline btn-xs">✎ Düzenle</a>
                     <form action="/admin/approve/<%= u.id %>" method="POST" style="display:inline">
-                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                       <button type="submit" class="btn btn-approve btn-xs">✓ Onayla</button>
                     </form>
                     <form action="/admin/reject/<%= u.id %>" method="POST" style="display:inline">
-                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                       <button type="submit" class="btn btn-reject btn-xs">✕ Reddet</button>
                     </form>
                   </td>
@@ -149,11 +147,9 @@
                   <td class="action-cell">
                     <a href="/admin/user/<%= u.id %>/edit" class="btn btn-outline btn-xs">✎ Düzenle</a>
                     <form action="/admin/reject/<%= u.id %>" method="POST" style="display:inline">
-                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                       <button type="submit" class="btn btn-reject btn-xs">✕ İptal</button>
                     </form>
                     <form action="/admin/delete/<%= u.id %>" method="POST" style="display:inline" onsubmit="return confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')">
-                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                       <button type="submit" class="btn btn-delete btn-xs">🗑 Sil</button>
                     </form>
                   </td>
@@ -195,11 +191,9 @@
                   <td class="action-cell">
                     <a href="/admin/user/<%= u.id %>/edit" class="btn btn-outline btn-xs">✎ Düzenle</a>
                     <form action="/admin/reset/<%= u.id %>" method="POST" style="display:inline">
-                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                       <button type="submit" class="btn btn-approve btn-xs">↺ Tekrar Değerlendir</button>
                     </form>
                     <form action="/admin/delete/<%= u.id %>" method="POST" style="display:inline" onsubmit="return confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')">
-                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                       <button type="submit" class="btn btn-delete btn-xs">🗑 Sil</button>
                     </form>
                   </td>
@@ -245,7 +239,6 @@
                   </td>
                   <td class="action-cell">
                     <form action="/admin/feedback/delete/<%= f.id %>" method="POST" style="display:inline" onsubmit="return confirm('Bu geri bildirimi silmek istediğinizden emin misiniz?')">
-                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                       <button type="submit" class="btn btn-delete btn-xs">🗑 Sil</button>
                     </form>
                   </td>
@@ -268,7 +261,6 @@
       <span onclick="closeDigestModal()" style="cursor: pointer; color: var(--text-muted); font-size: 1.5rem; font-weight: bold;">&times;</span>
     </div>
     <form action="/admin/digest/trigger" method="POST" style="display: flex; flex-direction: column; gap: 1.25rem;">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <div class="form-group">
         <label for="digest_subject" class="form-label">Bülten Konusu (E-posta Başlığı)</label>
         <input type="text" id="digest_subject" name="digest_subject" class="form-input" value="AIESEC İstanbul Mezunlar Portalı - Haftalık Özet 📰" required placeholder="Bülten konusu...">

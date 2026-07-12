@@ -43,7 +43,6 @@
             </div>
             <% if (currentUser && (currentUser.role === 'admin' || job.user_id === currentUser.id)) { %>
               <form action="/jobs/delete/<%= job.id %>" method="POST" style="margin: 0;" onsubmit="return confirm('Bu ilanı silmek istediğinizden emin misiniz?')">
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <button type="submit" class="btn btn-delete btn-xs" style="padding: 0.45rem 0.9rem; font-size: 0.75rem; border-radius: 6px; background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">🗑 Sil</button>
               </form>
             <% } %>
@@ -97,7 +96,6 @@
     <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 2rem;">Topluluk mezunlarına sunmak istediğiniz fırsatın tüm detaylarını girin.</p>
 
     <form action="/jobs" method="POST" style="display: flex; flex-direction: column; gap: 1.25rem;">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <div class="form-group" style="margin: 0;">
         <label for="title" class="form-label">Pozisyon Başlığı *</label>
         <input type="text" id="title" name="title" class="form-input" required placeholder="Örn: Senior Product Manager">

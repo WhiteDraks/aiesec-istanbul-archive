@@ -17,7 +17,6 @@
   <div class="container" style="max-width: 800px;">
     
     <form action="/admin/settings" method="POST" enctype="multipart/form-data" class="profile-card" style="padding: 2.5rem; margin-bottom: 2rem;">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       
       <!-- Tema Renkleri -->
       <div class="form-section">
@@ -242,7 +241,6 @@
 
     <!-- Restore Defaults Form -->
     <form action="/admin/settings/reset" method="POST" onsubmit="return confirm('Tüm ayarları varsayılan renklere ve logolara döndürmek istediğinizden emin misiniz?')" style="text-align: center; margin-bottom: 3rem;">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <button type="submit" class="btn btn-outline" style="color: #ff4d4f; border-color: rgba(255,77,79,0.3); padding: 0.75rem 2rem;">
         ⚙️ Tüm Ayarları Varsayılana Döndür
       </button>

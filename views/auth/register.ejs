@@ -35,7 +35,6 @@
         <% } %>
 
         <form action="/auth/register" method="POST" class="auth-form" id="register-form" novalidate>
-          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
           <div class="form-group">
             <label for="name" class="form-label">Ad Soyad</label>
             <input

@@ -14,7 +14,6 @@
     <div class="admin-card">
       <h3 class="admin-card-title">Takım Bilgileri</h3>
       <form action="/admin/eb/<%= team.id %>/edit" method="POST">
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <div class="form-group">
           <label class="form-label">Dönem (Örn: 26.27)</label>
           <input type="text" name="year" class="form-input" value="<%= team.year %>" required>
@@ -39,7 +38,6 @@
     <div class="admin-card">
       <h3 class="admin-card-title">Galeri Fotoğrafları</h3>
       <form action="/admin/eb/<%= team.id %>/gallery" method="POST" enctype="multipart/form-data" style="margin-bottom: 2rem;">
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <div class="form-group">
           <label class="form-label">Yeni Fotoğraflar Ekle (Çoklu Seçim)</label>
           <input type="file" name="photos" class="form-input" accept="image/*" multiple required>
