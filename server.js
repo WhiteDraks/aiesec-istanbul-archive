@@ -116,6 +116,55 @@ app.use((req, res, next) => {
   next();
 });
 
+// ─── CSRF Protection via Origin & Referer Verification ────────────────────────
+app.use((req, res, next) => {
+  if (['POST', 'PUT', 'DELETE'].includes(req.method)) {
+    const origin = req.headers.origin;
+    const referer = req.headers.referer;
+    const host = req.headers.host; // E.g. aiesec-istanbul-archive.vercel.app
+
+    let isValid = true;
+
+    if (origin) {
+      try {
+        const originUrl = new URL(origin);
+        // Compare origin host with server host
+        isValid = originUrl.host === host;
+      } catch (e) {
+        isValid = false;
+      }
+    } else if (referer) {
+      try {
+        const refererUrl = new URL(referer);
+        // Compare referer host with server host
+        isValid = refererUrl.host === host;
+      } catch (e) {
+        isValid = false;
+      }
+    }
+
+    if (!isValid) {
+      console.warn(`[CSRF Blocked] Request to ${req.path} from external origin. Origin: ${origin}, Referer: ${referer}, Host: ${host}`);
+      return res.status(403).render('error', {
+        title: '403 - Yetkisiz İstek',
+        statusCode: 403,
+        message: 'Güvenlik doğrulaması başarısız oldu (CSRF Koruması). Dış kaynaklardan yapılan durum değiştirme istekleri engellenmiştir.',
+      });
+    }
+  }
+  next();
+});
+
+// ─── Content Creation Rate Limiting (Anti-Spam) ───────────────────────────────
+const contentLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,  // 1 dakika
+  max: 10,                   // 1 dakikada en fazla 10 içerik isteği
+  message: 'Çok hızlı içerik oluşturuyorsunuz. Lütfen 1 dakika sonra tekrar deneyin.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.method === 'GET',
+});
+
 // ─── Global Template Locals ───────────────────────────────────────────────────
 app.use((req, res, next) => {
   res.locals.csrfToken = "";
@@ -131,9 +180,9 @@ app.use('/admin',    require('./routes/admin'));
 app.use('/admin/eb', require('./routes/admin-eb'));
 app.use('/profile',  require('./routes/profile'));
 app.use('/alumni',   require('./routes/alumni'));
-app.use('/feedback', require('./routes/feedback'));
-app.use('/jobs',     require('./routes/jobs'));
-app.use('/events',   require('./routes/events'));
+app.use('/feedback', contentLimiter, require('./routes/feedback'));
+app.use('/jobs',     contentLimiter, require('./routes/jobs'));
+app.use('/events',   contentLimiter, require('./routes/events'));
 
 // ─── 404 Handler ──────────────────────────────────────────────────────────────
 app.use((req, res) => {
