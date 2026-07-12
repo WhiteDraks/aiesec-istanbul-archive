@@ -29,7 +29,7 @@ app.use(helmet({
     useDefaults: true,
     directives: {
       "default-src": ["'self'"],
-      "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"],
+      "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
       // script-src-attr, script-src'den AYRI bir CSP3 direktifidir ve helmet
       // useDefaults:true ile bunu açıkça belirtilmezse 'none' yapar — bu da
       // onclick="..." gibi tüm satır-içi olay tetikleyicilerini (tema anahtarı,
@@ -37,8 +37,8 @@ app.use(helmet({
       "script-src-attr": ["'unsafe-inline'"],
       "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"],
       "font-src": ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
-      "img-src": ["'self'", "data:", "blob:", "https://*.public.blob.vercel-storage.com", "https://aiesec-blob-public.s3.amazonaws.com"],
-      "connect-src": ["'self'", "https://*.public.blob.vercel-storage.com"],
+      "img-src": ["'self'", "data:", "blob:", "https://*.public.blob.vercel-storage.com", "https://aiesec-blob-public.s3.amazonaws.com", "https://www.google-analytics.com", "https://*.google-analytics.com"],
+      "connect-src": ["'self'", "https://*.public.blob.vercel-storage.com", "https://www.google-analytics.com", "https://*.google-analytics.com"],
       "object-src": ["'none'"],
       "upgrade-insecure-requests": []
     }
