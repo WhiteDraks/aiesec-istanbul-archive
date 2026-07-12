@@ -24,38 +24,42 @@
         <p class="form-hint" style="margin-bottom: 1.5rem;">Sitenin kurumsal renk paletini buradan özelleştirebilirsiniz.</p>
         
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-          <div class="form-group">
+          <div class="form-group" style="margin: 0;">
             <label for="theme_primary" class="form-label">Ana Renk (Primary)</label>
-            <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.35rem;">
               <input type="color" id="theme_primary_picker" value="<%= settings.theme_primary %>" style="width: 40px; height: 40px; border: none; border-radius: 6px; cursor: pointer;" oninput="document.getElementById('theme_primary').value = this.value">
-              <input type="text" id="theme_primary" name="theme_primary" class="form-input" value="<%= settings.theme_primary %>" required oninput="document.getElementById('theme_primary_picker').value = this.value">
+              <input type="text" id="theme_primary" name="theme_primary" class="form-input" value="<%= settings.theme_primary %>" oninput="document.getElementById('theme_primary_picker').value = this.value">
             </div>
+            <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="resetField('theme_primary', '#037ef3', true)">↩ Varsayılana Dön</button>
           </div>
           
-          <div class="form-group">
+          <div class="form-group" style="margin: 0;">
             <label for="theme_secondary" class="form-label">İkincil Renk (Secondary)</label>
-            <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.35rem;">
               <input type="color" id="theme_secondary_picker" value="<%= settings.theme_secondary %>" style="width: 40px; height: 40px; border: none; border-radius: 6px; cursor: pointer;" oninput="document.getElementById('theme_secondary').value = this.value">
-              <input type="text" id="theme_secondary" name="theme_secondary" class="form-input" value="<%= settings.theme_secondary %>" required oninput="document.getElementById('theme_secondary_picker').value = this.value">
+              <input type="text" id="theme_secondary" name="theme_secondary" class="form-input" value="<%= settings.theme_secondary %>" oninput="document.getElementById('theme_secondary_picker').value = this.value">
             </div>
+            <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="resetField('theme_secondary', '#0a2540', true)">↩ Varsayılana Dön</button>
           </div>
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
-          <div class="form-group">
+          <div class="form-group" style="margin: 0;">
             <label for="theme_background" class="form-label">Arka Plan (Background)</label>
-            <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.35rem;">
               <input type="color" id="theme_background_picker" value="<%= settings.theme_background %>" style="width: 40px; height: 40px; border: none; border-radius: 6px; cursor: pointer;" oninput="document.getElementById('theme_background').value = this.value">
-              <input type="text" id="theme_background" name="theme_background" class="form-input" value="<%= settings.theme_background %>" required oninput="document.getElementById('theme_background_picker').value = this.value">
+              <input type="text" id="theme_background" name="theme_background" class="form-input" value="<%= settings.theme_background %>" oninput="document.getElementById('theme_background_picker').value = this.value">
             </div>
+            <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="resetField('theme_background', '#090d16', true)">↩ Varsayılana Dön</button>
           </div>
           
-          <div class="form-group">
+          <div class="form-group" style="margin: 0;">
             <label for="theme_surface" class="form-label">Yüzey Rengi (Surface)</label>
-            <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.35rem;">
               <input type="color" id="theme_surface_picker" value="<%= settings.theme_surface %>" style="width: 40px; height: 40px; border: none; border-radius: 6px; cursor: pointer;" oninput="document.getElementById('theme_surface').value = this.value">
-              <input type="text" id="theme_surface" name="theme_surface" class="form-input" value="<%= settings.theme_surface %>" required oninput="document.getElementById('theme_surface_picker').value = this.value">
+              <input type="text" id="theme_surface" name="theme_surface" class="form-input" value="<%= settings.theme_surface %>" oninput="document.getElementById('theme_surface_picker').value = this.value">
             </div>
+            <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="resetField('theme_surface', '#111827', true)">↩ Varsayılana Dön</button>
           </div>
         </div>
       </div>
@@ -68,26 +72,30 @@
         <p class="form-hint" style="margin-bottom: 1.5rem;">Sitenin sol üstündeki logo alanını ve tarayıcı başlığını düzenleyebilirsiniz.</p>
         
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
-          <div class="form-group">
+          <div class="form-group" style="margin: 0;">
             <label for="site_logo_emblem" class="form-label">Logo Amblemi (Görsel yoksa kullanılır)</label>
-            <input type="text" id="site_logo_emblem" name="site_logo_emblem" class="form-input" value="<%= settings.site_logo_emblem %>" required maxlength="5" placeholder="A">
+            <input type="text" id="site_logo_emblem" name="site_logo_emblem" class="form-input" value="<%= settings.site_logo_emblem %>" maxlength="5" placeholder="A" style="margin-bottom: 0.35rem;">
+            <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="resetField('site_logo_emblem', 'A')">↩ Varsayılana Dön</button>
           </div>
           
-          <div class="form-group">
+          <div class="form-group" style="margin: 0;">
             <label for="site_logo_text" class="form-label">Logo Ana Metni</label>
-            <input type="text" id="site_logo_text" name="site_logo_text" class="form-input" value="<%= settings.site_logo_text %>" required placeholder="AIESEC">
+            <input type="text" id="site_logo_text" name="site_logo_text" class="form-input" value="<%= settings.site_logo_text %>" placeholder="AIESEC" style="margin-bottom: 0.35rem;">
+            <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="resetField('site_logo_text', 'AIESEC')">↩ Varsayılana Dön</button>
           </div>
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
-          <div class="form-group">
+          <div class="form-group" style="margin: 0;">
             <label for="site_logo_sub" class="form-label">Logo Alt Metni</label>
-            <input type="text" id="site_logo_sub" name="site_logo_sub" class="form-input" value="<%= settings.site_logo_sub %>" required placeholder="İstanbul">
+            <input type="text" id="site_logo_sub" name="site_logo_sub" class="form-input" value="<%= settings.site_logo_sub %>" placeholder="İstanbul" style="margin-bottom: 0.35rem;">
+            <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="resetField('site_logo_sub', 'İstanbul')">↩ Varsayılana Dön</button>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" style="margin: 0;">
             <label for="site_title" class="form-label">Varsayılan Site Başlığı</label>
-            <input type="text" id="site_title" name="site_title" class="form-input" value="<%= settings.site_title %>" required placeholder="AIESEC İstanbul Alumni Archive">
+            <input type="text" id="site_title" name="site_title" class="form-input" value="<%= settings.site_title %>" placeholder="AIESEC İstanbul Alumni Archive" style="margin-bottom: 0.35rem;">
+            <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="resetField('site_title', 'AIESEC İstanbul Alumni Archive')">↩ Varsayılana Dön</button>
           </div>
         </div>
 
@@ -117,32 +125,34 @@
 
       <div class="form-divider" style="margin: 2rem 0; border-top: 1px dashed var(--border);"></div>
 
-      <div class="form-divider" style="margin: 2rem 0; border-top: 1px dashed var(--border);"></div>
-
       <!-- Homepage Hero Section Content -->
       <div class="form-section">
         <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Ana Sayfa Karşılama (Hero) Metinleri</h3>
         <p class="form-hint" style="margin-bottom: 1.5rem;">Ana sayfanın en üstünde yer alan karşılama metinlerini düzenleyin.</p>
         
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
-          <div class="form-group">
+          <div class="form-group" style="margin: 0;">
             <label for="hero_title" class="form-label">Hero Başlığı (Normal Metin)</label>
-            <input type="text" id="hero_title" name="hero_title" class="form-input" value="<%= settings.hero_title || 'Alumni' %>" required placeholder="Alumni">
+            <input type="text" id="hero_title" name="hero_title" class="form-input" value="<%= settings.hero_title || 'Alumni' %>" placeholder="Alumni" style="margin-bottom: 0.35rem;">
+            <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="resetField('hero_title', 'Alumni')">↩ Varsayılana Dön</button>
           </div>
-          <div class="form-group">
+          <div class="form-group" style="margin: 0;">
             <label for="hero_title_gradient" class="form-label">Hero Başlığı (Renkli Geçişli Kelime)</label>
-            <input type="text" id="hero_title_gradient" name="hero_title_gradient" class="form-input" value="<%= settings.hero_title_gradient || 'Executive Board' %>" required placeholder="Executive Board">
+            <input type="text" id="hero_title_gradient" name="hero_title_gradient" class="form-input" value="<%= settings.hero_title_gradient || 'Executive Board' %>" placeholder="Executive Board" style="margin-bottom: 0.35rem;">
+            <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="resetField('hero_title_gradient', 'Executive Board')">↩ Varsayılana Dön</button>
           </div>
         </div>
 
         <div class="form-group" style="margin-bottom: 1.5rem;">
           <label for="hero_subtitle" class="form-label">Hero Alt Başlık Açıklaması</label>
-          <textarea id="hero_subtitle" name="hero_subtitle" class="form-input" rows="3" required placeholder="AIESEC İstanbul'un geçmiş Executive Board dönemlerini keşfedin..."><%= settings.hero_subtitle || '' %></textarea>
+          <textarea id="hero_subtitle" name="hero_subtitle" class="form-input" rows="3" placeholder="AIESEC İstanbul'un geçmiş Executive Board dönemlerini keşfedin..." style="margin-bottom: 0.35rem;"><%= settings.hero_subtitle || '' %></textarea>
+          <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="resetField('hero_subtitle', 'AIESEC İstanbul\'un geçmiş Executive Board dönemlerini, liderlik hikayelerini ve başarılarını keşfedin. Her dönem, bir neslin izlerini taşıyor.')">↩ Varsayılana Dön</button>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" style="margin: 0;">
           <label for="hero_cta_text" class="form-label">Aksiyon (Buton) Yazısı</label>
-          <input type="text" id="hero_cta_text" name="hero_cta_text" class="form-input" value="<%= settings.hero_cta_text || 'EB Takımlarını Keşfet' %>" required placeholder="EB Takımlarını Keşfet">
+          <input type="text" id="hero_cta_text" name="hero_cta_text" class="form-input" value="<%= settings.hero_cta_text || 'EB Takımlarını Keşfet' %>" placeholder="EB Takımlarını Keşfet" style="margin-bottom: 0.35rem;">
+          <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="resetField('hero_cta_text', 'EB Takımlarını Keşfet')">↩ Varsayılana Dön</button>
         </div>
       </div>
 
@@ -180,9 +190,10 @@
         <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">E-posta Gönderim Ayarları</h3>
         <p class="form-hint" style="margin-bottom: 1.5rem;">Üyeler onaylandığında gönderilecek olan onay e-postasının gönderici adresini belirleyin.</p>
         
-        <div class="form-group">
+        <div class="form-group" style="margin: 0;">
           <label for="email_from" class="form-label">Gönderici Adresi (Resend 'From')</label>
-          <input type="text" id="email_from" name="email_from" class="form-input" value="<%= settings.email_from || 'AIESEC Alumni <onboarding@resend.dev>' %>" required placeholder="AIESEC İstanbul <arsiv@aiesec-istanbul.com>">
+          <input type="text" id="email_from" name="email_from" class="form-input" value="<%= settings.email_from || 'AIESEC Alumni <onboarding@resend.dev>' %>" placeholder="AIESEC İstanbul <arsiv@aiesec-istanbul.com>" style="margin-bottom: 0.35rem;">
+          <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; margin-bottom: 0.5rem;" onclick="resetField('email_from', 'AIESEC Alumni <onboarding@resend.dev>')">↩ Varsayılana Dön</button>
           <p class="form-hint" style="margin-top: 0.5rem;">
             ⚠️ Resend üzerinde kendi alan adınızı (domain) doğrulamadıysanız bu değerin sonu <strong>&lt;onboarding@resend.dev&gt;</strong> ile bitmelidir. Doğrulanmış alan adınız olduğunda <strong>AIESEC İstanbul &lt;arsiv@domaininiz.com&gt;</strong> formatında yazabilirsiniz.
           </p>
@@ -196,28 +207,31 @@
         <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Alt Bilgi (Footer) Özelleştirme</h3>
         <p class="form-hint" style="margin-bottom: 1.5rem;">Sayfa altındaki imza metnini, rengini ve görsel efektlerini düzenleyin.</p>
         
-        <div class="form-group" style="margin-bottom: 1.5rem;">
+        <div class="form-group" style="margin: 0; margin-bottom: 1.5rem;">
           <label for="footer_credit" class="form-label">Footer İmzası</label>
-          <input type="text" id="footer_credit" name="footer_credit" class="form-input" value="<%= settings.footer_credit %>" required placeholder="Geçmiş liderlik deneyimlerini onurlandırmak için 26.27 LCVP F&L Elif Kurnaz tarafından yapıldı.">
+          <input type="text" id="footer_credit" name="footer_credit" class="form-input" value="<%= settings.footer_credit %>" placeholder="Geçmiş liderlik deneyimlerini onurlandırmak için 26.27 LCVP F&L Elif Kurnaz tarafından yapıldı." style="margin-bottom: 0.35rem;">
+          <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="resetField('footer_credit', 'Geçmiş liderlik deneyimlerini onurlandırmak için 26.27 LCVP F&L Elif Kurnaz tarafından yapıldı.')">↩ Varsayılana Dön</button>
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
-          <div class="form-group">
+          <div class="form-group" style="margin: 0;">
             <label for="footer_credit_color" class="form-label">İmza Rengi</label>
-            <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.35rem;">
               <input type="color" id="footer_credit_color_picker" value="<%= settings.footer_credit_color || '#ffffff' %>" style="width: 40px; height: 40px; border: none; border-radius: 6px; cursor: pointer;" oninput="document.getElementById('footer_credit_color').value = this.value">
-              <input type="text" id="footer_credit_color" name="footer_credit_color" class="form-input" value="<%= settings.footer_credit_color || '#ffffff' %>" required oninput="document.getElementById('footer_credit_color_picker').value = this.value">
+              <input type="text" id="footer_credit_color" name="footer_credit_color" class="form-input" value="<%= settings.footer_credit_color || '#ffffff' %>" oninput="document.getElementById('footer_credit_color_picker').value = this.value">
             </div>
+            <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="resetField('footer_credit_color', '#ffffff', true)">↩ Varsayılana Dön</button>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" style="margin: 0;">
             <label for="footer_credit_effect" class="form-label">Görsel Efekt / Eklenti</label>
-            <select id="footer_credit_effect" name="footer_credit_effect" class="form-input">
+            <select id="footer_credit_effect" name="footer_credit_effect" class="form-input" style="margin-bottom: 0.35rem;">
               <option value="none" <%= settings.footer_credit_effect === 'none' ? 'selected' : '' %>>Düz (Efektsiz)</option>
               <option value="neon-glow" <%= settings.footer_credit_effect === 'neon-glow' ? 'selected' : '' %>>Neon Işıltısı (Glow) ✨</option>
               <option value="gradient-text" <%= settings.footer_credit_effect === 'gradient-text' ? 'selected' : '' %>>Renk Geçişi (Rainbow/Gradient) 🌈</option>
               <option value="pulse-animation" <%= settings.footer_credit_effect === 'pulse-animation' ? 'selected' : '' %>>Nefes Alma Efekti (Pulse/Zoom) 💓</option>
             </select>
+            <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="resetField('footer_credit_effect', 'none')">↩ Varsayılana Dön</button>
           </div>
         </div>
       </div>
@@ -236,6 +250,17 @@
 </section>
 
 <script>
+function resetField(inputId, defaultValue, isColor = false) {
+  const input = document.getElementById(inputId);
+  if (input) {
+    input.value = defaultValue;
+    if (isColor) {
+      const picker = document.getElementById(inputId + '_picker');
+      if (picker) picker.value = defaultValue;
+    }
+  }
+}
+
 function removeHeroBg() {
   if (confirm('Ana sayfa arka plan görselini kaldırmak istediğinizden emin misiniz?')) {
     document.getElementById('hero-bg-preview').src = '/images/default-cover.jpg';
