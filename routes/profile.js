@@ -90,6 +90,56 @@ router.post('/', upload.single('photo'), async (req, res) => {
   }
 });
 
+// POST /profile/change-password - Şifre Değiştirme
+router.post('/change-password', async (req, res) => {
+  try {
+    const { current_password, new_password, confirm_password } = req.body;
+    
+    if (!current_password || !new_password || !confirm_password) {
+      req.flash('error', 'Lütfen tüm şifre alanlarını doldurun.');
+      return res.redirect('/profile');
+    }
+
+    if (new_password !== confirm_password) {
+      req.flash('error', 'Yeni şifreler eşleşmiyor.');
+      return res.redirect('/profile');
+    }
+
+    if (new_password.length < 6) {
+      req.flash('error', 'Yeni şifre en az 6 karakter olmalıdır.');
+      return res.redirect('/profile');
+    }
+
+    const user = await User.findByEmail(req.session.user.email);
+    if (!user) {
+      req.flash('error', 'Kullanıcı bulunamadı.');
+      return res.redirect('/profile');
+    }
+
+    const isMatch = await User.comparePassword(current_password, user.password);
+    if (!isMatch) {
+      req.flash('error', 'Mevcut şifreniz yanlış.');
+      return res.redirect('/profile');
+    }
+
+    // Hash and update password
+    const bcrypt = require('bcryptjs');
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(new_password, salt);
+
+    const { getSQL } = require('../config/database');
+    const sql = getSQL();
+    await sql`UPDATE users SET password = ${hashedPassword} WHERE id = ${user.id}`;
+
+    req.flash('success', 'Şifreniz başarıyla güncellendi.');
+    res.redirect('/profile');
+  } catch (err) {
+    console.error('Password change error:', err);
+    req.flash('error', 'Şifre değiştirilirken bir hata oluştu.');
+    res.redirect('/profile');
+  }
+});
+
 // POST /profile/delete - Kendi hesabını sil
 router.post('/delete', async (req, res) => {
   try {

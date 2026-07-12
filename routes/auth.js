@@ -124,6 +124,148 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// GET /auth/forgot-password - Şifremi unuttum sayfası
+router.get('/forgot-password', (req, res) => {
+  if (req.session.userId) return res.redirect('/');
+  res.render('auth/forgot-password', {
+    title: 'Şifremi Unuttum - AIESEC İstanbul'
+  });
+});
+
+// POST /auth/forgot-password - Şifre sıfırlama talebi
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      req.flash('error', 'Lütfen e-posta adresinizi girin.');
+      return res.redirect('/auth/forgot-password');
+    }
+
+    const user = await User.findByEmail(email);
+    if (!user) {
+      // Güvenlik amacıyla e-posta bulunmasa bile başarılıymış gibi genel mesaj verilir
+      req.flash('info', 'Eğer bu e-posta adresi kayıtlıysa, şifre sıfırlama bağlantısı gönderilmiştir.');
+      return res.redirect('/auth/forgot-password');
+    }
+
+    // Generate crypto token
+    const crypto = require('crypto');
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 3600000); // 1 saat geçerli
+
+    const { getSQL } = require('../config/database');
+    const sql = getSQL();
+    await sql`
+      UPDATE users
+      SET reset_token = ${token}, reset_token_expires = ${expires}
+      WHERE id = ${user.id}
+    `;
+
+    // Send email
+    const { sendResetPasswordEmail } = require('../utils/email');
+    const resetLink = `https://aiesec-istanbul-archive.vercel.app/auth/reset-password?token=${token}&email=${encodeURIComponent(user.email)}`;
+    await sendResetPasswordEmail(user.email, user.name, resetLink);
+
+    req.flash('success', 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.');
+    res.redirect('/auth/forgot-password');
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    req.flash('error', 'Bir hata oluştu. Lütfen tekrar deneyin.');
+    res.redirect('/auth/forgot-password');
+  }
+});
+
+// GET /auth/reset-password - Şifre sıfırlama formu
+router.get('/reset-password', async (req, res) => {
+  try {
+    const { token, email } = req.query;
+    if (!token || !email) {
+      req.flash('error', 'Geçersiz şifre sıfırlama talebi.');
+      return res.redirect('/auth/login');
+    }
+
+    const { getSQL } = require('../config/database');
+    const sql = getSQL();
+    const rows = await sql`
+      SELECT id FROM users
+      WHERE email = ${email.toLowerCase().trim()}
+        AND reset_token = ${token}
+        AND reset_token_expires > NOW()
+    `;
+
+    if (rows.length === 0) {
+      req.flash('error', 'Şifre sıfırlama bağlantısı geçersiz veya süresi dolmuş.');
+      return res.redirect('/auth/login');
+    }
+
+    res.render('auth/reset-password', {
+      title: 'Şifre Sıfırla - AIESEC İstanbul',
+      token,
+      email
+    });
+  } catch (err) {
+    console.error('Reset password get error:', err);
+    req.flash('error', 'Sistemsel bir hata oluştu.');
+    res.redirect('/auth/login');
+  }
+});
+
+// POST /auth/reset-password - Yeni şifre kaydetme
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, email, password, passwordConfirm } = req.body;
+    
+    if (!token || !email || !password || !passwordConfirm) {
+      req.flash('error', 'Lütfen tüm alanları doldurun.');
+      return res.redirect(`/auth/reset-password?token=${token}&email=${encodeURIComponent(email)}`);
+    }
+
+    if (password !== passwordConfirm) {
+      req.flash('error', 'Şifreler eşleşmiyor.');
+      return res.redirect(`/auth/reset-password?token=${token}&email=${encodeURIComponent(email)}`);
+    }
+
+    if (password.length < 6) {
+      req.flash('error', 'Şifre en az 6 karakter olmalıdır.');
+      return res.redirect(`/auth/reset-password?token=${token}&email=${encodeURIComponent(email)}`);
+    }
+
+    const { getSQL } = require('../config/database');
+    const sql = getSQL();
+    const rows = await sql`
+      SELECT id FROM users
+      WHERE email = ${email.toLowerCase().trim()}
+        AND reset_token = ${token}
+        AND reset_token_expires > NOW()
+    `;
+
+    if (rows.length === 0) {
+      req.flash('error', 'Şifre sıfırlama bağlantısı geçersiz veya süresi dolmuş.');
+      return res.redirect('/auth/login');
+    }
+
+    const userId = rows[0].id;
+    const bcrypt = require('bcryptjs');
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    await sql`
+      UPDATE users
+      SET password = ${hashedPassword},
+          reset_token = NULL,
+          reset_token_expires = NULL
+      WHERE id = ${userId}
+    `;
+
+    req.flash('success', 'Şifreniz başarıyla güncellendi! Yeni şifrenizle giriş yapabilirsiniz.');
+    res.redirect('/auth/login');
+  } catch (err) {
+    console.error('Reset password post error:', err);
+    req.flash('error', 'Şifre güncellenirken bir hata oluştu.');
+    res.redirect('/auth/login');
+  }
+});
+
 // GET /auth/logout - Çıkış
 router.get('/logout', (req, res) => {
   req.session.destroy((err) => {

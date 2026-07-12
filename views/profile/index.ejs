@@ -182,6 +182,32 @@
     </form>
   </div>
 
+  <!-- Şifre Değiştirme Paneli -->
+  <div class="profile-card" style="margin-top: 2rem;">
+    <h3>Şifremi Değiştir</h3>
+    <p class="form-hint" style="margin-bottom: 1.5rem;">Hesap şifrenizi güncellemek için aşağıdaki alanları doldurun.</p>
+    
+    <form action="/profile/change-password" method="POST" style="display: flex; flex-direction: column; gap: 1.25rem;">
+      <div class="form-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 0;">
+        <div class="form-group" style="margin: 0;">
+          <label for="current_password" class="form-label">Mevcut Şifre *</label>
+          <input type="password" id="current_password" name="current_password" class="form-input" required placeholder="••••••••">
+        </div>
+        <div class="form-group" style="margin: 0;">
+          <label for="new_password" class="form-label">Yeni Şifre *</label>
+          <input type="password" id="new_password" name="new_password" class="form-input" required placeholder="••••••••">
+        </div>
+        <div class="form-group" style="margin: 0;">
+          <label for="confirm_password" class="form-label">Yeni Şifre (Tekrar) *</label>
+          <input type="password" id="confirm_password" name="confirm_password" class="form-input" required placeholder="••••••••">
+        </div>
+      </div>
+      <div style="text-align: right;">
+        <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.2rem; border-radius: 8px;">Şifreyi Güncelle</button>
+      </div>
+    </form>
+  </div>
+
   <div class="profile-card danger-zone">
     <h3>Tehlikeli Bölge</h3>
     <p class="form-hint">Hesabını sildiğinde tüm bilgilerin kalıcı olarak kaldırılır. Bu işlem geri alınamaz.</p>
