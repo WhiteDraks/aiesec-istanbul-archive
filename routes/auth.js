@@ -55,6 +55,14 @@ router.post('/register', async (req, res) => {
       role: 'user',
     });
 
+    // Kullanıcıya kayıt bilgilendirme/bekleme maili gönder
+    try {
+      const { sendWelcomePendingEmail } = require('../utils/email');
+      await sendWelcomePendingEmail(email, name);
+    } catch (mailErr) {
+      console.error('Welcome pending email failed to send:', mailErr);
+    }
+
     req.flash('success', 'Kaydınız başarıyla alındı! Admin onayı bekleniyor. Onay sonrası giriş yapabilirsiniz.');
     res.redirect('/auth/login');
   } catch (err) {
