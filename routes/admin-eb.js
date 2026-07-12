@@ -167,7 +167,7 @@ router.post('/year/:year/delete', async (req, res) => {
     `;
 
     // 3. Clear memories if they are year-bound
-    await sql`DELETE FROM eb_memories WHERE year = ${year}`;
+    await sql`DELETE FROM eb_memories WHERE team_year = ${year}`;
 
     req.flash('success', `${year} EB takımı ve bu döneme ait kayıtlar başarıyla silindi.`);
   } catch (err) {

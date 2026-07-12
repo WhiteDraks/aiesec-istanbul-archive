@@ -157,7 +157,14 @@ router.post('/user/:id/edit', upload.single('photo'), async (req, res) => {
     }
     const eb_year = roles_history.length > 0 ? roles_history[0].year : null;
 
+    const existingUser = await User.findById(req.params.id);
+    if (!existingUser) {
+      req.flash('error', 'Kullanıcı bulunamadı.');
+      return res.redirect('/admin');
+    }
+
     await User.updateProfile(req.params.id, {
+      ...existingUser,
       name: name?.trim(),
       school: school?.trim(),
       department: department?.trim(),
@@ -168,7 +175,7 @@ router.post('/user/:id/edit', upload.single('photo'), async (req, res) => {
       sector: sector?.trim(),
       phone: phone?.trim(),
       aiesec_journey: aiesec_journey?.trim(),
-      photo: photoUrl,
+      photo: photoUrl || existingUser.photo,
     });
 
     req.flash('success', 'Kullanıcı bilgileri güncellendi.');
