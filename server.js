@@ -103,6 +103,10 @@ app.use((req, res, next) => {
 });
 
 // ─── Global Template Locals ───────────────────────────────────────────────────
+app.use((req, res, next) => {
+  res.locals.csrfToken = "";
+  next();
+});
 app.use(setLocals);
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
