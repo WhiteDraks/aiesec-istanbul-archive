@@ -99,7 +99,11 @@
         <h3>AIESEC Kariyeri</h3>
         <p class="form-hint" style="margin-bottom: 1rem;">Geçmiş EB ve diğer AIESEC görevlerini ekleyebilirsin. Örn: 26.27 - LCP, 25.26 - LCVP B2C</p>
         <div id="roles-container">
-          <% const roles = (user.roles_history && Array.isArray(user.roles_history) && user.roles_history.length > 0) ? user.roles_history : [{year: '', role: ''}]; %>
+        <div id="roles-container">
+          <% const roles = (user.roles_history && Array.isArray(user.roles_history) && user.roles_history.length > 0) ? user.roles_history : []; %>
+          <% if (roles.length === 0) { %>
+            <p class="form-hint no-roles-text" style="color: var(--text-muted); margin-bottom: 1rem;">Henüz bir görev eklenmemiş.</p>
+          <% } %>
           <% roles.forEach((r, idx) => { %>
             <div class="role-row">
               <div class="form-group" style="flex: 1;">
@@ -110,11 +114,7 @@
                 <label class="form-label">Görev</label>
                 <input type="text" name="role_titles[]" class="form-input" value="<%= r.role %>" placeholder="Örn: Başkan (LCP)">
               </div>
-              <% if (idx > 0) { %>
-                <button type="button" class="btn btn-outline" style="align-self: flex-end; margin-bottom: 0.2rem;" onclick="this.parentElement.remove()">Sil</button>
-              <% } else { %>
-                <div style="width: 50px;"></div> <!-- placeholder -->
-              <% } %>
+              <button type="button" class="btn btn-outline" style="align-self: flex-end; margin-bottom: 0.2rem;" onclick="this.parentElement.remove(); checkEmptyRolesState()">Sil</button>
             </div>
           <% }) %>
         </div>
@@ -193,6 +193,13 @@ function previewImage(event) {
 
 function addRoleRow() {
   const container = document.getElementById('roles-container');
+  
+  // Remove empty state message if exists
+  const noRolesText = container.querySelector('.no-roles-text');
+  if (noRolesText) {
+    noRolesText.remove();
+  }
+
   const div = document.createElement('div');
   div.className = 'role-row';
   div.innerHTML = `
@@ -204,9 +211,22 @@ function addRoleRow() {
       <label class="form-label">Görev</label>
       <input type="text" name="role_titles[]" class="form-input" placeholder="Örn: Başkan (LCP)">
     </div>
-    <button type="button" class="btn btn-outline" style="align-self: flex-end; margin-bottom: 0.2rem;" onclick="this.parentElement.remove()">Sil</button>
+    <button type="button" class="btn btn-outline" style="align-self: flex-end; margin-bottom: 0.2rem;" onclick="this.parentElement.remove(); checkEmptyRolesState()">Sil</button>
   `;
   container.appendChild(div);
+}
+
+function checkEmptyRolesState() {
+  const container = document.getElementById('roles-container');
+  const rows = container.querySelectorAll('.role-row');
+  if (rows.length === 0 && !container.querySelector('.no-roles-text')) {
+    const p = document.createElement('p');
+    p.className = 'form-hint no-roles-text';
+    p.style.color = 'var(--text-muted)';
+    p.style.marginBottom = '1rem';
+    p.innerText = 'Henüz bir görev eklenmemiş.';
+    container.appendChild(p);
+  }
 }
 </script>
 
