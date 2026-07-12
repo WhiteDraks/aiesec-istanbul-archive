@@ -16,9 +16,14 @@ const { isLoggedIn, isApproved } = require('../middleware/auth');
 router.get('/', async (req, res) => {
   try {
     const sql = getSQL();
+    const start_year = req.query.start_year || '';
+    const end_year = req.query.end_year || '';
 
     // Fetch all admin-defined teams
     const teamMetas = await EBTeam.findAll();
+    
+    // Sort available years descending for dropdown filter options
+    const availableYears = teamMetas.map(t => t.year).sort((a, b) => b.localeCompare(a));
 
     // Query member count for each admin-defined team in parallel
     const periods = await Promise.all(teamMetas.map(async (team) => {
@@ -41,9 +46,30 @@ router.get('/', async (req, res) => {
       };
     }));
 
+    // Sort periods descending by year: 2026-2027, 2025-2026...
+    periods.sort((a, b) => b.year.localeCompare(a.year));
+
+    // Filter by year range if specified
+    let filteredPeriods = periods;
+    if (start_year || end_year) {
+      const getYearStart = (y) => parseInt(y.split('-')[0], 10);
+      const startVal = start_year ? getYearStart(start_year) : null;
+      const endVal = end_year ? getYearStart(end_year) : null;
+
+      filteredPeriods = periods.filter(p => {
+        const yVal = getYearStart(p.year);
+        if (startVal && yVal < startVal) return false;
+        if (endVal && yVal > endVal) return false;
+        return true;
+      });
+    }
+
     res.render('eb/index', {
       title: 'EB Takımları - AIESEC İstanbul',
-      teams: periods,
+      teams: filteredPeriods,
+      availableYears,
+      start_year,
+      end_year
     });
   } catch (err) {
     console.error(err);

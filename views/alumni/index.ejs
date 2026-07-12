@@ -17,10 +17,10 @@
 
   <!-- Gelişmiş Filtreleme & Arama Formu -->
   <form action="/alumni" method="GET" style="background: var(--surface); border: 1px solid var(--border); padding: 1.5rem; border-radius: 16px; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 1rem;">
-    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; flex-wrap: wrap;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
       
       <!-- Text Search -->
-      <div class="form-group" style="margin: 0;">
+      <div class="form-group" style="margin: 0; grid-column: span 2;">
         <input type="text" name="query" class="form-input" placeholder="İsim, Şirket, Okul, Departman veya AIESEC Rolü Ara..." value="<%= activeQuery %>" style="padding: 0.65rem 1rem;">
       </div>
 
@@ -50,6 +50,26 @@
           <option value="">Tüm Ülkeler</option>
           <% countries.forEach(country => { %>
             <option value="<%= country %>" <%= activeCountry === country ? 'selected' : '' %>><%= country %></option>
+          <% }) %>
+        </select>
+      </div>
+
+      <!-- Start Year Filter -->
+      <div class="form-group" style="margin: 0;">
+        <select name="start_year" class="form-input" style="padding: 0.65rem 1rem;">
+          <option value="">Dönem Başlangıcı (En Eski)</option>
+          <% [...availableYears].reverse().forEach(year => { %>
+            <option value="<%= year %>" <%= start_year === year ? 'selected' : '' %>><%= year %></option>
+          <% }) %>
+        </select>
+      </div>
+
+      <!-- End Year Filter -->
+      <div class="form-group" style="margin: 0;">
+        <select name="end_year" class="form-input" style="padding: 0.65rem 1rem;">
+          <option value="">Dönem Bitişi (En Yeni)</option>
+          <% availableYears.forEach(year => { %>
+            <option value="<%= year %>" <%= end_year === year ? 'selected' : '' %>><%= year %></option>
           <% }) %>
         </select>
       </div>

@@ -16,6 +16,38 @@
 <section class="section">
   <div class="container">
 
+    <!-- Years Range Filter Bar -->
+    <div class="filter-bar" style="background: var(--surface); border: 1px solid var(--border); padding: 1.5rem; border-radius: 16px; margin-bottom: 2.5rem; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03); backdrop-filter: blur(5px);">
+      <form action="/eb" method="GET" style="display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-end; width: 100%;">
+        <div style="display: flex; flex-direction: column; gap: 0.5rem; min-width: 160px; flex: 1;">
+          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-lighter);">Başlangıç Dönemi</label>
+          <select name="start_year" class="form-input" style="height: auto; padding: 0.65rem 1rem; border-radius: 8px;">
+            <option value="">En Eski</option>
+            <% [...availableYears].reverse().forEach(year => { %>
+              <option value="<%= year %>" <%= start_year === year ? 'selected' : '' %>><%= year %></option>
+            <% }) %>
+          </select>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 0.5rem; min-width: 160px; flex: 1;">
+          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-lighter);">Bitiş Dönemi</label>
+          <select name="end_year" class="form-input" style="height: auto; padding: 0.65rem 1rem; border-radius: 8px;">
+            <option value="">En Yeni</option>
+            <% availableYears.forEach(year => { %>
+              <option value="<%= year %>" <%= end_year === year ? 'selected' : '' %>><%= year %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+          <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.4rem; font-size: 0.9rem; border-radius: 8px; font-weight: 600;">Filtrele 🔍</button>
+          <% if (start_year || end_year) { %>
+            <a href="/eb" class="btn btn-outline" style="padding: 0.65rem 1.4rem; font-size: 0.9rem; border-radius: 8px; font-weight: 600;">Temizle</a>
+          <% } %>
+        </div>
+      </form>
+    </div>
+
     <% if (!currentUser || !isApproved) { %>
       <div class="access-notice">
         <div class="access-notice-icon">🔒</div>

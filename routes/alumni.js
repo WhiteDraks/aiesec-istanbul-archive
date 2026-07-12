@@ -9,12 +9,48 @@ router.use(isLoggedIn, isApproved);
 // GET /alumni - Mezunlar dizini
 router.get('/', async (req, res) => {
   try {
-    const { query, sector, city, country, is_mentor } = req.query;
+    const { query, sector, city, country, is_mentor, start_year, end_year } = req.query;
     const { getSQL } = require('../config/database');
     const sql = getSQL();
 
     // Fetch alumni using search helper
     const alumni = await User.searchApproved({ query, sector, city, country, is_mentor });
+
+    // Fetch all available EB team years for the range dropdown options
+    const EBTeam = require('../models/EBTeam');
+    const teamMetas = await EBTeam.findAll();
+    const availableYears = teamMetas.map(t => t.year).sort((a, b) => b.localeCompare(a));
+
+    // Filter alumni by year range (checks both primary eb_year and roles_history)
+    let filteredAlumni = alumni;
+    if (start_year || end_year) {
+      const getYearStart = (y) => parseInt(y.split('-')[0], 10);
+      const startVal = start_year ? getYearStart(start_year) : null;
+      const endVal = end_year ? getYearStart(end_year) : null;
+
+      filteredAlumni = alumni.filter(person => {
+        const personYears = new Set();
+        if (person.eb_year && /^\d{4}-\d{4}$/.test(person.eb_year)) {
+          personYears.add(person.eb_year);
+        }
+        if (person.roles_history && Array.isArray(person.roles_history)) {
+          person.roles_history.forEach(role => {
+            if (role.year && /^\d{4}-\d{4}$/.test(role.year)) {
+              personYears.add(role.year);
+            }
+          });
+        }
+
+        if (personYears.size === 0) return false;
+
+        return Array.from(personYears).some(py => {
+          const yVal = getYearStart(py);
+          if (startVal && yVal < startVal) return false;
+          if (endVal && yVal > endVal) return false;
+          return true;
+        });
+      });
+    }
 
     // Distinct cities and countries from DB for filters
     const citiesRows = await sql`SELECT DISTINCT city FROM users WHERE status = 'approved' AND city IS NOT NULL AND city <> '' ORDER BY city ASC`;
@@ -31,10 +67,13 @@ router.get('/', async (req, res) => {
 
     res.render('alumni/index', {
       title: 'Mezunlar Rehberi - AIESEC İstanbul',
-      alumni,
+      alumni: filteredAlumni,
       sectors,
       cities,
       countries,
+      availableYears,
+      start_year: start_year || '',
+      end_year: end_year || '',
       activeSector: sector || '',
       activeCity: city || '',
       activeCountry: country || '',
