@@ -90,11 +90,7 @@ app.use(session(sessionConfig));
 
 // ─── CSRF Protection ──────────────────────────────────────────────────────────
 const { doubleCsrf } = require('csrf-csrf');
-const {
-  invalidCsrfTokenError,
-  generateToken,
-  doubleCsrfProtection,
-} = doubleCsrf({
+const doubleCsrfUtilities = doubleCsrf({
   getSecret: (req) => req.session.secret || (req.session.secret = require('crypto').randomBytes(32).toString('hex')),
   getSessionIdentifier: (req) => req.session.id,
   cookieName: 'x-csrf-token',
@@ -108,6 +104,10 @@ const {
     return req.body?._csrf || req.headers['x-csrf-token'];
   },
 });
+
+const generateToken = doubleCsrfUtilities.generateToken;
+const doubleCsrfProtection = doubleCsrfUtilities.doubleCsrfProtection;
+const invalidCsrfTokenError = doubleCsrfUtilities.invalidCsrfTokenError;
 
 // CSRF korumasını GET istekleri dışındaki tüm POST/PUT/DELETE rotaları için etkinleştir
 app.use((req, res, next) => {
