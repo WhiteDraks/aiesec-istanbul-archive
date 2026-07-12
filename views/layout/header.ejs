@@ -139,25 +139,47 @@
       background: rgba(248, 250, 252, 0.8) !important;
       border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
     }
-    .light-theme .nav-link {
-      padding: 0.55rem 1.15rem !important;
-      border-radius: 50px !important;
-      font-size: var(--font-size-sm) !important;
-      font-weight: 600 !important;
-      color: #334155 !important;
-      background: rgba(15, 23, 42, 0.03) !important;
-      border: 1px solid rgba(15, 23, 42, 0.06) !important;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-      display: inline-flex !important;
-      align-items: center !important;
+    /* Responsive Light Mode Navbar rules */
+    @media (min-width: 769px) {
+      .light-theme .nav-link {
+        padding: 0.5rem 1.1rem !important;
+        border-radius: 50px !important;
+        font-size: var(--font-size-sm) !important;
+        font-weight: 600 !important;
+        color: #334155 !important;
+        background: transparent !important;
+        border: 1px solid transparent !important;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        display: inline-flex !important;
+        align-items: center !important;
+      }
+      .light-theme .nav-link.active,
+      .light-theme .nav-link:hover {
+        color: #ffffff !important;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--blue-sky, #00AEEF) 100%) !important;
+        border-color: transparent !important;
+        box-shadow: 0 4px 15px rgba(3, 126, 243, 0.2) !important;
+        transform: translateY(-1px) !important;
+      }
     }
-    .light-theme .nav-link.active,
-    .light-theme .nav-link:hover {
-      color: #ffffff !important;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--blue-sky, #00AEEF) 100%) !important;
-      border-color: transparent !important;
-      box-shadow: 0 4px 15px rgba(3, 126, 243, 0.2) !important;
-      transform: translateY(-1px) !important;
+
+    @media (max-width: 768px) {
+      .light-theme .nav-links {
+        background: rgba(255, 255, 255, 0.98) !important;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
+      }
+      .light-theme .nav-link {
+        color: #334155 !important;
+        background: transparent !important;
+        border-radius: var(--radius-lg) !important;
+        padding: var(--space-3) var(--space-4) !important;
+        display: block !important;
+      }
+      .light-theme .nav-link.active,
+      .light-theme .nav-link:hover {
+        color: var(--primary) !important;
+        background: rgba(15, 23, 42, 0.04) !important;
+      }
     }
     .light-theme .dropdown-menu {
       background: rgba(255, 255, 255, 0.95) !important;
