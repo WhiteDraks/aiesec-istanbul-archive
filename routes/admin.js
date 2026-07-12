@@ -122,7 +122,7 @@ router.get('/user/:id/edit', async (req, res) => {
     const EBTeam = require('../models/EBTeam');
     const [user, dbTeams] = await Promise.all([
       User.findById(req.params.id),
-      EBTeam.findAll()
+      EBTeam.findAllYears()
     ]);
     if (!user) {
       req.flash('error', 'Kullanıcı bulunamadı.');
@@ -143,7 +143,7 @@ router.get('/user/:id/edit', async (req, res) => {
 // POST /admin/user/:id/edit - Kullanıcı bilgilerini güncelle
 router.post('/user/:id/edit', upload.single('photo'), async (req, res) => {
   try {
-    const { name, school, department, linkedin, workplaces, sector, phone, aiesec_journey, role_years, role_titles } = req.body;
+    const { name, school, department, linkedin, workplaces, sector, phone, aiesec_journey, role_years, role_years_custom, role_titles } = req.body;
     let photoUrl = null;
 
     if (req.file) {
@@ -153,10 +153,12 @@ router.post('/user/:id/edit', upload.single('photo'), async (req, res) => {
     let roles_history = [];
     if (role_years && role_titles) {
       const years = Array.isArray(role_years) ? role_years : [role_years];
+      const customYears = role_years_custom ? (Array.isArray(role_years_custom) ? role_years_custom : [role_years_custom]) : [];
       const titles = Array.isArray(role_titles) ? role_titles : [role_titles];
       for (let i = 0; i < years.length; i++) {
-        if (years[i].trim() || titles[i].trim()) {
-          roles_history.push({ year: years[i].trim(), role: titles[i].trim() });
+        const resolvedYear = years[i] === 'other' ? (customYears[i] || '') : years[i];
+        if (resolvedYear.trim() || titles[i].trim()) {
+          roles_history.push({ year: resolvedYear.trim(), role: titles[i].trim() });
         }
       }
     }

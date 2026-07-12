@@ -192,15 +192,14 @@
             <div class="role-row">
               <div class="form-group" style="flex: 1;">
                 <label class="form-label">Dönem</label>
-                <select name="role_years[]" class="form-input" required>
+                <select name="role_years[]" class="form-input role-year-select" required onchange="toggleCustomYear(this)">
                   <option value="">Seçiniz...</option>
                   <% dbTeams.forEach(team => { %>
                     <option value="<%= team.year %>" <%= r.year === team.year ? 'selected' : '' %>><%= team.year %></option>
                   <% }) %>
-                  <% if (r.year && !dbTeams.some(t => t.year === r.year)) { %>
-                    <option value="<%= r.year %>" selected><%= r.year %></option>
-                  <% } %>
+                  <option value="other" <%= (r.year && !dbTeams.some(t => t.year === r.year)) ? 'selected' : '' %>>Diğer (Kendim Yazacağım)</option>
                 </select>
+                <input type="text" name="role_years_custom[]" class="form-input role-year-custom" style="margin-top: 0.5rem; <%= (!r.year || dbTeams.some(t => t.year === r.year)) ? 'display: none;' : '' %>" placeholder="Örn: 26.27" value="<%= r.year %>">
               </div>
               <div class="form-group" style="flex: 2;">
                 <label class="form-label">Görev</label>
@@ -336,24 +335,38 @@ function triggerRemovePhoto() {
   }
 }
 
+function toggleCustomYear(select) {
+  const customInput = select.parentElement.querySelector('.role-year-custom');
+  if (!customInput) return;
+  if (select.value === 'other') {
+    customInput.style.display = 'block';
+    customInput.value = '';
+  } else {
+    customInput.style.display = 'none';
+    customInput.value = select.value;
+  }
+}
+
 function addRoleRow() {
   const container = document.getElementById('roles-container');
   const div = document.createElement('div');
   div.className = 'role-row';
-  
+
   let selectOptions = `<option value="">Seçiniz...</option>`;
   <% if (typeof dbTeams !== 'undefined' && dbTeams.length > 0) { %>
     <% dbTeams.forEach(team => { %>
       selectOptions += `<option value="<%= team.year %>"><%= team.year %></option>`;
     <% }) %>
   <% } %>
+  selectOptions += `<option value="other">Diğer (Kendim Yazacağım)</option>`;
 
   div.innerHTML = `
     <div class="form-group" style="flex: 1;">
       <label class="form-label">Dönem</label>
-      <select name="role_years[]" class="form-input" required>
+      <select name="role_years[]" class="form-input role-year-select" required onchange="toggleCustomYear(this)">
         ${selectOptions}
       </select>
+      <input type="text" name="role_years_custom[]" class="form-input role-year-custom" style="margin-top: 0.5rem; display: none;" placeholder="Örn: 26.27">
     </div>
     <div class="form-group" style="flex: 2;">
       <label class="form-label">Görev</label>

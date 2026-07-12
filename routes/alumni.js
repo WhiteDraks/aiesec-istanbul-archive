@@ -48,4 +48,24 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET /alumni/:id - Mezun detay sayfası
+router.get('/:id', async (req, res) => {
+  try {
+    const person = await User.findById(req.params.id);
+    if (!person || person.status !== 'approved') {
+      req.flash('error', 'Bu mezun kaydı bulunamadı.');
+      return res.redirect('/alumni');
+    }
+
+    res.render('alumni/detail', {
+      title: `${person.name} - AIESEC İstanbul`,
+      person,
+    });
+  } catch (err) {
+    console.error('Mezun detayı yüklenirken hata:', err);
+    req.flash('error', 'Mezun detayı yüklenirken bir hata oluştu.');
+    res.redirect('/alumni');
+  }
+});
+
 module.exports = router;

@@ -36,6 +36,29 @@ const EBTeam = {
   },
 
   /**
+   * Tüm EB dönemi seçeneklerini döndürür: hem eb_teams'te admin'in zenginleştirdiği
+   * dönemler hem de kullanıcıların roles_history'sinde geçen dönemler (eb_teams satırı
+   * henüz olmasa bile). Görev/rol düzenleme formlarındaki "Dönem" seçim kutusu için kullanılır —
+   * yalnızca eb_teams'e bakmak, hiç admin dokunmamış dönemleri listeden düşürüp
+   * kullanıcıların yeni görev eklemesini imkansız hale getiriyordu.
+   */
+  async findAllYears() {
+    const sql = getSQL();
+    const rows = await sql`
+      SELECT year FROM eb_teams
+      UNION
+      SELECT (role_entry->>'year') AS year
+      FROM users,
+           LATERAL jsonb_array_elements(
+             CASE WHEN roles_history IS NULL OR roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE roles_history END
+           ) AS role_entry
+      WHERE (role_entry->>'year') IS NOT NULL AND (role_entry->>'year') <> ''
+      ORDER BY year DESC
+    `;
+    return rows;
+  },
+
+  /**
    * EB dönemleri esasen users.roles_history'den türetiliyor; eb_teams satırı
    * sadece admin bir dönemi (açıklama/başarı/galeri) zenginleştirdiğinde var olur.
    * Admin bir döneme ilk kez girdiğinde satırı burada oluşturuyoruz.

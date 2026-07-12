@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
     const EBTeam = require('../models/EBTeam');
     const [user, dbTeams] = await Promise.all([
       User.findById(req.session.userId),
-      EBTeam.findAll()
+      EBTeam.findAllYears()
     ]);
     if (!user) {
       req.flash('error', 'Kullanıcı bulunamadı.');
@@ -37,7 +37,7 @@ router.get('/', async (req, res) => {
 router.post('/', upload.single('photo'), async (req, res) => {
   try {
     const sanitizeHtml = require('sanitize-html');
-    const { name, school, department, linkedin, workplaces, sector, phone, show_phone, aiesec_journey, role_years, role_titles, remove_photo, city, city_custom, country, country_custom, is_mentor, is_mentee, mentorship_details } = req.body;
+    const { name, school, department, linkedin, workplaces, sector, phone, show_phone, aiesec_journey, role_years, role_years_custom, role_titles, remove_photo, city, city_custom, country, country_custom, is_mentor, is_mentee, mentorship_details } = req.body;
     let photoUrl = null;
 
     // Fotoğraf temizlendiyse veya yüklendiyse
@@ -51,11 +51,13 @@ router.post('/', upload.single('photo'), async (req, res) => {
     let roles_history = [];
     if (role_years && role_titles) {
       const years = Array.isArray(role_years) ? role_years : [role_years];
+      const customYears = role_years_custom ? (Array.isArray(role_years_custom) ? role_years_custom : [role_years_custom]) : [];
       const titles = Array.isArray(role_titles) ? role_titles : [role_titles];
       for (let i = 0; i < years.length; i++) {
-        if (years[i].trim() || titles[i].trim()) {
+        const resolvedYear = years[i] === 'other' ? (customYears[i] || '') : years[i];
+        if (resolvedYear.trim() || titles[i].trim()) {
           // XSS koruması: Rol başlığını temizle
-          const cleanYear = sanitizeHtml(years[i].trim(), { allowedTags: [], allowedAttributes: {} });
+          const cleanYear = sanitizeHtml(resolvedYear.trim(), { allowedTags: [], allowedAttributes: {} });
           const cleanTitle = sanitizeHtml(titles[i].trim(), { allowedTags: [], allowedAttributes: {} });
           roles_history.push({ year: cleanYear, role: cleanTitle });
         }
