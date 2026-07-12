@@ -152,16 +152,23 @@ async function sendWeeklyDigest(customSubject = null, customIntro = null, extraT
   // 5. Send digest emails to users in a batch loop
   let sentCount = 0;
   for (const u of users) {
+    if (!u.email) continue;
+    const recipientEmail = u.email.trim().toLowerCase();
     try {
-      await resend.emails.send({
+      const response = await resend.emails.send({
         from: emailFrom,
-        to: u.email,
+        to: recipientEmail,
         subject: customSubject || 'AIESEC İstanbul Mezunlar Portalı - Haftalık Özet 📰',
         html: htmlContent
       });
-      sentCount++;
+      
+      if (response && response.error) {
+        console.error(`Resend API Error sending to ${recipientEmail}:`, response.error);
+      } else {
+        sentCount++;
+      }
     } catch (sendErr) {
-      console.error(`Failed to send digest email to ${u.email}:`, sendErr);
+      console.error(`Failed to send digest email to ${recipientEmail}:`, sendErr.message || sendErr);
     }
   }
 
