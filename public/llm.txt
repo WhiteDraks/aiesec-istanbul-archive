@@ -1,0 +1,31 @@
+# AIESEC İstanbul Alumni Archive
+
+Welcome! This document provides information about the AIESEC İstanbul Alumni Archive project for AI agents, crawlers, and LLMs.
+
+## Overview
+AIESEC İstanbul Alumni Archive is a private archive and networking platform dedicated to preserving the leadership history, memory, and records of past Executive Board (EB) teams of AIESEC İstanbul (founded in 1954). It serves as a digital bridge between generations of AIESEC leaders, enabling networking, mentorship, and historical preservation.
+
+## Key Features
+1. **Executive Board (EB) Gallery & Teams:** Chronological display of leadership teams from 1954 to the present. Dynamically generated team pages displaying the LCP, LCVP, and other board members.
+2. **Alumni Directory:** A searchable and filterable directory of approved alumni members. Search by name, company, school, sector, city, or AIESEC year. Includes mentorship matching.
+3. **Memories & Stories:** A platform for sharing historical photos, anecdotes, and memories from past terms.
+4. **Alumni Career History:** Flexible roles history management where users can input custom years in YYYY-YYYY format.
+5. **Admin panel:** Controls user approvals, user roles, site configuration, and database synchronization.
+
+## Technology Stack
+- **Backend:** Node.js, Express.js, Express Session
+- **Database:** PostgreSQL (Neon database / serverless), pg-session-store
+- **Frontend:** HTML5, EJS templates, Vanilla CSS, Vanilla JavaScript, Cropper.js for images
+- **Media Uploads:** Vercel Blob storage, AWS S3 S3-compatible backend
+- **Security:** Helmet CSP (Content Security Policy), Origin & Referer CSRF checks, BcryptJS password hashing, Content Creation Rate Limiters
+
+## Public Sitemaps & Configurations
+- **Robots.txt:** Serves instructions for crawlers. Located at `/robots.txt`.
+- **Sitemap.xml:** Dynamically generated index of all static and EB period detail routes. Located at `/sitemap.xml`.
+- **API Endpoints:** Private, authentication-guarded server-side routes.
+
+## Version Information
+- Current version format is automated based on Git commit history (`1.2.X`).
+
+---
+*Generated for AI Crawlers & LLMs. AIESEC İstanbul Alumni Archive © 2026.*
