@@ -296,7 +296,9 @@
           </a></li>
         <% } %>
         <li>
-          <a href="/auth/logout" class="btn btn-outline btn-sm">Çıkış (<%= currentUser.name.split(' ')[0] %>)</a>
+          <form action="/auth/logout" method="POST" style="display:inline;">
+            <button type="submit" class="btn btn-outline btn-sm">Çıkış (<%= currentUser.name.split(' ')[0] %>)</button>
+          </form>
         </li>
       <% } else { %>
         <li><a href="/auth/register" class="nav-link">Kayıt Ol</a></li>

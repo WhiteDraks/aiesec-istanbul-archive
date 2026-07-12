@@ -36,8 +36,20 @@ const upload = {
             const matches = base64Str.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
             if (matches && matches.length === 3) {
               const mimeType = matches[1];
+
+              // Güvenlik: Sadece belirli resim formatlarına izin ver
+              const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+              if (!allowedMimes.includes(mimeType)) {
+                return next(new Error('Geçersiz dosya tipi. Sadece JPEG, PNG, WebP veya GIF yükleyebilirsiniz.'));
+              }
+
               const buffer = Buffer.from(matches[2], 'base64');
-              
+
+              // Güvenlik: 5 MB limitini base64 yolu için de uygula
+              if (buffer.length > 5 * 1024 * 1024) {
+                return next(new Error('Dosya boyutu 5 MB sınırını aşıyor.'));
+              }
+
               req.file = {
                 fieldname: fieldName,
                 originalname: `cropped_image.${mimeType.split('/')[1] || 'jpg'}`,

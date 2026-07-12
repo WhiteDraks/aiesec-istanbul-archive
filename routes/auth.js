@@ -21,7 +21,7 @@ router.post('/register', async (req, res) => {
   const errors = [];
   if (!name || name.trim().length < 2) errors.push('Ad Soyad en az 2 karakter olmalıdır.');
   if (!email || !/^\S+@\S+\.\S+$/.test(email)) errors.push('Geçerli bir e-posta adresi giriniz.');
-  if (!password || password.length < 6) errors.push('Şifre en az 6 karakter olmalıdır.');
+  if (!password || password.length < 8) errors.push('Şifre en az 8 karakter olmalıdır.');
   if (password !== passwordConfirm) errors.push('Şifreler eşleşmiyor.');
   if (!kvkk) errors.push('KVKK Aydınlatma Metnini onaylamanız gerekmektedir.');
 
@@ -101,22 +101,29 @@ router.post('/login', async (req, res) => {
       return res.redirect('/auth/login');
     }
 
-    // Store user info in session (exclude password)
-    req.session.userId = user.id;
-    req.session.user = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      status: user.status,
-    };
-
-    req.flash('success', `Hoş geldin, ${user.name}!`);
-
     // Redirect to originally requested page or home
-    const redirectTo = req.session.redirectTo || '/';
+    // Open Redirect koruması: sadece göreceli (relative) URL'lere izin ver
+    const rawRedirect = req.session.redirectTo || '/';
     delete req.session.redirectTo;
-    res.redirect(redirectTo);
+    const safeRedirect = rawRedirect.startsWith('/') && !rawRedirect.startsWith('//') ? rawRedirect : '/';
+
+    // Session Fixation koruması: giriş sonrası yeni session ID üret
+    req.session.regenerate((regenErr) => {
+      if (regenErr) {
+        console.error('Session regenerate hatası:', regenErr);
+        return res.redirect('/');
+      }
+      req.session.userId = user.id;
+      req.session.user = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+      };
+      req.flash('success', `Hoş geldin, ${user.name}!`);
+      res.redirect(safeRedirect);
+    });
   } catch (err) {
     console.error('Giriş hatası:', err);
     req.flash('error', 'Bir hata oluştu. Lütfen tekrar deneyin.');
@@ -266,7 +273,15 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
-// GET /auth/logout - Çıkış
+// POST /auth/logout - Çıkış (GET yerine POST — CSRF koruması için)
+router.post('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) console.error('Session destroy hatası:', err);
+    res.redirect('/');
+  });
+});
+
+// GET /auth/logout - Geriye dönük uyumluluk (eski linkleri yönlendir)
 router.get('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) console.error('Session destroy hatası:', err);

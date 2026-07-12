@@ -5,13 +5,56 @@ const pgSession = require('connect-pg-simple')(session);
 const { Pool } = require('pg');
 const methodOverride = require('method-override');
 const path = require('path');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const { initDB, getSQL } = require('./config/database');
 const { setLocals } = require('./middleware/auth');
+
+// ─── Session Secret Guard ─────────────────────────────────────────────────────
+if (!process.env.SESSION_SECRET) {
+  console.warn('⚠️  WARNING: SESSION_SECRET environment variable is not set. Using insecure fallback. Set this in production!');
+}
 
 const app = express();
 
 // Trust proxy is required for secure cookies behind Vercel's reverse proxy
 app.set('trust proxy', 1);
+
+// ─── Helmet — HTTP Security Headers ──────────────────────────────────────────
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "'unsafe-inline'",                        // EJS inline scripts
+        'https://cdnjs.cloudflare.com',            // Cropper.js
+      ],
+      styleSrc: [
+        "'self'",
+        "'unsafe-inline'",
+        'https://fonts.googleapis.com',
+        'https://cdnjs.cloudflare.com',
+      ],
+      fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+      imgSrc: ["'self'", 'data:', 'blob:', 'https://'],  // blob: for cropper preview, https: for Vercel Blob CDN
+      connectSrc: ["'self'"],
+      frameSrc: ["'none'"],
+      objectSrc: ["'none'"],
+    },
+  },
+  crossOriginEmbedderPolicy: false, // Needed for Vercel Blob images
+}));
+
+// ─── Rate Limiting ────────────────────────────────────────────────────────────
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,  // 15 dakika
+  max: 20,                    // 15 dakikada en fazla 20 deneme
+  message: 'Çok fazla istek gönderildi. Lütfen 15 dakika sonra tekrar deneyin.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.method === 'GET', // Sadece POST isteklerine uygula
+});
 
 // ─── View Engine ─────────────────────────────────────────────────────────────
 app.set('view engine', 'ejs');
@@ -80,16 +123,16 @@ app.use((req, res, next) => {
 app.use(setLocals);
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
-app.use('/',      require('./routes/index'));
-app.use('/auth',  require('./routes/auth'));
-app.use('/eb',    require('./routes/eb'));
-app.use('/admin', require('./routes/admin'));
+app.use('/',         require('./routes/index'));
+app.use('/auth',     authLimiter, require('./routes/auth'));  // Rate limit tüm auth rotalarına
+app.use('/eb',       require('./routes/eb'));
+app.use('/admin',    require('./routes/admin'));
 app.use('/admin/eb', require('./routes/admin-eb'));
-app.use('/profile', require('./routes/profile'));
-app.use('/alumni',  require('./routes/alumni'));
+app.use('/profile',  require('./routes/profile'));
+app.use('/alumni',   require('./routes/alumni'));
 app.use('/feedback', require('./routes/feedback'));
-app.use('/jobs', require('./routes/jobs'));
-app.use('/events', require('./routes/events'));
+app.use('/jobs',     require('./routes/jobs'));
+app.use('/events',   require('./routes/events'));
 
 // ─── 404 Handler ──────────────────────────────────────────────────────────────
 app.use((req, res) => {
