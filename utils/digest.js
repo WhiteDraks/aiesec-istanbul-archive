@@ -1,5 +1,5 @@
 const { getSQL } = require('../config/database');
-const { Resend } = require('resend');
+const { sendMailHelper } = require('./email');
 
 async function sendWeeklyDigest(customSubject = null, customIntro = null, extraTitle = null, extraContent = null, targetYears = null) {
   const sql = getSQL();
@@ -10,12 +10,13 @@ async function sendWeeklyDigest(customSubject = null, customIntro = null, extraT
   settingsRows.forEach(r => { settings[r.key] = r.value; });
   const emailFrom = settings.email_from || 'AIESEC Alumni <onboarding@resend.dev>';
   
-  // Check if Resend API key is present
-  if (!process.env.RESEND_API_KEY) {
-    console.warn('⚠️ RESEND_API_KEY environment variable is not defined. Digest sending skipped.');
-    return { success: false, reason: 'API key missing' };
+  // SMTP veya Resend kurulu mu kontrol et
+  const hasSMTP = process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS;
+  const hasResend = process.env.RESEND_API_KEY;
+  if (!hasSMTP && !hasResend) {
+    console.warn('⚠️ No mail sending provider (SMTP or Resend) is configured. Digest sending skipped.');
+    return { success: false, reason: 'Mail provider missing' };
   }
-  const resend = new Resend(process.env.RESEND_API_KEY);
 
   // 2. Fetch new content in the last 7 days
   const newJobs = await sql`
@@ -155,16 +156,13 @@ async function sendWeeklyDigest(customSubject = null, customIntro = null, extraT
     if (!u.email) continue;
     const recipientEmail = u.email.trim().toLowerCase();
     try {
-      const response = await resend.emails.send({
-        from: emailFrom,
+      const isSent = await sendMailHelper({
         to: recipientEmail,
         subject: customSubject || 'AIESEC İstanbul Mezunlar Portalı - Haftalık Özet 📰',
         html: htmlContent
       });
       
-      if (response && response.error) {
-        console.error(`Resend API Error sending to ${recipientEmail}:`, response.error);
-      } else {
+      if (isSent) {
         sentCount++;
       }
     } catch (sendErr) {
