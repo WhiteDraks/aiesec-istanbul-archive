@@ -23,7 +23,7 @@ const User = {
     const sql = getSQL();
     const rows = await sql`
       SELECT id, name, email, role, status, school, eb_year, approved_at, created_at,
-             photo, department, linkedin, workplaces, sector, phone, aiesec_journey, roles_history,
+             photo, department, linkedin, workplaces, sector, phone, show_phone, aiesec_journey, roles_history,
              city, country, is_mentor, is_mentee, mentorship_details
       FROM users WHERE id = ${id} LIMIT 1
     `;
@@ -44,6 +44,7 @@ const User = {
         workplaces = ${profileData.workplaces || null},
         sector = ${profileData.sector || null},
         phone = ${profileData.phone || null},
+        show_phone = ${profileData.show_phone || false},
         aiesec_journey = ${profileData.aiesec_journey || null},
         photo = COALESCE(${profileData.photo || null}, photo),
         city = ${profileData.city || null},
@@ -62,14 +63,14 @@ const User = {
     const sql = getSQL();
     if (sector) {
       return await sql`
-        SELECT id, name, email, school, department, eb_year, roles_history, photo, linkedin, workplaces, sector, aiesec_journey, city, country, is_mentor, is_mentee, mentorship_details, phone
+        SELECT id, name, email, school, department, eb_year, roles_history, photo, linkedin, workplaces, sector, aiesec_journey, city, country, is_mentor, is_mentee, mentorship_details, phone, show_phone
         FROM users
         WHERE status = 'approved' AND sector = ${sector}
         ORDER BY name ASC
       `;
     }
     return await sql`
-      SELECT id, name, email, school, department, eb_year, roles_history, photo, linkedin, workplaces, sector, aiesec_journey, city, country, is_mentor, is_mentee, mentorship_details, phone
+      SELECT id, name, email, school, department, eb_year, roles_history, photo, linkedin, workplaces, sector, aiesec_journey, city, country, is_mentor, is_mentee, mentorship_details, phone, show_phone
       FROM users
       WHERE status = 'approved'
       ORDER BY name ASC
@@ -86,7 +87,7 @@ const User = {
 
     // Query filters
     return await sql`
-      SELECT id, name, email, school, department, eb_year, roles_history, photo, linkedin, workplaces, sector, aiesec_journey, city, country, is_mentor, is_mentee, mentorship_details, phone
+      SELECT id, name, email, school, department, eb_year, roles_history, photo, linkedin, workplaces, sector, aiesec_journey, city, country, is_mentor, is_mentee, mentorship_details, phone, show_phone
       FROM users
       WHERE status = 'approved'
         AND (${q}::text IS NULL OR name ILIKE ${q} OR workplaces ILIKE ${q} OR department ILIKE ${q} OR school ILIKE ${q})

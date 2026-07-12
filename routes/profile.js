@@ -31,7 +31,8 @@ router.get('/', async (req, res) => {
 // POST /profile - Profili güncelleme
 router.post('/', upload.single('photo'), async (req, res) => {
   try {
-    const { name, school, department, linkedin, workplaces, sector, phone, aiesec_journey, role_years, role_titles, remove_photo, city, country, is_mentor, is_mentee, mentorship_details } = req.body;
+    const sanitizeHtml = require('sanitize-html');
+    const { name, school, department, linkedin, workplaces, sector, phone, show_phone, aiesec_journey, role_years, role_titles, remove_photo, city, country, is_mentor, is_mentee, mentorship_details } = req.body;
     let photoUrl = null;
 
     // Fotoğraf temizlendiyse veya yüklendiyse
@@ -48,7 +49,10 @@ router.post('/', upload.single('photo'), async (req, res) => {
       const titles = Array.isArray(role_titles) ? role_titles : [role_titles];
       for (let i = 0; i < years.length; i++) {
         if (years[i].trim() || titles[i].trim()) {
-          roles_history.push({ year: years[i].trim(), role: titles[i].trim() });
+          // XSS koruması: Rol başlığını temizle
+          const cleanYear = sanitizeHtml(years[i].trim(), { allowedTags: [], allowedAttributes: {} });
+          const cleanTitle = sanitizeHtml(titles[i].trim(), { allowedTags: [], allowedAttributes: {} });
+          roles_history.push({ year: cleanYear, role: cleanTitle });
         }
       }
     }
@@ -56,24 +60,31 @@ router.post('/', upload.single('photo'), async (req, res) => {
     // Ana dönemi belirle (ilk eklenen rolü kabul edebiliriz)
     const eb_year = roles_history.length > 0 ? roles_history[0].year : null;
 
+    // XSS Koruması: Tüm girdileri HTML etiketlerinden arındır (Düz Metin)
+    const cleanString = (val) => {
+      if (!val) return null;
+      return sanitizeHtml(val.trim(), { allowedTags: [], allowedAttributes: {} });
+    };
+
     // Profil güncelleme objesi
     const updateData = {
-      name: name?.trim(),
-      school: school?.trim(),
-      department: department?.trim(),
+      name: cleanString(name) || 'Mezun',
+      school: cleanString(school),
+      department: cleanString(department),
       eb_year: eb_year, // geriye dönük uyumluluk
       roles_history,
-      linkedin: linkedin?.trim(),
-      workplaces: workplaces?.trim(),
-      sector: sector?.trim(),
-      phone: phone?.trim(),
-      aiesec_journey: aiesec_journey?.trim(),
+      linkedin: cleanString(linkedin),
+      workplaces: cleanString(workplaces),
+      sector: cleanString(sector),
+      phone: cleanString(phone),
+      show_phone: show_phone === 'true', // gizlilik tercihi
+      aiesec_journey: cleanString(aiesec_journey),
       photo: photoUrl,
-      city: city?.trim(),
-      country: country?.trim(),
+      city: cleanString(city),
+      country: cleanString(country),
       is_mentor: is_mentor === 'true',
       is_mentee: is_mentee === 'true',
-      mentorship_details: mentorship_details?.trim(),
+      mentorship_details: cleanString(mentorship_details),
     };
 
     const updatedUser = await User.updateProfile(req.session.userId, updateData);
@@ -84,7 +95,7 @@ router.post('/', upload.single('photo'), async (req, res) => {
     req.flash('success', 'Profiliniz başarıyla güncellendi.');
     res.redirect('/profile');
   } catch (err) {
-    console.error('Profile update error:', err);
+    console.error('Profile update error:', err.message); // Hassas hata detaylarını logdan gizle
     req.flash('error', 'Profil güncellenirken bir hata oluştu.');
     res.redirect('/profile');
   }

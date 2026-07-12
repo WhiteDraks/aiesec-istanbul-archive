@@ -59,6 +59,10 @@
           <div class="form-group">
             <label for="phone" class="form-label">Telefon Numarası</label>
             <input type="tel" id="phone" name="phone" class="form-input" value="<%= user.phone || '' %>" placeholder="Örn: +90 555 123 4567">
+            <label style="display: inline-flex; align-items: center; gap: 0.35rem; margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-muted); cursor: pointer;">
+              <input type="checkbox" name="show_phone" value="true" <%= user.show_phone ? 'checked' : '' %> style="width: 14px; height: 14px;">
+              Telefon numaramı diğer mezunlarla paylaş (KVKK)
+            </label>
           </div>
           <div class="form-group">
             <label for="linkedin" class="form-label">LinkedIn Profil URL</label>
