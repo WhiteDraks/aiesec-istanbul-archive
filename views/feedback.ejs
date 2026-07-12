@@ -29,6 +29,7 @@
     <% } %>
 
     <form action="/feedback" method="POST" class="profile-card" style="padding: 2.5rem;">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem; color: var(--white);">Görüşleriniz Bizim İçin Değerli</h3>
 
       <% if (!currentUser) { %>

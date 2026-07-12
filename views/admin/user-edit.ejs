@@ -10,6 +10,7 @@
 
   <div class="profile-card">
     <form action="/admin/user/<%= user.id %>/edit" method="POST" enctype="multipart/form-data" class="profile-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
       <!-- Profil Fotoğrafı Alanı -->
       <div class="profile-photo-section">

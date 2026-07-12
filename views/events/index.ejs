@@ -54,6 +54,7 @@
               </div>
               <% if (currentUser && (currentUser.role === 'admin' || event.created_by === currentUser.id)) { %>
                 <form action="/events/delete/<%= event.id %>" method="POST" style="margin: 0;" onsubmit="return confirm('Bu etkinliği silmek istediğinizden emin misiniz?')">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                   <button type="submit" class="btn btn-delete btn-xs" style="padding: 0.45rem 0.9rem; font-size: 0.75rem; border-radius: 6px; background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">🗑 Sil</button>
                 </form>
               <% } %>
@@ -82,10 +83,12 @@
             <div style="margin-top: 0.75rem; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1.25rem;">
               <% if (event.attending) { %>
                 <form action="/events/<%= event.id %>/leave" method="POST" style="margin: 0;">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                   <button type="submit" class="btn btn-outline btn-sm" style="border-color: #ff4d4f; color: #ff4d4f; background: rgba(255,77,79,0.05); border-radius: 8px;">Katılmaktan Vazgeç ❌</button>
                 </form>
               <% } else { %>
                 <form action="/events/<%= event.id %>/attend" method="POST" style="margin: 0;">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                   <button type="submit" class="btn btn-primary btn-sm" style="border-radius: 8px;">Buluşmaya Katıl 🎉</button>
                 </form>
               <% } %>
@@ -118,6 +121,7 @@
     <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 2rem;">AIESEC İstanbul mezunları için planladığınız buluşmanın tüm detaylarını girin.</p>
 
     <form action="/events" method="POST" style="display: flex; flex-direction: column; gap: 1.25rem;">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <div class="form-group" style="margin: 0;">
         <label for="title" class="form-label">Etkinlik Başlığı *</label>
         <input type="text" id="title" name="title" class="form-input" required placeholder="Örn: AIESEC İstanbul Yaz Pikniği">

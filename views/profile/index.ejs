@@ -17,6 +17,7 @@
 
   <div class="profile-card">
     <form action="/profile" method="POST" enctype="multipart/form-data" class="profile-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       
       <!-- Profil Fotoğrafı Alanı -->
       <div class="profile-photo-section">
@@ -223,6 +224,7 @@
     <p class="form-hint" style="margin-bottom: 1.5rem;">Hesap şifrenizi güncellemek için aşağıdaki alanları doldurun.</p>
     
     <form action="/profile/change-password" method="POST" style="display: flex; flex-direction: column; gap: 1.25rem;">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <div class="form-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 0;">
         <div class="form-group" style="margin: 0;">
           <label for="current_password" class="form-label">Mevcut Şifre *</label>
@@ -247,6 +249,7 @@
     <h3>Tehlikeli Bölge</h3>
     <p class="form-hint">Hesabını sildiğinde tüm bilgilerin kalıcı olarak kaldırılır. Bu işlem geri alınamaz.</p>
     <form action="/profile/delete" method="POST" onsubmit="return confirm('Hesabını kalıcı olarak silmek istediğine emin misin? Bu işlem geri alınamaz.')">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <button type="submit" class="btn btn-delete">Hesabımı Sil</button>
     </form>
   </div>

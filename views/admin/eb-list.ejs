@@ -61,6 +61,7 @@
                       </a>
                     <% } %>
                     <form action="/admin/eb/year/<%= encodeURIComponent(team.year) %>/delete" method="POST" style="display: inline; margin: 0;" onsubmit="return confirm('<%= team.year %> dönemini silmek istediğinizden emin misiniz? Bu işlem dönem metadatalarını, anılarını silecek ve üyelerin rol geçmişlerinden bu dönemi kaldıracaktır.')">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                       <button type="submit" class="btn btn-sm btn-danger" style="display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; font-size: 0.8rem; padding: 0.45rem 0.9rem; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                         Sil
