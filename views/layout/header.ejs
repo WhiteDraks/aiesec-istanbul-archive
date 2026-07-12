@@ -21,24 +21,25 @@
   <!-- Dynamic Theme Settings -->
   <style>
     :root {
-      <% if (siteSettings.theme_primary) { %>
-        --blue-500: <%= siteSettings.theme_primary %>;
-        --blue-600: <%= siteSettings.theme_primary %>dd;
-        --blue-700: <%= siteSettings.theme_primary %>bb;
-        --primary: <%= siteSettings.theme_primary %>;
-        --primary-hover: <%= siteSettings.theme_primary %>ee;
+      <% const _s = (typeof siteSettings !== 'undefined' && siteSettings) ? siteSettings : {}; %>
+      <% if (_s.theme_primary) { %>
+        --blue-500: <%= _s.theme_primary %>;
+        --blue-600: <%= _s.theme_primary %>dd;
+        --blue-700: <%= _s.theme_primary %>bb;
+        --primary: <%= _s.theme_primary %>;
+        --primary-hover: <%= _s.theme_primary %>ee;
       <% } %>
-      <% if (siteSettings.theme_background) { %>
-        --navy-900: <%= siteSettings.theme_background %>;
-        --background: <%= siteSettings.theme_background %>;
+      <% if (_s.theme_background) { %>
+        --navy-900: <%= _s.theme_background %>;
+        --background: <%= _s.theme_background %>;
       <% } %>
-      <% if (siteSettings.theme_surface) { %>
-        --navy-800: <%= siteSettings.theme_surface %>;
-        --surface: <%= siteSettings.theme_surface %>;
+      <% if (_s.theme_surface) { %>
+        --navy-800: <%= _s.theme_surface %>;
+        --surface: <%= _s.theme_surface %>;
       <% } %>
-      <% if (siteSettings.theme_secondary) { %>
-        --navy-700: <%= siteSettings.theme_secondary %>;
-        --secondary: <%= siteSettings.theme_secondary %>;
+      <% if (_s.theme_secondary) { %>
+        --navy-700: <%= _s.theme_secondary %>;
+        --secondary: <%= _s.theme_secondary %>;
       <% } %>
     }
 
@@ -245,14 +246,14 @@
   <div class="container nav-inner">
     <!-- Logo -->
     <a href="/" class="nav-logo" id="nav-logo">
-      <% if (siteSettings.site_logo_image) { %>
-        <img src="<%= siteSettings.site_logo_image %>" alt="Logo" style="height: 48px; width: 48px; object-fit: contain; border-radius: 8px;" />
+      <% if (_s.site_logo_image) { %>
+        <img src="<%= _s.site_logo_image %>" alt="Logo" style="height: 48px; width: 48px; object-fit: contain; border-radius: 8px;" />
       <% } else { %>
-        <div class="logo-emblem"><%= siteSettings.site_logo_emblem || 'A' %></div>
+        <div class="logo-emblem"><%= _s.site_logo_emblem || 'A' %></div>
       <% } %>
       <span class="logo-text">
-        <strong><%= siteSettings.site_logo_text || 'AIESEC' %></strong> <%= siteSettings.site_logo_sub || 'İstanbul' %>
-        <small><%= siteSettings.site_title || 'Alumni Archive' %></small>
+        <strong><%= _s.site_logo_text || 'AIESEC' %></strong> <%= _s.site_logo_sub || 'İstanbul' %>
+        <small><%= _s.site_title || 'Alumni Archive' %></small>
       </span>
     </a>
 

@@ -6,13 +6,14 @@
     <div class="footer-grid">
       <!-- Brand -->
       <div class="footer-brand">
+<% const _fs = (typeof siteSettings !== 'undefined' && siteSettings) ? siteSettings : {}; %>
         <div class="footer-logo">
-          <% if (siteSettings.site_logo_image) { %>
-            <img src="<%= siteSettings.site_logo_image %>" alt="Logo" style="height: 38px; width: 38px; object-fit: contain; border-radius: 6px; margin-right: 0.5rem;" />
+          <% if (_fs.site_logo_image) { %>
+            <img src="<%= _fs.site_logo_image %>" alt="Logo" style="height: 38px; width: 38px; object-fit: contain; border-radius: 6px; margin-right: 0.5rem;" />
           <% } else { %>
-            <div class="logo-emblem logo-emblem-sm"><%= siteSettings.site_logo_emblem || 'A' %></div>
+            <div class="logo-emblem logo-emblem-sm"><%= _fs.site_logo_emblem || 'A' %></div>
           <% } %>
-          <span><strong><%= siteSettings.site_logo_text || 'AIESEC' %></strong> <%= siteSettings.site_logo_sub || 'İstanbul' %></span>
+          <span><strong><%= _fs.site_logo_text || 'AIESEC' %></strong> <%= _fs.site_logo_sub || 'İstanbul' %></span>
         </div>
         <p class="footer-tagline">Liderlik deneyimini paylaş,<br />geleceği birlikte inşa et.</p>
       </div>
@@ -56,30 +57,30 @@
     </div>
 
     <div class="footer-bottom">
-      <p>&copy; <%= new Date().getFullYear() %> <%= siteSettings.site_logo_text || 'AIESEC' %> <%= siteSettings.site_logo_sub || 'İstanbul' %> Alumni Archive. Tüm hakları saklıdır.</p>
+      <p>&copy; <%= new Date().getFullYear() %> <%= _fs.site_logo_text || 'AIESEC' %> <%= _fs.site_logo_sub || 'İstanbul' %> Alumni Archive. Tüm hakları saklıdır.</p>
       
       <!-- Dynamic Footer Style Injection -->
       <style>
         .footer-credit-text {
-          color: <%= siteSettings.footer_credit_color || '#ffffff' %>;
+          color: <%= _fs.footer_credit_color || '#ffffff' %>;
           display: inline-block;
           font-weight: 500;
           transition: all 0.3s ease;
         }
-        <% if (siteSettings.footer_credit_effect === 'neon-glow') { %>
+        <% if (_fs.footer_credit_effect === 'neon-glow') { %>
         .footer-credit-text {
-          text-shadow: 0 0 5px <%= siteSettings.footer_credit_color || '#ffffff' %>,
-                       0 0 10px <%= siteSettings.footer_credit_color || '#ffffff' %>cc,
-                       0 0 20px <%= siteSettings.footer_credit_color || '#ffffff' %>88;
+          text-shadow: 0 0 5px <%= _fs.footer_credit_color || '#ffffff' %>,
+                       0 0 10px <%= _fs.footer_credit_color || '#ffffff' %>cc,
+                       0 0 20px <%= _fs.footer_credit_color || '#ffffff' %>88;
         }
-        <% } else if (siteSettings.footer_credit_effect === 'gradient-text') { %>
+        <% } else if (_fs.footer_credit_effect === 'gradient-text') { %>
         .footer-credit-text {
-          background: linear-gradient(135deg, <%= siteSettings.footer_credit_color || '#ffffff' %> 0%, var(--primary) 50%, #00AEEF 100%);
+          background: linear-gradient(135deg, <%= _fs.footer_credit_color || '#ffffff' %> 0%, var(--primary) 50%, #00AEEF 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           font-weight: 700;
         }
-        <% } else if (siteSettings.footer_credit_effect === 'pulse-animation') { %>
+        <% } else if (_fs.footer_credit_effect === 'pulse-animation') { %>
         .footer-credit-text {
           animation: footerCreditPulse 2s infinite alternate;
         }
@@ -91,14 +92,14 @@
           to {
             opacity: 1;
             transform: scale(1.02);
-            text-shadow: 0 0 8px <%= siteSettings.footer_credit_color || '#ffffff' %>bb;
+            text-shadow: 0 0 8px <%= _fs.footer_credit_color || '#ffffff' %>bb;
           }
         }
         <% } %>
       </style>
       
       <p class="footer-sub" style="margin-top: 0.5rem;">
-        <span class="footer-credit-text"><%= siteSettings.footer_credit || 'Geçmiş liderlik deneyimlerini onurlandırmak için 26.27 LCVP F&L Elif Kurnaz tarafından yapıldı.' %></span>
+        <span class="footer-credit-text"><%= _fs.footer_credit || 'Geçmiş liderlik deneyimlerini onurlandırmak için 26.27 LCVP F&L Elif Kurnaz tarafından yapıldı.' %></span>
       </p>
     </div>
   </div>
