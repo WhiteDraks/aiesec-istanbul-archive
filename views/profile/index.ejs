@@ -333,12 +333,14 @@ function addRoleRow() {
   div.className = 'role-row';
   div.innerHTML = `
     <div class="form-group" style="flex: 1;">
+      <label class="form-label">Dönem</label>
       <input type="text" name="role_years[]" class="form-input" placeholder="Örn: 26.27">
     </div>
     <div class="form-group" style="flex: 2;">
+      <label class="form-label">Görev</label>
       <input type="text" name="role_titles[]" class="form-input" placeholder="Örn: Başkan (LCP)">
     </div>
-    <button type="button" class="btn btn-outline" style="align-self: flex-start; margin-top: 0.15rem;" onclick="this.parentElement.remove()">Sil</button>
+    <button type="button" class="btn btn-outline" style="align-self: flex-end; margin-bottom: 0.2rem;" onclick="this.parentElement.remove()">Sil</button>
   `;
   container.appendChild(div);
 }
