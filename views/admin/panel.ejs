@@ -301,12 +301,12 @@
           <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.5rem; max-height: 120px; overflow-y: auto; padding: 0.5rem; background: rgba(0,0,0,0.2); border-radius: 8px;">
             <% if (typeof ebTeams !== 'undefined' && ebTeams && ebTeams.length > 0) { %>
               <% ebTeams.forEach(team => { %>
-                <label style="display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.8rem; color: var(--text);">
+                <label style="display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.8.rem; color: var(--text);">
                   <input type="checkbox" name="selected_years" value="<%= team.year %>"> <%= team.year %>
                 </label>
               <% }) %>
             <% } else { %>
-              <span style="font-size: 0.75rem; color: var(--text-muted);">Kayıtlı EB dönemi bulunamadı.</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Dönem listesi yükleniyor veya boş.</span>
             <% } %>
           </div>
         </div>
