@@ -130,20 +130,30 @@ app.use((req, res, next) => {
     const host = req.headers.host; // E.g. aiesec-istanbul-archive.vercel.app
 
     let isValid = true;
+    const cleanHost = host ? host.replace('www.', '').toLowerCase() : '';
+
+    const checkHost = (targetHost) => {
+      if (!targetHost) return false;
+      const cleanTarget = targetHost.replace('www.', '').toLowerCase();
+      // Exact match or subdomain match or vercel preview URL match
+      return cleanTarget === cleanHost ||
+             cleanTarget.endsWith('.' + cleanHost) ||
+             cleanHost.endsWith('.' + cleanTarget) ||
+             cleanTarget.endsWith('.vercel.app') ||
+             (req.headers['x-forwarded-host'] && cleanTarget === req.headers['x-forwarded-host'].replace('www.', '').toLowerCase());
+    };
 
     if (origin) {
       try {
         const originUrl = new URL(origin);
-        const originHost = originUrl.host;
-        isValid = originHost === host || originHost === req.headers['x-forwarded-host'] || originHost.endsWith('.vercel.app');
+        isValid = checkHost(originUrl.host);
       } catch (e) {
         isValid = false;
       }
     } else if (referer) {
       try {
         const refererUrl = new URL(referer);
-        const refererHost = refererUrl.host;
-        isValid = refererHost === host || refererHost === req.headers['x-forwarded-host'] || refererHost.endsWith('.vercel.app');
+        isValid = checkHost(refererUrl.host);
       } catch (e) {
         isValid = false;
       }

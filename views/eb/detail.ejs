@@ -318,15 +318,6 @@
 <%- include('../layout/footer') %>
 
 <script>
-function toggleMemberDetails(id) {
-  const details = document.getElementById('details-' + id);
-  const btn = document.querySelector('#member-' + id + ' .btn-details:not(.btn-details-close)');
-  if (!details) return;
-  const isHidden = details.hidden;
-  details.hidden = !isHidden;
-  if (btn) btn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
-}
-
 function toggleEditAchievementsForm() {
   const formWrap = document.getElementById('edit-achievements-form-wrap');
   if (formWrap) {
