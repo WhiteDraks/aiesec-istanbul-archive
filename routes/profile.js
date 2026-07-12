@@ -32,7 +32,7 @@ router.get('/', async (req, res) => {
 router.post('/', upload.single('photo'), async (req, res) => {
   try {
     const sanitizeHtml = require('sanitize-html');
-    const { name, school, department, linkedin, workplaces, sector, phone, show_phone, aiesec_journey, role_years, role_titles, remove_photo, city, country, is_mentor, is_mentee, mentorship_details } = req.body;
+    const { name, school, department, linkedin, workplaces, sector, phone, show_phone, aiesec_journey, role_years, role_titles, remove_photo, city, city_custom, country, country_custom, is_mentor, is_mentee, mentorship_details } = req.body;
     let photoUrl = null;
 
     // Fotoğraf temizlendiyse veya yüklendiyse
@@ -80,8 +80,8 @@ router.post('/', upload.single('photo'), async (req, res) => {
       show_phone: show_phone === 'true', // gizlilik tercihi
       aiesec_journey: cleanString(aiesec_journey),
       photo: photoUrl,
-      city: cleanString(city),
-      country: cleanString(country),
+      city: city === 'other' ? cleanString(city_custom) : cleanString(city),
+      country: country === 'other' ? cleanString(country_custom) : cleanString(country),
       is_mentor: is_mentor === 'true',
       is_mentee: is_mentee === 'true',
       mentorship_details: cleanString(mentorship_details),

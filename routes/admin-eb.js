@@ -91,10 +91,16 @@ router.post('/:id/edit', async (req, res) => {
       achievementsArray = achievements.split('\n').map(a => a.trim()).filter(a => a.length > 0);
     }
 
+    const existingTeam = await EBTeam.findById(req.params.id);
+    if (!existingTeam) {
+      req.flash('error', 'Takım bulunamadı.');
+      return res.redirect('/admin/eb');
+    }
+
     await EBTeam.update(req.params.id, {
-      year: year.trim(),
-      title: title.trim(),
-      description: description.trim(),
+      year: year?.trim() || existingTeam.year,
+      title: title?.trim() || existingTeam.title,
+      description: description?.trim() || null,
       achievements: achievementsArray
     });
 
