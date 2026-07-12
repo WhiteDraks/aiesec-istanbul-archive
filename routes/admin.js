@@ -35,7 +35,7 @@ router.get('/', async (req, res) => {
       Feedback.findAll(),
       EBTeam.findAll(),
       sql`SELECT COUNT(*)::integer as count FROM jobs`,
-      sql`SELECT COUNT(*)::integer as count FROM memories`
+      sql`SELECT COUNT(*)::integer as count FROM eb_memories`
     ]);
 
     const totalJobs = jobsCountRes[0]?.count || 0;
