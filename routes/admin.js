@@ -15,14 +15,31 @@ const Feedback = require('../models/Feedback');
 router.get('/', async (req, res) => {
   try {
     const EBTeam = require('../models/EBTeam');
-    const [pendingUsers, approvedUsers, rejectedUsers, totalUsers, feedbacks, ebTeams] = await Promise.all([
+    const { getSQL } = require('../config/database');
+    const sql = getSQL();
+
+    const [
+      pendingUsers,
+      approvedUsers,
+      rejectedUsers,
+      totalUsers,
+      feedbacks,
+      ebTeams,
+      jobsCountRes,
+      memoriesCountRes
+    ] = await Promise.all([
       User.findAllByStatus('pending'),
       User.findAllByStatus('approved'),
       User.findAllByStatus('rejected'),
       User.countByRole('user'),
       Feedback.findAll(),
       EBTeam.findAll(),
+      sql`SELECT COUNT(*)::integer as count FROM jobs`,
+      sql`SELECT COUNT(*)::integer as count FROM memories`
     ]);
+
+    const totalJobs = jobsCountRes[0]?.count || 0;
+    const totalMemories = memoriesCountRes[0]?.count || 0;
 
     res.render('admin/panel', {
       title: 'Admin Paneli - AIESEC İstanbul',
@@ -37,6 +54,8 @@ router.get('/', async (req, res) => {
         approved: approvedUsers.length,
         rejected: rejectedUsers.length,
         total: totalUsers,
+        jobs: totalJobs,
+        memories: totalMemories
       },
     });
   } catch (err) {

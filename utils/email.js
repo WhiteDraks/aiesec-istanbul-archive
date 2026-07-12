@@ -4,18 +4,81 @@ const nodemailer = require('nodemailer');
 // Resend ve SMTP istemcilerini ortam değişkenlerine göre başlat
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-// SMTP Taşıyıcısını oluştur (Eğer değişkenler tanımlıysa)
+// SMTP Taşıyıcısını oluştur
 let transporter = null;
 if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
   transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+    secure: process.env.SMTP_SECURE === 'true',
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
   });
+}
+
+/**
+ * Premium Email Wrapper HTML Template
+ */
+function getEmailTemplate(title, content) {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${title}</title>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f4f6f9; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f6f9; padding: 20px 0;">
+        <tr>
+          <td align="center">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+              <!-- Blue Top Accent Bar -->
+              <tr>
+                <td style="background-color: #037ef3; height: 6px;"></td>
+              </tr>
+              <!-- Header -->
+              <tr>
+                <td align="center" style="padding: 30px 40px 20px 40px; border-bottom: 1px solid #f0f0f0;">
+                  <h1 style="margin: 0; color: #037ef3; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">AIESEC İSTANBUL</h1>
+                  <span style="color: #6b7280; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 4px;">Alumni Archive & Portal</span>
+                </td>
+              </tr>
+              <!-- Body Content -->
+              <tr>
+                <td style="padding: 40px 40px 30px 40px; color: #374151; font-size: 16px; line-height: 1.6;">
+                  ${content}
+                </td>
+              </tr>
+              <!-- Footer / Signature -->
+              <tr>
+                <td style="padding: 0 40px 40px 40px;">
+                  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px solid #f0f0f0; padding-top: 30px;">
+                    <tr>
+                      <td style="vertical-align: top;">
+                        <p style="margin: 0; font-size: 14px; font-weight: 700; color: #111827;">AIESEC İstanbul Mezunlar Birliği</p>
+                        <p style="margin: 2px 0 10px 0; font-size: 13px; color: #6b7280;">Alumni Relations Team</p>
+                        <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+                          Bu e-posta otomatik olarak gönderilmiştir. Lütfen yanıtlamayınız.
+                        </p>
+                      </td>
+                      <td align="right" style="vertical-align: top; width: 80px;">
+                        <!-- Small Yellow Dot Accent -->
+                        <span style="display: inline-block; width: 12px; height: 12px; background-color: #ffc80a; border-radius: 50%;"></span>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
 }
 
 /**
@@ -26,17 +89,9 @@ async function sendMailHelper({ to, subject, html }) {
   const settings = await SiteSetting.getAll();
   const fromEmail = settings.email_from || 'AIESEC Alumni <onboarding@resend.dev>';
 
-  // 1. Önce SMTP (Nodemailer) kurulu mu kontrol et
   if (transporter) {
     try {
-      // E-posta göndericisini parse et ("İsim <email@domain.com>" formatı için)
-      let fromAddress = fromEmail;
-      if (fromEmail.includes('<') && fromEmail.includes('>')) {
-        fromAddress = fromEmail;
-      } else {
-        fromAddress = `AIESEC Alumni <${fromEmail}>`;
-      }
-
+      let fromAddress = fromEmail.includes('<') ? fromEmail : `AIESEC Alumni <${fromEmail}>`;
       await transporter.sendMail({
         from: fromAddress,
         to: Array.isArray(to) ? to.join(', ') : to,
@@ -50,7 +105,6 @@ async function sendMailHelper({ to, subject, html }) {
     }
   }
 
-  // 2. SMTP yoksa veya hata verdiyse Resend kullan
   if (resend) {
     try {
       const { data, error } = await resend.emails.send({
@@ -80,17 +134,16 @@ async function sendMailHelper({ to, subject, html }) {
  * Onay maili gönderir
  */
 async function sendApprovalEmail(email, name) {
-  const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-      <h2 style="color: #037ef3;">Merhaba ${name},</h2>
-      <p>AIESEC İstanbul Alumni Archive sistemine yaptığınız kayıt başarıyla onaylanmıştır!</p>
-      <p>Artık sisteme giriş yapabilir, geçmiş dönem (EB) takımlarını detaylıca inceleyebilir, diğer mezunların bilgilerine "Alumni Rehberi" üzerinden erişebilir ve kendi profil bilgilerinizi (fotoğraf, iş yeri, sektör vb.) güncelleyebilirsiniz.</p>
-      <p style="text-align: center; margin: 30px 0;">
-        <a href="https://aiesec-istanbul-archive.vercel.app/auth/login" style="background-color: #037ef3; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Sisteme Giriş Yap</a>
-      </p>
-      <p>Görüşmek üzere,<br><strong>AIESEC İstanbul</strong></p>
+  const htmlContent = `
+    <h2 style="color: #111827; font-size: 20px; margin-top: 0;">Merhaba ${name},</h2>
+    <p>AIESEC İstanbul Alumni Archive sistemine yaptığınız kayıt başvurusu <strong>başarıyla onaylanmıştır!</strong></p>
+    <p>Artık sisteme giriş yapabilir, geçmiş dönem takımlarını detaylıca inceleyebilir, diğer mezunların bilgilerine "Mezunlar Rehberi" üzerinden erişebilir ve kendi profil bilgilerinizi güncelleyebilirsiniz.</p>
+    <div style="text-align: center; margin: 35px 0;">
+      <a href="https://aiesec-istanbul-archive.vercel.app/auth/login" style="background-color: #037ef3; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px rgba(3,126,243,0.2);">Sisteme Giriş Yap</a>
     </div>
+    <p style="margin-bottom: 0;">Aramıza tekrar hoş geldiniz!</p>
   `;
+  const html = getEmailTemplate('Hesabınız Onaylandı! 🎉', htmlContent);
   return await sendMailHelper({ to: email, subject: 'AIESEC İstanbul Alumni Archive - Hesabınız Onaylandı! 🎉', html });
 }
 
@@ -98,18 +151,16 @@ async function sendApprovalEmail(email, name) {
  * Şifre sıfırlama maili gönderir
  */
 async function sendResetPasswordEmail(email, name, resetLink) {
-  const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-      <h2 style="color: #037ef3;">Merhaba ${name},</h2>
-      <p>Hesabınız için şifre sıfırlama talebinde bulundunuz.</p>
-      <p>Aşağıdaki bağlantıya tıklayarak yeni şifrenizi belirleyebilirsiniz. Bu bağlantı güvenlik nedeniyle 1 saat geçerli kalacaktır:</p>
-      <p style="text-align: center; margin: 30px 0;">
-        <a href="${resetLink}" style="background-color: #037ef3; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Şifremi Sıfırla</a>
-      </p>
-      <p>Eğer bu talebi siz yapmadıysanız bu e-postayı görmezden gelebilirsiniz.</p>
-      <p>Görüşmek üzere,<br><strong>AIESEC İstanbul</strong></p>
+  const htmlContent = `
+    <h2 style="color: #111827; font-size: 20px; margin-top: 0;">Merhaba ${name},</h2>
+    <p>Hesabınız için şifre sıfırlama talebinde bulundunuz.</p>
+    <p>Aşağıdaki bağlantıya tıklayarak yeni şifrenizi belirleyebilirsiniz. Bu bağlantı güvenlik nedeniyle <strong>1 saat</strong> geçerli kalacaktır:</p>
+    <div style="text-align: center; margin: 35px 0;">
+      <a href="${resetLink}" style="background-color: #037ef3; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px rgba(3,126,243,0.2);">Şifremi Sıfırla</a>
     </div>
+    <p style="margin-bottom: 0; color: #6b7280; font-size: 14px;">Eğer bu talebi siz yapmadıysanız bu e-postayı görmezden gelebilirsiniz.</p>
   `;
+  const html = getEmailTemplate('Şifre Sıfırlama Talebi 🔑', htmlContent);
   return await sendMailHelper({ to: email, subject: 'AIESEC İstanbul Mezunlar Portalı - Şifre Sıfırlama Talebi 🔑', html });
 }
 
@@ -117,16 +168,14 @@ async function sendResetPasswordEmail(email, name, resetLink) {
  * Kayıt bilgilendirme maili gönderir
  */
 async function sendWelcomePendingEmail(email, name) {
-  const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6;">
-      <h2 style="color: #037ef3;">Merhaba ${name},</h2>
-      <p>AIESEC İstanbul Alumni Archive platformuna yaptığınız kayıt talebi başarıyla alınmıştır.</p>
-      <p>Üyeliğinizin doğrulanması ve platformun güvenli kalması amacıyla başvurunuz admin ekibimiz tarafından incelemeye alınmıştır.</p>
-      <p>Hesabınız onaylandığında giriş yapabilmeniz için size yeni bir onay e-postası göndereceğiz.</p>
-      <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
-      <p style="font-size: 0.9rem; color: #666;">Görüşmek üzere,<br><strong>AIESEC İstanbul</strong></p>
-    </div>
+  const htmlContent = `
+    <h2 style="color: #111827; font-size: 20px; margin-top: 0;">Merhaba ${name},</h2>
+    <p>AIESEC İstanbul Alumni Archive platformuna yaptığınız kayıt talebi <strong>başarıyla alınmıştır.</strong></p>
+    <p>Üyeliğinizin doğrulanması ve platformun güvenli kalması amacıyla başvurunuz yöneticilerimiz tarafından incelemeye alınmıştır.</p>
+    <p>Hesabınız onaylandığında giriş yapabilmeniz için size yeni bir onay e-postası göndereceğiz.</p>
+    <p style="margin-bottom: 0; color: #6b7280; font-size: 14px;">Gösterdiğiniz ilgi için teşekkür ederiz.</p>
   `;
+  const html = getEmailTemplate('Kayıt Talebiniz Alındı 📩', htmlContent);
   return await sendMailHelper({ to: email, subject: 'AIESEC İstanbul Mezunlar Portalı - Kayıt Talebiniz Alındı 📩', html });
 }
 

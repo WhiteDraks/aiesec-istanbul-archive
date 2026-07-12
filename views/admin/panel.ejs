@@ -21,7 +21,7 @@
   <div class="container">
 
     <!-- Stats Row -->
-    <div class="admin-stats">
+    <div class="admin-stats" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
       <div class="admin-stat admin-stat-pending">
         <span class="admin-stat-num"><%= stats.pending %></span>
         <span class="admin-stat-label">Bekleyen</span>
@@ -37,6 +37,14 @@
       <div class="admin-stat admin-stat-total">
         <span class="admin-stat-num"><%= stats.total %></span>
         <span class="admin-stat-label">Toplam Üye</span>
+      </div>
+      <div class="admin-stat" style="border-color: rgba(3, 126, 243, 0.2); background: rgba(3, 126, 243, 0.02);">
+        <span class="admin-stat-num" style="color: #037ef3;"><%= stats.jobs %></span>
+        <span class="admin-stat-label">Kariyer İlanı</span>
+      </div>
+      <div class="admin-stat" style="border-color: rgba(245, 158, 11, 0.2); background: rgba(245, 158, 11, 0.02);">
+        <span class="admin-stat-num" style="color: #f59e0b;"><%= stats.memories %></span>
+        <span class="admin-stat-label">Dönem Anısı 📸</span>
       </div>
     </div>
 
