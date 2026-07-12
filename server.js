@@ -105,7 +105,7 @@ const doubleCsrfUtilities = doubleCsrf({
   },
 });
 
-const generateToken = doubleCsrfUtilities.generateToken;
+const generateToken = (req, res) => doubleCsrfUtilities.generateToken(req, res);
 const doubleCsrfProtection = doubleCsrfUtilities.doubleCsrfProtection;
 const invalidCsrfTokenError = doubleCsrfUtilities.invalidCsrfTokenError;
 
