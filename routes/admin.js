@@ -119,7 +119,11 @@ router.post('/delete/:id', async (req, res) => {
 // GET /admin/user/:id/edit - Kullanıcı bilgilerini düzenleme formu
 router.get('/user/:id/edit', async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const EBTeam = require('../models/EBTeam');
+    const [user, dbTeams] = await Promise.all([
+      User.findById(req.params.id),
+      EBTeam.findAll()
+    ]);
     if (!user) {
       req.flash('error', 'Kullanıcı bulunamadı.');
       return res.redirect('/admin');
@@ -127,6 +131,7 @@ router.get('/user/:id/edit', async (req, res) => {
     res.render('admin/user-edit', {
       title: `${user.name} - Düzenle - AIESEC İstanbul`,
       user,
+      dbTeams
     });
   } catch (err) {
     console.error(err);

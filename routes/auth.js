@@ -3,12 +3,24 @@ const router = express.Router();
 const User = require('../models/User');
 
 // GET /auth/register - Kayıt formu
-router.get('/register', (req, res) => {
+router.get('/register', async (req, res) => {
   if (req.session.userId) return res.redirect('/');
-  res.render('auth/register', {
-    title: 'Kayıt Ol - AIESEC İstanbul',
-    formData: {},
-  });
+  try {
+    const EBTeam = require('../models/EBTeam');
+    const dbTeams = await EBTeam.findAll();
+    res.render('auth/register', {
+      title: 'Kayıt Ol - AIESEC İstanbul',
+      formData: {},
+      dbTeams
+    });
+  } catch (err) {
+    console.error(err);
+    res.render('auth/register', {
+      title: 'Kayıt Ol - AIESEC İstanbul',
+      formData: {},
+      dbTeams: []
+    });
+  }
 });
 
 // POST /auth/register - Kayıt işlemi
@@ -26,21 +38,36 @@ router.post('/register', async (req, res) => {
   if (!kvkk) errors.push('KVKK Aydınlatma Metnini onaylamanız gerekmektedir.');
 
   if (errors.length > 0) {
-    return res.render('auth/register', {
-      title: 'Kayıt Ol - AIESEC İstanbul',
-      errors,
-      formData: { name, email, school, ebYear, ebRole },
-    });
+    try {
+      const EBTeam = require('../models/EBTeam');
+      const dbTeams = await EBTeam.findAll();
+      return res.render('auth/register', {
+        title: 'Kayıt Ol - AIESEC İstanbul',
+        errors,
+        formData: { name, email, school, ebYear, ebRole },
+        dbTeams
+      });
+    } catch (e) {
+      return res.render('auth/register', {
+        title: 'Kayıt Ol - AIESEC İstanbul',
+        errors,
+        formData: { name, email, school, ebYear, ebRole },
+        dbTeams: []
+      });
+    }
   }
 
   try {
     // Check if email already exists
     const existingUser = await User.findByEmail(email);
     if (existingUser) {
+      const EBTeam = require('../models/EBTeam');
+      const dbTeams = await EBTeam.findAll();
       return res.render('auth/register', {
         title: 'Kayıt Ol - AIESEC İstanbul',
         errors: ['Bu e-posta adresi zaten kayıtlıdır.'],
         formData: { name, email, school, ebYear, ebRole },
+        dbTeams
       });
     }
 
@@ -67,11 +94,23 @@ router.post('/register', async (req, res) => {
     res.redirect('/auth/login');
   } catch (err) {
     console.error('Kayıt hatası:', err);
-    res.render('auth/register', {
-      title: 'Kayıt Ol - AIESEC İstanbul',
-      errors: ['Bir hata oluştu. Lütfen tekrar deneyin.'],
-      formData: { name, email, school, ebYear, ebRole },
-    });
+    try {
+      const EBTeam = require('../models/EBTeam');
+      const dbTeams = await EBTeam.findAll();
+      res.render('auth/register', {
+        title: 'Kayıt Ol - AIESEC İstanbul',
+        errors: ['Bir hata oluştu. Lütfen tekrar deneyin.'],
+        formData: { name, email, school, ebYear, ebRole },
+        dbTeams
+      });
+    } catch (e) {
+      res.render('auth/register', {
+        title: 'Kayıt Ol - AIESEC İstanbul',
+        errors: ['Bir hata oluştu. Lütfen tekrar deneyin.'],
+        formData: { name, email, school, ebYear, ebRole },
+        dbTeams: []
+      });
+    }
   }
 });
 

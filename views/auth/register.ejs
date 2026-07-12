@@ -79,14 +79,14 @@
           <div class="form-row">
             <div class="form-group">
               <label for="ebYear" class="form-label">EB Dönemi <span class="form-optional">(opsiyonel)</span></label>
-              <input
-                type="text"
-                id="ebYear"
-                name="ebYear"
-                class="form-input"
-                placeholder="Örn: 2026-2027"
-                value="<%= typeof formData !== 'undefined' ? formData.ebYear || '' : '' %>"
-              />
+              <select id="ebYear" name="ebYear" class="form-input">
+                <option value="">Seçiniz...</option>
+                <% if (typeof dbTeams !== 'undefined') { %>
+                  <% dbTeams.forEach(team => { %>
+                    <option value="<%= team.year %>" <%= (typeof formData !== 'undefined' && formData.ebYear === team.year) ? 'selected' : '' %>><%= team.year %></option>
+                  <% }) %>
+                <% } %>
+              </select>
             </div>
             <div class="form-group">
               <label for="ebRole" class="form-label">Pozisyon <span class="form-optional">(opsiyonel)</span></label>
@@ -95,7 +95,7 @@
                 id="ebRole"
                 name="ebRole"
                 class="form-input"
-                placeholder="Örn: Team Leader"
+                placeholder="Örn: Başkan (LCP)"
                 value="<%= typeof formData !== 'undefined' ? formData.ebRole || '' : '' %>"
               />
             </div>

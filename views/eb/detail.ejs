@@ -112,7 +112,7 @@
             <div class="member-card-inner">
               <!-- Front face -->
               <div class="member-front">
-                <div class="member-photo-wrap">
+                <div class="member-photo-wrap" onclick="toggleMemberDetails('<%= member.id %>')" style="cursor: pointer; position: relative; width: 90px; height: 90px; flex-shrink: 0;">
                   <img
                     src="<%= member.photo || '/images/default-avatar.svg' %>"
                     alt="<%= member.name %>"
@@ -122,7 +122,7 @@
                   />
                   <div class="member-photo-ring"></div>
                 </div>
-                <div class="member-info">
+                <div class="member-info" onclick="toggleMemberDetails('<%= member.id %>')" style="cursor: pointer;">
                   <h3 class="member-name"><%= member.name %></h3>
                   <span class="member-role"><%= member.current_role || 'EB Üyesi' %></span>
                   <% if (member.department) { %>

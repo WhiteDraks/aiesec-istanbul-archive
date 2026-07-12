@@ -11,7 +11,11 @@ router.use(isLoggedIn);
 // GET /profile - Profil görüntüleme/düzenleme formu
 router.get('/', async (req, res) => {
   try {
-    const user = await User.findById(req.session.userId);
+    const EBTeam = require('../models/EBTeam');
+    const [user, dbTeams] = await Promise.all([
+      User.findById(req.session.userId),
+      EBTeam.findAll()
+    ]);
     if (!user) {
       req.flash('error', 'Kullanıcı bulunamadı.');
       return res.redirect('/');
@@ -20,6 +24,7 @@ router.get('/', async (req, res) => {
     res.render('profile/index', {
       title: 'Profilim - AIESEC İstanbul',
       user,
+      dbTeams
     });
   } catch (err) {
     console.error('Profile fetch error:', err);

@@ -15,27 +15,42 @@ router.use(isLoggedIn, isAdmin);
 router.get('/', async (req, res) => {
   try {
     const sql = getSQL();
-    const yearRows = await sql`
-      SELECT DISTINCT (role_entry->>'year') AS year, COUNT(*) AS member_count
-      FROM users,
-           LATERAL jsonb_array_elements(
-             CASE WHEN roles_history IS NULL OR roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE roles_history END
-           ) AS role_entry
-      WHERE status = 'approved'
-        AND (role_entry->>'year') IS NOT NULL
-        AND (role_entry->>'year') <> ''
-      GROUP BY (role_entry->>'year')
-      ORDER BY (role_entry->>'year') DESC
-    `;
+    const [yearRows, teamMetas] = await Promise.all([
+      sql`
+        SELECT DISTINCT (role_entry->>'year') AS year, COUNT(*) AS member_count
+        FROM users,
+             LATERAL jsonb_array_elements(
+               CASE WHEN roles_history IS NULL OR roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE roles_history END
+             ) AS role_entry
+        WHERE status = 'approved'
+          AND (role_entry->>'year') IS NOT NULL
+          AND (role_entry->>'year') <> ''
+        GROUP BY (role_entry->>'year')
+      `,
+      EBTeam.findAll()
+    ]);
 
-    const teamMetas = await EBTeam.findAll();
+    const memberCountByYear = {};
+    yearRows.forEach(row => {
+      memberCountByYear[row.year] = parseInt(row.member_count, 10);
+    });
+
+    // Merge years from both user roles and admin-defined eb_teams
+    const allYearsSet = new Set([
+      ...teamMetas.map(t => t.year),
+      ...yearRows.map(r => r.year)
+    ]);
+
+    // Sort years descending numerically
+    const sortedYears = Array.from(allYearsSet).sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+
     const metaByYear = {};
     teamMetas.forEach(t => { metaByYear[t.year] = t; });
 
-    const teams = yearRows.map(row => ({
-      year: row.year,
-      member_count: parseInt(row.member_count, 10),
-      meta: metaByYear[row.year] || null,
+    const teams = sortedYears.map(year => ({
+      year: year,
+      member_count: memberCountByYear[year] || 0,
+      meta: metaByYear[year] || null,
     }));
 
     res.render('admin/eb-list', {
@@ -179,6 +194,38 @@ router.post('/year/:year/delete', async (req, res) => {
   } catch (err) {
     console.error('Failed to delete EB team:', err);
     req.flash('error', 'Dönem silinirken bir hata oluştu.');
+  }
+  res.redirect('/admin/eb');
+});
+
+// POST /admin/eb/new - Yeni EB Dönemi Ekle
+router.post('/new', async (req, res) => {
+  try {
+    const { year, title, description } = req.body;
+    if (!year || !year.trim()) {
+      req.flash('error', 'Dönem yılı boş olamaz.');
+      return res.redirect('/admin/eb');
+    }
+
+    const cleanYear = year.trim();
+    const cleanTitle = title?.trim() || `${cleanYear} Executive Board`;
+
+    // Create the team record
+    await EBTeam.create({
+      year: cleanYear,
+      title: cleanTitle,
+      description: description?.trim() || null,
+      isPublic: true
+    });
+
+    req.flash('success', `${cleanYear} EB Dönemi başarıyla oluşturuldu.`);
+  } catch (err) {
+    console.error('Failed to create EB team:', err);
+    if (err.message.includes('unique constraint')) {
+      req.flash('error', 'Bu EB dönemi zaten mevcut.');
+    } else {
+      req.flash('error', 'EB dönemi oluşturulurken bir hata oluştu.');
+    }
   }
   res.redirect('/admin/eb');
 });

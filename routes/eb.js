@@ -17,33 +17,28 @@ router.get('/', async (req, res) => {
   try {
     const sql = getSQL();
 
-    // Parallelize DB queries on EB list route
-    const [yearRows, teamMetas] = await Promise.all([
-      sql`
-        SELECT DISTINCT (role_entry->>'year') AS year, COUNT(*) AS member_count
+    // Fetch all admin-defined teams
+    const teamMetas = await EBTeam.findAll();
+
+    // Query member count for each admin-defined team in parallel
+    const periods = await Promise.all(teamMetas.map(async (team) => {
+      const countRes = await sql`
+        SELECT COUNT(*)::integer AS count
         FROM users,
              LATERAL jsonb_array_elements(
                CASE WHEN roles_history IS NULL OR roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE roles_history END
              ) AS role_entry
         WHERE status = 'approved'
-          AND (role_entry->>'year') IS NOT NULL
-          AND (role_entry->>'year') <> ''
-        GROUP BY (role_entry->>'year')
-        ORDER BY (role_entry->>'year') DESC
-      `,
-      EBTeam.findAll()
-    ]);
-    const metaByYear = {};
-    teamMetas.forEach(t => { metaByYear[t.year] = t; });
-
-    // Merge: periods from user data, enriched with admin metadata where available
-    const periods = yearRows.map(row => ({
-      year: row.year,
-      member_count: parseInt(row.member_count, 10),
-      meta: metaByYear[row.year] || null,
-      title: metaByYear[row.year]?.title || `${row.year} Executive Board`,
-      description: metaByYear[row.year]?.description || null,
-      cover_image: metaByYear[row.year]?.cover_image || '/images/default-cover.jpg',
+          AND role_entry->>'year' = ${team.year}
+      `;
+      return {
+        year: team.year,
+        member_count: countRes[0]?.count || 0,
+        meta: team,
+        title: team.title,
+        description: team.description,
+        cover_image: team.cover_image || '/images/default-cover.jpg',
+      };
     }));
 
     res.render('eb/index', {
