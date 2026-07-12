@@ -567,7 +567,7 @@ input, textarea, select { font-family: inherit; }
 
 .hero-subtitle {
   font-size: var(--font-size-lg);
-  color: var(--gray-300);
+  color: rgba(255, 255, 255, 0.9);
   max-width: 560px;
   line-height: 1.7;
 }
@@ -604,8 +604,8 @@ input, textarea, select { font-family: inherit; }
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--gray-400);
-  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
 }
 
 .stat-divider {
