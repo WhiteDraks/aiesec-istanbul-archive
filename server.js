@@ -21,24 +21,12 @@ const app = express();
 app.set('trust proxy', 1);
 
 // ─── Helmet — HTTP Security Headers ──────────────────────────────────────────
+// CSP (Content Security Policy) devre dışı — EJS inline script yapısıyla çakışıyor.
+// Diğer tüm korumalar aktif: X-Frame-Options, HSTS, XSS, nosniff, Referrer-Policy...
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc:   ["'self'"],
-      scriptSrc:    ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com'],
-      scriptSrcAttr: ["'unsafe-inline'"],  // onclick/onchange gibi inline event handler'lara izin ver
-      styleSrc:     ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com'],
-      fontSrc:      ["'self'", 'https://fonts.gstatic.com'],
-      imgSrc:       ["'self'", 'data:', 'blob:', 'https:'],  // https: = tüm HTTPS görseller (Vercel Blob dahil)
-      connectSrc:   ["'self'"],
-      frameSrc:     ["'none'"],
-      objectSrc:    ["'none'"],
-      baseUri:      ["'self'"],
-      formAction:   ["'self'"],
-    },
-  },
-  crossOriginResourcePolicy:  { policy: 'cross-origin' }, // Vercel Blob CDN'den görsel yüklenmesine izin ver
-  crossOriginEmbedderPolicy:  false,
+  contentSecurityPolicy:     false,   // CSP kapalı (EJS inline script uyumluluğu için)
+  crossOriginEmbedderPolicy: false,   // Vercel Blob CDN görselleri için
+  crossOriginResourcePolicy: false,   // Harici görsellerin yüklenmesine izin ver
 }));
 
 // ─── Rate Limiting ────────────────────────────────────────────────────────────
