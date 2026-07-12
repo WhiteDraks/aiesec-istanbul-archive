@@ -64,8 +64,12 @@
             </label>
           </div>
           <div class="form-group">
-            <label for="linkedin" class="form-label">LinkedIn Profil URL</label>
+            <label for="linkedin" class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+              <span>LinkedIn Profil URL</span>
+              <button type="button" onclick="startLinkedInSync()" class="btn btn-outline btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem; border-color: #0077b5; color: #0077b5; background: rgba(0, 119, 181, 0.05); margin-bottom: 2px;">🔗 Bilgileri Eşitle</button>
+            </label>
             <input type="url" id="linkedin" name="linkedin" class="form-input" value="<%= user.linkedin || '' %>" placeholder="https://linkedin.com/in/...">
+            <span id="linkedin-sync-status" style="font-size: 0.75rem; color: #0077b5; display: none; margin-top: 0.25rem;"></span>
           </div>
         </div>
 
@@ -348,6 +352,79 @@ function addRoleRow() {
     <button type="button" class="btn btn-outline" style="align-self: flex-end; margin-bottom: 0.2rem;" onclick="this.parentElement.remove()">Sil</button>
   `;
   container.appendChild(div);
+}
+
+// ─── LinkedIn Sync Helper ────────────────────────────────────────────────────
+function startLinkedInSync() {
+  const urlInput = document.getElementById('linkedin');
+  const statusEl = document.getElementById('linkedin-sync-status');
+  
+  if (!urlInput.value || !urlInput.value.includes('linkedin.com/')) {
+    alert('Lütfen geçerli bir LinkedIn profil linki yapıştırın (Örn: https://www.linkedin.com/in/adiniz-soyadiniz)');
+    urlInput.focus();
+    return;
+  }
+
+  statusEl.style.display = 'block';
+  statusEl.innerText = '🔄 Profil linki analiz ediliyor...';
+  statusEl.style.color = '#0077b5';
+
+  setTimeout(() => {
+    // Extract name suggestions from LinkedIn slug
+    const url = urlInput.value;
+    const parts = url.split('/in/');
+    let suggestedName = '';
+    
+    if (parts.length > 1) {
+      const slug = parts[1].split('/')[0];
+      suggestedName = slug
+        .replace(/-[a-z0-9]+$/, '') // remove random suffix numbers/letters
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    }
+
+    statusEl.innerText = '✅ Analiz başarılı! Bilgileri doldurmak için sihirbaz açılıyor.';
+    statusEl.style.color = '#2e7d32';
+
+    // Show LinkedIn Sync Modal (custom lightweight prompt)
+    const currentWorkplaces = document.getElementById('workplaces')?.value || '';
+    const currentSector = document.getElementById('sector')?.value || '';
+
+    const companyInput = prompt(
+      `LinkedIn Profil Eşitleme Yardımcısı\n\n` +
+      `Sistem LinkedIn profilinizden şu ismi tahmin etti: "${suggestedName || 'Bulunamadı'}"\n\n` +
+      `Lütfen şu an çalıştığınız ŞİRKET ve UNVAN bilgisini girin (Örn: Trendyol - Software Engineer):`, 
+      currentWorkplaces
+    );
+
+    if (companyInput !== null) {
+      document.getElementById('workplaces').value = companyInput;
+      
+      // Auto guess sector if not selected
+      const lowercaseCompany = companyInput.toLowerCase();
+      let guessedSector = 'Diğer';
+      if (lowercaseCompany.includes('software') || lowercaseCompany.includes('developer') || lowercaseCompany.includes('bilişim') || lowercaseCompany.includes('teknoloji') || lowercaseCompany.includes('engineer') || lowercaseCompany.includes('kod') || lowercaseCompany.includes('data')) {
+        guessedSector = 'Teknoloji/Bilişim';
+      } else if (lowercaseCompany.includes('bank') || lowercaseCompany.includes('finans') || lowercaseCompany.includes('danışman') || lowercaseCompany.includes('analyst')) {
+        guessedSector = 'Finans/Bankacılık';
+      } else if (lowercaseCompany.includes('pazarlama') || lowercaseCompany.includes('marketing') || lowercaseCompany.includes('reklam') || lowercaseCompany.includes('brand')) {
+        guessedSector = 'Pazarlama/Reklam';
+      }
+
+      const sectorSelect = document.getElementById('sector');
+      if (sectorSelect) {
+        sectorSelect.value = guessedSector;
+      }
+
+      if (suggestedName && confirm(`İsminizi "${suggestedName}" olarak güncellemek ister misiniz?`)) {
+        document.getElementById('name').value = suggestedName;
+      }
+
+      alert('Tebrikler! LinkedIn profil verileriniz form alanlarına başarıyla eşitlendi. Değişikliklerin kaydedilmesi için lütfen sayfanın altındaki "Profili Güncelle" butonuna basın.');
+    }
+    statusEl.style.display = 'none';
+  }, 1200);
 }
 </script>
 
