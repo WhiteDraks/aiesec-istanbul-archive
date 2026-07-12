@@ -1,7 +1,7 @@
 const { getSQL } = require('../config/database');
 const { Resend } = require('resend');
 
-async function sendWeeklyDigest() {
+async function sendWeeklyDigest(customSubject = null, customIntro = null) {
   const sql = getSQL();
   
   // 1. Fetch site settings to get custom sender address
@@ -39,9 +39,9 @@ async function sendWeeklyDigest() {
     ORDER BY approved_at DESC
   `;
 
-  // If no new content, do not send email
-  if (newJobs.length === 0 && newMemories.length === 0 && newAlumni.length === 0) {
-    console.log('No new content in the last 7 days. Digest email skipped.');
+  // If no new content AND no custom intro message, do not send email
+  if (newJobs.length === 0 && newMemories.length === 0 && newAlumni.length === 0 && !customIntro) {
+    console.log('No new content in the last 7 days and no custom announcement. Digest email skipped.');
     return { success: true, sent: 0, reason: 'No new content' };
   }
 
@@ -57,6 +57,12 @@ async function sendWeeklyDigest() {
         <p style="color: #9ca3af; margin: 0.5rem 0 0 0; font-size: 1rem;">Haftalık Mezunlar Bülteni 📰</p>
       </div>
   `;
+
+  if (customIntro && customIntro.trim()) {
+    htmlContent += `
+      <div style="margin-bottom: 2rem; padding: 1.25rem; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); font-size: 0.95rem; line-height: 1.6; color: #f3f4f6; white-space: pre-wrap;">${customIntro}</div>
+    `;
+  }
 
   if (newAlumni.length > 0) {
     htmlContent += `
@@ -123,7 +129,7 @@ async function sendWeeklyDigest() {
       await resend.emails.send({
         from: emailFrom,
         to: u.email,
-        subject: 'AIESEC İstanbul Mezunlar Portalı - Haftalık Özet 📰',
+        subject: customSubject || 'AIESEC İstanbul Mezunlar Portalı - Haftalık Özet 📰',
         html: htmlContent
       });
       sentCount++;

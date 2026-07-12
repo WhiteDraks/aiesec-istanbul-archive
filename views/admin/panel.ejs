@@ -9,9 +9,7 @@
         <p class="page-hero-sub">AIESEC İstanbul Alumni Archive Yönetimi</p>
       </div>
       <div style="display: flex; gap: 0.5rem; align-items: center;">
-        <form action="/admin/digest/trigger" method="POST" style="margin: 0;">
-          <button type="submit" class="btn btn-outline" style="border-color: rgba(245, 158, 11, 0.4); color: #f59e0b; background: rgba(245, 158, 11, 0.05);">📰 Bülten Gönder (Haftalık Özet)</button>
-        </form>
+        <button onclick="openDigestModal()" class="btn btn-outline" style="border-color: rgba(245, 158, 11, 0.4); color: #f59e0b; background: rgba(245, 158, 11, 0.05);">📰 Bülten Gönder (Haftalık Özet)</button>
         <a href="/admin/settings" class="btn btn-outline">⚙ Site Ayarları</a>
         <a href="/admin/eb" class="btn btn-primary">EB Takımlarını Yönet</a>
       </div>
@@ -254,5 +252,45 @@
 
   </div>
 </section>
+
+<!-- Digest (Bülten) Modal -->
+<div id="digestModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(8px); align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; max-width: 600px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
+      <h3 style="margin: 0; color: #fff; font-size: 1.25rem;">📰 Mezunlar Bülteni Gönder</h3>
+      <span onclick="closeDigestModal()" style="cursor: pointer; color: var(--text-muted); font-size: 1.5rem; font-weight: bold;">&times;</span>
+    </div>
+    <form action="/admin/digest/trigger" method="POST" style="display: flex; flex-direction: column; gap: 1.25rem;">
+      <div class="form-group">
+        <label for="digest_subject" class="form-label">Bülten Konusu (E-posta Başlığı)</label>
+        <input type="text" id="digest_subject" name="digest_subject" class="form-input" value="AIESEC İstanbul Mezunlar Portalı - Haftalık Özet 📰" required placeholder="Bülten konusu...">
+      </div>
+      <div class="form-group">
+        <label for="digest_message" class="form-label">Admin Özel Mesajı / Duyuru (İsteğe bağlı - Bültenin üst kısmına eklenir)</label>
+        <textarea id="digest_message" name="digest_message" class="form-input" rows="6" placeholder="Sevgili Mezunlarımız, bu haftaki özet bültenimizle karşınızdayız..."></textarea>
+      </div>
+      <p class="form-hint" style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">
+        * Bülten onaylı tüm üyelere gönderilecektir. Alt kısma son 7 günde eklenen yeni mezunlar, iş ilanları ve dönem anıları otomatik olarak eklenecektir.
+      </p>
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem;">
+        <button type="button" onclick="closeDigestModal()" class="btn btn-outline">İptal</button>
+        <button type="submit" class="btn btn-primary">Bülteni Gönder</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openDigestModal() {
+  document.getElementById('digestModal').style.display = 'flex';
+}
+function closeDigestModal() {
+  document.getElementById('digestModal').style.display = 'none';
+}
+// ensure modal is hidden by default on load
+document.addEventListener('DOMContentLoaded', () => {
+  closeDigestModal();
+});
+</script>
 
 <%- include('../layout/footer') %>

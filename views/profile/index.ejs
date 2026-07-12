@@ -68,11 +68,46 @@
         <div class="form-row">
           <div class="form-group">
             <label for="city" class="form-label">Şehir</label>
-            <input type="text" id="city" name="city" class="form-input" value="<%= user.city || '' %>" placeholder="Örn: İstanbul">
+            <select id="city" name="city" class="form-input" onchange="toggleCustomLocation('city')">
+              <option value="" <%= !user.city ? 'selected' : '' %>>Şehir Seçin</option>
+              <option value="İstanbul" <%= user.city === 'İstanbul' ? 'selected' : '' %>>İstanbul</option>
+              <option value="Ankara" <%= user.city === 'Ankara' ? 'selected' : '' %>>Ankara</option>
+              <option value="İzmir" <%= user.city === 'İzmir' ? 'selected' : '' %>>İzmir</option>
+              <option value="Bursa" <%= user.city === 'Bursa' ? 'selected' : '' %>>Bursa</option>
+              <option value="Kocaeli" <%= user.city === 'Kocaeli' ? 'selected' : '' %>>Kocaeli</option>
+              <option value="Londra" <%= user.city === 'Londra' ? 'selected' : '' %>>Londra</option>
+              <option value="Berlin" <%= user.city === 'Berlin' ? 'selected' : '' %>>Berlin</option>
+              <option value="Amsterdam" <%= user.city === 'Amsterdam' ? 'selected' : '' %>>Amsterdam</option>
+              <option value="Münih" <%= user.city === 'Münih' ? 'selected' : '' %>>Münih</option>
+              <option value="New York" <%= user.city === 'New York' ? 'selected' : '' %>>New York</option>
+              <option value="San Francisco" <%= user.city === 'San Francisco' ? 'selected' : '' %>>San Francisco</option>
+              <% if (user.city && !['İstanbul', 'Ankara', 'İzmir', 'Bursa', 'Kocaeli', 'Londra', 'Berlin', 'Amsterdam', 'Münih', 'New York', 'San Francisco'].includes(user.city)) { %>
+                <option value="<%= user.city %>" selected><%= user.city %></option>
+              <% } %>
+              <option value="other">Diğer (Kendim Yazacağım)</option>
+            </select>
+            <input type="text" id="city_custom" name="city_custom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Şehir adını yazın...">
           </div>
           <div class="form-group">
             <label for="country" class="form-label">Ülke</label>
-            <input type="text" id="country" name="country" class="form-input" value="<%= user.country || '' %>" placeholder="Örn: Türkiye">
+            <select id="country" name="country" class="form-input" onchange="toggleCustomLocation('country')">
+              <option value="" <%= !user.country ? 'selected' : '' %>>Ülke Seçin</option>
+              <option value="Türkiye" <%= user.country === 'Türkiye' ? 'selected' : '' %>>Türkiye</option>
+              <option value="Almanya" <%= user.country === 'Almanya' ? 'selected' : '' %>>Almanya</option>
+              <option value="İngiltere" <%= user.country === 'İngiltere' ? 'selected' : '' %>>İngiltere</option>
+              <option value="Hollanda" <%= user.country === 'Hollanda' ? 'selected' : '' %>>Hollanda</option>
+              <option value="Amerika Birleşik Devletleri" <%= user.country === 'Amerika Birleşik Devletleri' ? 'selected' : '' %>>Amerika Birleşik Devletleri</option>
+              <option value="Kanada" <%= user.country === 'Kanada' ? 'selected' : '' %>>Kanada</option>
+              <option value="Fransa" <%= user.country === 'Fransa' ? 'selected' : '' %>>Fransa</option>
+              <option value="İtalya" <%= user.country === 'İtalya' ? 'selected' : '' %>>İtalya</option>
+              <option value="İspanya" <%= user.country === 'İspanya' ? 'selected' : '' %>>İspanya</option>
+              <option value="İsviçre" <%= user.country === 'İsviçre' ? 'selected' : '' %>>İsviçre</option>
+              <% if (user.country && !['Türkiye', 'Almanya', 'İngiltere', 'Hollanda', 'Amerika Birleşik Devletleri', 'Kanada', 'Fransa', 'İtalya', 'İspanya', 'İsviçre'].includes(user.country)) { %>
+                <option value="<%= user.country %>" selected><%= user.country %></option>
+              <% } %>
+              <option value="other">Diğer (Kendim Yazacağım)</option>
+            </select>
+            <input type="text" id="country_custom" name="country_custom" class="form-input" style="display: none; margin-top: 0.5rem;" placeholder="Ülke adını yazın...">
           </div>
         </div>
       </div>
@@ -270,8 +305,17 @@
 }
 </style>
 
-<script>
-
+function toggleCustomLocation(type) {
+  const select = document.getElementById(type);
+  const customInput = document.getElementById(type + '_custom');
+  if (select.value === 'other') {
+    customInput.style.display = 'block';
+    customInput.required = true;
+  } else {
+    customInput.style.display = 'none';
+    customInput.required = false;
+  }
+}
 
 function triggerRemovePhoto() {
   if (confirm('Profil fotoğrafınızı kaldırmak istediğinizden emin misiniz?')) {

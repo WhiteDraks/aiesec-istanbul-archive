@@ -272,13 +272,14 @@ router.post('/settings/reset', async (req, res) => {
 // POST /admin/digest/trigger - Haftalık Özet Bültenini Manüel Tetikleme
 router.post('/digest/trigger', async (req, res) => {
   try {
+    const { digest_subject, digest_message } = req.body;
     const { sendWeeklyDigest } = require('../utils/digest');
-    const result = await sendWeeklyDigest();
+    const result = await sendWeeklyDigest(digest_subject, digest_message);
     if (result.success) {
       if (result.sent > 0) {
         req.flash('success', `Haftalık özet bülteni başarıyla gönderildi. Toplam Gönderim: ${result.sent} üye.`);
       } else {
-        req.flash('info', `Bülten gönderimi tetiklendi: Gönderilecek yeni içerik bulunamadı (${result.reason}).`);
+        req.flash('info', `Bülten gönderimi tetiklendi: Gönderilecek içerik/mesaj bulunamadı (${result.reason}).`);
       }
     } else {
       req.flash('error', `Bülten gönderimi başarısız oldu: ${result.reason || 'Bilinmeyen hata'}`);
