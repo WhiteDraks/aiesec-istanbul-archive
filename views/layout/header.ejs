@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
   <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="/css/style.css?v=1.0.4" />
+  <link rel="stylesheet" href="/css/style.css?v=1.0.5" />
 
   <!-- Cropper.js for image resizing/cropping -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
@@ -104,6 +104,7 @@
     }
 
     /* Light Theme Global Override */
+    /* Light Theme Global Override */
     .light-theme {
       --background: #f8fafc;
       --surface: #ffffff;
@@ -119,8 +120,70 @@
       --gray-200: #1e293b;
       --gray-300: #334155;
       --gray-400: #475569;
+      --gradient-hero: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 40%, #e2e8f0 100%);
       color: #0f172a;
     }
+
+    /* Homepage Hero Light Mode */
+    .light-theme .hero-title {
+      color: #0f172a !important;
+    }
+    .light-theme .hero-title-gradient {
+      background: linear-gradient(135deg, var(--primary, #037ef3) 0%, #00AEEF 100%) !important;
+      -webkit-background-clip: text !important;
+      background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+    }
+    .light-theme .hero-subtitle {
+      color: #475569 !important;
+    }
+    .light-theme .hero-actions .btn-ghost {
+      color: #0f172a !important;
+      border-color: rgba(15, 23, 42, 0.25) !important;
+    }
+    .light-theme .hero-actions .btn-ghost:hover {
+      background: rgba(15, 23, 42, 0.05) !important;
+    }
+    .light-theme .hero-stats {
+      border-top-color: rgba(15, 23, 42, 0.08) !important;
+    }
+    .light-theme .stat-num {
+      color: #0f172a !important;
+    }
+    .light-theme .stat-label {
+      color: #64748b !important;
+    }
+    .light-theme .stat-divider {
+      background: rgba(15, 23, 42, 0.1) !important;
+    }
+
+    /* About/Intro Section Light Mode */
+    .light-theme .section-intro {
+      background: rgba(15, 23, 42, 0.01) !important;
+      border-top: 1px solid rgba(15, 23, 42, 0.06) !important;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
+    }
+    .light-theme .intro-card {
+      background: #ffffff !important;
+      border-color: rgba(15, 23, 42, 0.08) !important;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.02) !important;
+    }
+    .light-theme .intro-card-blue {
+      background: rgba(3, 126, 243, 0.05) !important;
+      border-color: rgba(3, 126, 243, 0.15) !important;
+    }
+    .light-theme .intro-card-navy {
+      background: rgba(15, 23, 42, 0.02) !important;
+      border-color: rgba(15, 23, 42, 0.06) !important;
+    }
+    .light-theme .intro-card h3 {
+      color: #0f172a !important;
+    }
+    .light-theme .intro-card p {
+      color: #475569 !important;
+    }
+
+    /* Card Components */
     .light-theme .profile-card,
     .light-theme .alumni-card,
     .light-theme .admin-card,
@@ -130,6 +193,27 @@
       border-color: rgba(15, 23, 42, 0.08) !important;
       box-shadow: 0 4px 20px rgba(0,0,0,0.04) !important;
     }
+
+    /* Jobs/Events Inner Separators & Badges */
+    .light-theme .profile-card div,
+    .light-theme .profile-card style {
+      border-color: rgba(15, 23, 42, 0.08) !important;
+    }
+    .light-theme .profile-card [style*="border-bottom"],
+    .light-theme .profile-card [style*="border-top"],
+    .light-theme .profile-card [style*="border-left"],
+    .light-theme .profile-card [style*="border-right"] {
+      border-color: rgba(15, 23, 42, 0.08) !important;
+    }
+    .light-theme .profile-card [style*="background: rgba(255,255,255,0.03)"],
+    .light-theme .profile-card [style*="background: rgba(255, 255, 255, 0.03)"],
+    .light-theme .profile-card [style*="background:rgba(255,255,255,0.03)"] {
+      background: rgba(15, 23, 42, 0.03) !important;
+      border-color: rgba(15, 23, 42, 0.08) !important;
+      color: #334155 !important;
+    }
+    
+    /* General forms & interactive elements */
     .light-theme .form-input {
       background: #f8fafc !important;
       border-color: rgba(15, 23, 42, 0.12) !important;
@@ -143,7 +227,6 @@
       background: rgba(248, 250, 252, 0.8) !important;
       border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
     }
-    /* Light Mode Navbar rules */
     .light-theme .nav-link {
       color: #334155 !important;
     }
