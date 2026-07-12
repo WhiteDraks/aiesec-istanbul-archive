@@ -274,6 +274,32 @@
       <li><a href="/" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'home' ? 'active' : '' %>">Ana Sayfa</a></li>
       <li><a href="/eb" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'eb' ? 'active' : '' %>">EB Takımları</a></li>
 
+      <!-- Instagram Dropdown -->
+      <li class="nav-item-dropdown">
+        <a href="#" class="nav-link" style="display: flex; align-items: center; gap: 0.25rem;">
+          Instagram
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="margin-top: 2px;"><polyline points="6 9 12 15 18 9"/></svg>
+        </a>
+        <div class="dropdown-menu">
+          <a href="https://instagram.com/1954.ist" target="_blank" rel="noopener" class="dropdown-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            AIESEC İstanbul
+          </a>
+          <a href="https://instagram.com/istanbul.bda" target="_blank" rel="noopener" class="dropdown-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            BDa
+          </a>
+          <a href="https://instagram.com/istanbul_bde" target="_blank" rel="noopener" class="dropdown-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            BDe
+          </a>
+          <a href="https://instagram.com/igt_istanbul" target="_blank" rel="noopener" class="dropdown-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            iGT
+          </a>
+        </div>
+      </li>
+
       <li><a href="/feedback" class="nav-link nav-link-highlight <%= typeof currentPage !== 'undefined' && currentPage === 'feedback' ? 'active' : '' %>" style="color: var(--primary) !important; font-weight: 600;">Geri Bildirim 💬</a></li>
 
       <% if (currentUser) { %>
