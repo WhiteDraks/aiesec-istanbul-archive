@@ -55,11 +55,38 @@
       </div>
 
       <!-- Years Checklist Filter -->
+      <style>
+        .filter-scroll-container {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+          align-items: center;
+          max-height: 120px;
+          overflow-y: auto;
+          padding: 0.65rem;
+          border-radius: 8px;
+          background: rgba(255, 255, 255, 0.01);
+          border: 1px solid var(--border);
+        }
+        .filter-scroll-container::-webkit-scrollbar {
+          width: 6px;
+        }
+        .filter-scroll-container::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .filter-scroll-container::-webkit-scrollbar-thumb {
+          background: var(--border);
+          border-radius: 3px;
+        }
+        .filter-scroll-container::-webkit-scrollbar-thumb:hover {
+          background: var(--primary);
+        }
+      </style>
       <div class="form-group" style="margin: 0; grid-column: 1 / -1; display: flex; flex-direction: column; gap: 0.5rem;">
         <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-lighter);">Dönem Filtrele (Yıllar):</span>
-        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+        <div class="filter-scroll-container">
           <% availableYears.forEach(year => { %>
-            <label class="btn btn-outline btn-xs" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; padding: 0.3rem 0.6rem; border-radius: 20px; font-weight: 500; cursor: pointer; color: var(--text); border-color: var(--border);">
+            <label class="btn btn-outline btn-xs" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; padding: 0.3rem 0.6rem; border-radius: 20px; font-weight: 500; cursor: pointer; color: var(--text); border-color: var(--border); background: var(--surface);">
               <input type="checkbox" name="years[]" value="<%= year %>" <%= (typeof selectedYears !== 'undefined' && selectedYears.includes(year)) ? 'checked' : '' %> style="cursor: pointer; width: 13px; height: 13px; border-radius: 3px; accent-color: var(--primary);">
               <%= year %>
             </label>
