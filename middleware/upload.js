@@ -4,10 +4,14 @@ const multer = require('multer');
 // dosyayı Vercel sunucusunda değil, Vercel Blob'da tutacağız.
 const storage = multer.memoryStorage();
 
-// Sadece resim dosyalarına izin ver
+// Sadece resim dosyalarına izin ver (SVG hariç - XSS riski nedeniyle)
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image/')) {
-    cb(null, true);
+  if (file && file.mimetype && file.mimetype.startsWith('image/')) {
+    if (file.mimetype === 'image/svg+xml') {
+      cb(new Error('Güvenlik nedeniyle SVG formatında resim yüklenemez.'), false);
+    } else {
+      cb(null, true);
+    }
   } else {
     cb(new Error('Lütfen sadece resim dosyası yükleyin.'), false);
   }
@@ -37,16 +41,20 @@ const upload = {
             if (matches && matches.length === 3) {
               const mimeType = matches[1];
 
-              const buffer = Buffer.from(matches[2], 'base64');
+              if (mimeType === 'image/svg+xml') {
+                console.warn('Blocked SVG base64 upload attempt.');
+              } else {
+                const buffer = Buffer.from(matches[2], 'base64');
 
-              req.file = {
-                fieldname: fieldName,
-                originalname: `cropped_image.${mimeType.split('/')[1] || 'jpg'}`,
-                encoding: '7bit',
-                mimetype: mimeType,
-                buffer: buffer,
-                size: buffer.length
-              };
+                req.file = {
+                  fieldname: fieldName,
+                  originalname: `cropped_image.${mimeType.split('/')[1] || 'jpg'}`,
+                  encoding: '7bit',
+                  mimetype: mimeType,
+                  buffer: buffer,
+                  size: buffer.length
+                };
+              }
             }
           } catch (e) {
             console.error('Failed to parse base64 fallback upload:', e);
