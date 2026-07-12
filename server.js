@@ -37,7 +37,7 @@ app.use(helmet({
         'https://cdnjs.cloudflare.com',
       ],
       fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-      imgSrc: ["'self'", 'data:', 'blob:', 'https://'],  // blob: for cropper preview, https: for Vercel Blob CDN
+      imgSrc: ["'self'", 'data:', 'blob:', 'https:'],  // https: = tüm HTTPS kaynaklarına izin ver (Vercel Blob CDN dahil)
       connectSrc: ["'self'"],
       frameSrc: ["'none'"],
       objectSrc: ["'none'"],
