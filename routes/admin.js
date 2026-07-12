@@ -14,12 +14,14 @@ const Feedback = require('../models/Feedback');
 // GET /admin - Admin paneli
 router.get('/', async (req, res) => {
   try {
-    const [pendingUsers, approvedUsers, rejectedUsers, totalUsers, feedbacks] = await Promise.all([
+    const EBTeam = require('../models/EBTeam');
+    const [pendingUsers, approvedUsers, rejectedUsers, totalUsers, feedbacks, ebTeams] = await Promise.all([
       User.findAllByStatus('pending'),
       User.findAllByStatus('approved'),
       User.findAllByStatus('rejected'),
       User.countByRole('user'),
       Feedback.findAll(),
+      EBTeam.findAll(),
     ]);
 
     res.render('admin/panel', {
@@ -29,6 +31,7 @@ router.get('/', async (req, res) => {
       rejectedUsers,
       totalUsers,
       feedbacks,
+      ebTeams,
       stats: {
         pending: pendingUsers.length,
         approved: approvedUsers.length,
@@ -272,14 +275,21 @@ router.post('/settings/reset', async (req, res) => {
 // POST /admin/digest/trigger - Haftalık Özet Bültenini Manüel Tetikleme
 router.post('/digest/trigger', async (req, res) => {
   try {
-    const { digest_subject, digest_message, digest_extra_title, digest_extra_content } = req.body;
+    const { digest_subject, digest_message, digest_extra_title, digest_extra_content, target_type, selected_years } = req.body;
     const { sendWeeklyDigest } = require('../utils/digest');
-    const result = await sendWeeklyDigest(digest_subject, digest_message, digest_extra_title, digest_extra_content);
+    
+    // Ensure selected_years is passed as an array (if single value, convert to array)
+    let yearsArray = null;
+    if (target_type === 'specific_eb' && selected_years) {
+      yearsArray = Array.isArray(selected_years) ? selected_years : [selected_years];
+    }
+
+    const result = await sendWeeklyDigest(digest_subject, digest_message, digest_extra_title, digest_extra_content, yearsArray);
     if (result.success) {
       if (result.sent > 0) {
         req.flash('success', `Haftalık özet bülteni başarıyla gönderildi. Toplam Gönderim: ${result.sent} üye.`);
       } else {
-        req.flash('info', `Bülten gönderimi tetiklendi: Gönderilecek içerik/mesaj bulunamadı (${result.reason}).`);
+        req.flash('info', `Bülten gönderimi tetiklendi: Gönderilecek üye veya içerik bulunamadı (${result.reason}).`);
       }
     } else {
       req.flash('error', `Bülten gönderimi başarısız oldu: ${result.reason || 'Bilinmeyen hata'}`);

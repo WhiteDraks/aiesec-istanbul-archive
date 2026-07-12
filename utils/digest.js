@@ -1,7 +1,7 @@
 const { getSQL } = require('../config/database');
 const { Resend } = require('resend');
 
-async function sendWeeklyDigest(customSubject = null, customIntro = null, extraTitle = null, extraContent = null) {
+async function sendWeeklyDigest(customSubject = null, customIntro = null, extraTitle = null, extraContent = null, targetYears = null) {
   const sql = getSQL();
   
   // 1. Fetch site settings to get custom sender address
@@ -45,9 +45,26 @@ async function sendWeeklyDigest(customSubject = null, customIntro = null, extraT
     return { success: true, sent: 0, reason: 'No new content' };
   }
 
-  // 3. Fetch all approved user emails
-  const users = await sql`SELECT email, name FROM users WHERE status = 'approved'`;
-  if (users.length === 0) return { success: true, sent: 0, reason: 'No approved users' };
+  // 3. Fetch approved user emails (either all approved users or only users matching targetYears)
+  let users = [];
+  if (targetYears && Array.isArray(targetYears) && targetYears.length > 0) {
+    users = await sql`
+      SELECT DISTINCT email, name 
+      FROM users u
+      WHERE status = 'approved'
+        AND EXISTS (
+          SELECT 1 
+          FROM jsonb_array_elements(
+            CASE WHEN u.roles_history IS NULL OR u.roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE u.roles_history END
+          ) AS role_entry
+          WHERE role_entry->>'year' IN ${sql(targetYears)}
+        )
+    `;
+  } else {
+    users = await sql`SELECT email, name FROM users WHERE status = 'approved'`;
+  }
+
+  if (users.length === 0) return { success: true, sent: 0, reason: 'No matching approved users found' };
 
   // 4. Construct beautiful HTML email template
   let htmlContent = `
