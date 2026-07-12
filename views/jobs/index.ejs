@@ -1,10 +1,10 @@
 <%- include('../layout/header', { currentPage: 'jobs' }) %>
 
-<section class="page-hero page-hero-sm" style="padding-top: calc(var(--navbar-h) + 2rem); padding-bottom: 2rem; margin-bottom: 3rem; border-bottom: 1px solid rgba(255, 255, 255, 0.06); background: rgba(4, 13, 26, 0.2);">
+<section class="page-hero page-hero-sm">
   <div class="page-hero-bg"></div>
   <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; position: relative; z-index: 10;">
     <div>
-      <h1 class="page-hero-title" style="margin: 0; font-size: 2rem; font-weight: 700; color: #fff; letter-spacing: -0.01em;">Kariyer Fırsatları</h1>
+      <h1 class="page-hero-title" style="margin: 0; font-size: 2rem; font-weight: 700; letter-spacing: -0.01em;">Kariyer Fırsatları</h1>
       <p style="margin: 0.35rem 0 0 0; color: var(--text-muted); font-size: 0.95rem;">AIESEC İstanbul mezunları arasında iş, staj ve iş birliği ilanları.</p>
     </div>
     <div>
@@ -22,7 +22,7 @@
   <% if (jobs.length === 0) { %>
     <div class="empty-state" style="background: var(--surface); border: 1px solid var(--border); padding: 5rem 2rem; border-radius: 16px; text-align: center;">
       <div class="empty-icon" style="font-size: 3.5rem; margin-bottom: 1rem;">💼</div>
-      <h3 style="font-size: 1.4rem; font-weight: 600; color: #fff; margin-bottom: 0.5rem;">Henüz ilan yayınlanmamış</h3>
+      <h3 style="font-size: 1.4rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Henüz ilan yayınlanmamış</h3>
       <p style="color: var(--text-muted); max-width: 450px; margin: 0 auto; line-height: 1.6;">Topluluğa özel ilk kariyer veya staj fırsatını siz paylaşın!</p>
     </div>
   <% } else { %>
@@ -90,7 +90,7 @@
     <!-- Close button -->
     <button onclick="closeJobModal()" style="position: absolute; right: 1.5rem; top: 1.5rem; background: none; border: none; color: var(--text-muted); font-size: 1.75rem; cursor: pointer; line-height: 1;">&times;</button>
     
-    <h3 style="font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+    <h3 style="font-size: 1.4rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
       💼 Yeni İlan Yayınla
     </h3>
     <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 2rem;">Topluluk mezunlarına sunmak istediğiniz fırsatın tüm detaylarını girin.</p>
