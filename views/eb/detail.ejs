@@ -150,27 +150,36 @@
 
               <!-- Expandable Details -->
               <div class="member-details" id="details-<%= member.id %>" hidden>
+                <% 
+                  const allRoles = member.roles_history && Array.isArray(member.roles_history) ? member.roles_history : [];
+                %>
+
+                <%# Show all AIESEC roles %>
+                <% if (allRoles.length > 0) { %>
+                  <div class="detail-section">
+                    <h4>AIESEC Görevleri</h4>
+                    <% allRoles.forEach(r => { %>
+                      <div style="display: flex; gap: 0.5rem; margin-bottom: 0.35rem; font-size: 0.875rem; align-items: center;">
+                        <span class="member-role" style="font-size: 0.7rem; padding: 0.1rem 0.5rem; white-space: nowrap;"><%= r.year %></span>
+                        <span style="color: var(--gray-300);"><%= r.role %></span>
+                      </div>
+                    <% }) %>
+                  </div>
+                <% } %>
+
+                <%# AIESEC journey %>
                 <% if (member.aiesec_journey) { %>
                   <div class="detail-section">
                     <h4>AIESEC Yolculuğu</h4>
                     <p><%= member.aiesec_journey %></p>
                   </div>
                 <% } %>
-                <% 
-                  // Show all roles if user has multiple
-                  const allRoles = member.roles_history && Array.isArray(member.roles_history) ? member.roles_history : [];
-                  if (allRoles.length > 1) { 
-                %>
-                  <div class="detail-section">
-                    <h4>AIESEC Görevleri</h4>
-                    <% allRoles.forEach(r => { %>
-                      <div style="display: flex; gap: 0.5rem; margin-bottom: 0.25rem; font-size: 0.875rem;">
-                        <span class="member-role" style="font-size: 0.75rem; padding: 0.1rem 0.5rem;"><%= r.year %></span>
-                        <span><%= r.role %></span>
-                      </div>
-                    <% }) %>
-                  </div>
+
+                <%# If no extra info, show a hint %>
+                <% if (!member.aiesec_journey && !member.linkedin && !member.phone) { %>
+                  <p style="font-size: 0.8rem; color: var(--gray-500); font-style: italic; margin-bottom: 0.75rem;">Üye profilini henüz tamamlamamış.</p>
                 <% } %>
+
                 <div class="detail-links">
                   <% if (member.email) { %>
                     <a href="mailto:<%= member.email %>" class="detail-link detail-link-email">
