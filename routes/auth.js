@@ -82,6 +82,16 @@ router.post('/register', async (req, res) => {
       role: 'user',
     });
 
+    // Auto-create EB Team page for the registered year if format matches YYYY-YYYY
+    if (ebYear && /^\d{4}-\d{4}$/.test(ebYear.trim())) {
+      try {
+        const EBTeam = require('../models/EBTeam');
+        await EBTeam.findOrCreateByYear(ebYear.trim());
+      } catch (err) {
+        console.error(`Failed to auto-create EB team for registration year ${ebYear}:`, err);
+      }
+    }
+
     // Kullanıcıya kayıt bilgilendirme/bekleme maili gönder
     try {
       const { sendWelcomePendingEmail } = require('../utils/email');

@@ -51,15 +51,26 @@ router.post('/', upload.single('photo'), async (req, res) => {
     let roles_history = [];
     if (role_years && role_titles) {
       const years = Array.isArray(role_years) ? role_years : [role_years];
-      const customYears = role_years_custom ? (Array.isArray(role_years_custom) ? role_years_custom : [role_years_custom]) : [];
       const titles = Array.isArray(role_titles) ? role_titles : [role_titles];
       for (let i = 0; i < years.length; i++) {
-        const resolvedYear = years[i] === 'other' ? (customYears[i] || '') : years[i];
+        const resolvedYear = years[i];
         if (resolvedYear.trim() || titles[i].trim()) {
           // XSS koruması: Rol başlığını temizle
           const cleanYear = stripTags(resolvedYear.trim());
           const cleanTitle = stripTags(titles[i].trim());
           roles_history.push({ year: cleanYear, role: cleanTitle });
+        }
+      }
+
+      // Auto-create EB Team pages for any years in roles_history that don't exist yet
+      const EBTeam = require('../models/EBTeam');
+      for (const role of roles_history) {
+        if (role.year && /^\d{4}-\d{4}$/.test(role.year)) {
+          try {
+            await EBTeam.findOrCreateByYear(role.year);
+          } catch (err) {
+            console.error(`Failed to auto-create EB team for year ${role.year}:`, err);
+          }
         }
       }
     }
