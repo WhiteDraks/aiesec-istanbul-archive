@@ -1120,7 +1120,7 @@ input, textarea, select { font-family: inherit; }
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.07);
   border-radius: var(--radius-2xl);
-  overflow: hidden;
+  overflow: visible;
   transition: transform var(--transition-slow), border-color var(--transition-base), box-shadow var(--transition-slow);
   animation: fadeInUp 0.5s ease both;
   animation-delay: var(--card-delay, 0s);
@@ -1137,6 +1137,7 @@ input, textarea, select { font-family: inherit; }
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  border-radius: var(--radius-2xl);
 }
 
 .member-front {
