@@ -36,7 +36,7 @@ router.get('/', async (req, res) => {
 // POST /profile - Profili güncelleme
 router.post('/', upload.single('photo'), async (req, res) => {
   try {
-    const sanitizeHtml = require('sanitize-html');
+    const { stripTags } = require('../utils/sanitize');
     const { name, school, department, linkedin, workplaces, sector, phone, show_phone, aiesec_journey, role_years, role_years_custom, role_titles, remove_photo, city, city_custom, country, country_custom, is_mentor, is_mentee, mentorship_details } = req.body;
     let photoUrl = null;
 
@@ -57,8 +57,8 @@ router.post('/', upload.single('photo'), async (req, res) => {
         const resolvedYear = years[i] === 'other' ? (customYears[i] || '') : years[i];
         if (resolvedYear.trim() || titles[i].trim()) {
           // XSS koruması: Rol başlığını temizle
-          const cleanYear = sanitizeHtml(resolvedYear.trim(), { allowedTags: [], allowedAttributes: {} });
-          const cleanTitle = sanitizeHtml(titles[i].trim(), { allowedTags: [], allowedAttributes: {} });
+          const cleanYear = stripTags(resolvedYear.trim());
+          const cleanTitle = stripTags(titles[i].trim());
           roles_history.push({ year: cleanYear, role: cleanTitle });
         }
       }
@@ -70,7 +70,7 @@ router.post('/', upload.single('photo'), async (req, res) => {
     // XSS Koruması: Tüm girdileri HTML etiketlerinden arındır (Düz Metin)
     const cleanString = (val) => {
       if (!val) return null;
-      return sanitizeHtml(val.trim(), { allowedTags: [], allowedAttributes: {} });
+      return stripTags(val.trim());
     };
 
     // Profil güncelleme objesi
