@@ -220,25 +220,18 @@ input, textarea, select { font-family: inherit; }
 }
 
 .nav-link {
-  padding: 0.55rem 1.15rem;
-  border-radius: 50px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
   font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--gray-300);
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  display: inline-flex;
-  align-items: center;
+  transition: color var(--transition-fast), background var(--transition-fast);
 }
 
 .nav-link:hover,
 .nav-link.active {
-  color: #ffffff !important;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--blue-sky, #00AEEF) 100%) !important;
-  box-shadow: 0 4px 15px rgba(3, 126, 243, 0.3);
-  border-color: transparent;
-  transform: translateY(-1px);
+  color: var(--white);
+  background: rgba(255,255,255,0.08);
 }
 
 .nav-link-highlight {
