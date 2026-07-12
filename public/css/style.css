@@ -558,7 +558,7 @@ input, textarea, select { font-family: inherit; }
 }
 
 .hero-title-gradient {
-  background: var(--gradient-blue);
+  background: linear-gradient(135deg, #ffffff 0%, var(--blue-sky, #00AEEF) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
