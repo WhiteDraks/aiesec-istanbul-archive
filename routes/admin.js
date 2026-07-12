@@ -315,7 +315,7 @@ router.post('/digest/trigger', async (req, res) => {
       if (result.sent > 0) {
         req.flash('success', `Haftalık özet bülteni başarıyla gönderildi. Toplam Gönderim: ${result.sent} üye.`);
       } else {
-        req.flash('info', `Bülten gönderimi tetiklendi: Gönderilecek üye veya içerik bulunamadı (${result.reason}).`);
+        req.flash('success', `Bülten gönderimi tetiklendi: Gönderilecek üye veya içerik bulunamadı (${result.reason}).`);
       }
     } else {
       req.flash('error', `Bülten gönderimi başarısız oldu: ${result.reason || 'Bilinmeyen hata'}`);

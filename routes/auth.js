@@ -159,7 +159,7 @@ router.post('/forgot-password', async (req, res) => {
     const user = await User.findByEmail(email);
     if (!user) {
       // Güvenlik amacıyla e-posta bulunmasa bile başarılıymış gibi genel mesaj verilir
-      req.flash('info', 'Eğer bu e-posta adresi kayıtlıysa, şifre sıfırlama bağlantısı gönderilmiştir.');
+      req.flash('success', 'Eğer bu e-posta adresi kayıtlıysa, şifre sıfırlama bağlantısı gönderilmiştir.');
       return res.redirect('/auth/forgot-password');
     }
 

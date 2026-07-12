@@ -67,19 +67,31 @@ const EBTeam = {
 
   async update(id, { year, title, description, isPublic, achievements, order, gallery_images, cover_image, group_photo }) {
     const sql = getSQL();
-    // Use a single flat query - Neon driver does not support dynamic template composition
+    const existing = await this.findById(id);
+    if (!existing) return null;
+
+    const finalYear = year !== undefined ? year : existing.year;
+    const finalTitle = title !== undefined ? title : existing.title;
+    const finalDescription = description !== undefined ? description : existing.description;
+    const finalIsPublic = isPublic !== undefined ? isPublic : existing.is_public;
+    const finalAchievements = achievements !== undefined ? achievements : existing.achievements;
+    const finalOrder = order !== undefined ? order : existing.sort_order;
+    const finalGalleryImages = gallery_images !== undefined ? gallery_images : existing.gallery_images;
+    const finalCoverImage = cover_image !== undefined ? cover_image : existing.cover_image;
+    const finalGroupPhoto = group_photo !== undefined ? group_photo : existing.group_photo;
+
     const rows = await sql`
       UPDATE eb_teams
       SET
-        year        = COALESCE(${year ?? null}, year),
-        title       = COALESCE(${title ?? null}, title),
-        description = COALESCE(${description ?? null}, description),
-        is_public   = COALESCE(${isPublic ?? null}, is_public),
-        achievements = COALESCE(${achievements ?? null}, achievements),
-        sort_order  = COALESCE(${order ?? null}, sort_order),
-        gallery_images = COALESCE(${gallery_images ?? null}, gallery_images),
-        cover_image = COALESCE(${cover_image ?? null}, cover_image),
-        group_photo = COALESCE(${group_photo ?? null}, group_photo)
+        year           = ${finalYear},
+        title          = ${finalTitle},
+        description    = ${finalDescription},
+        is_public      = ${finalIsPublic},
+        achievements   = ${finalAchievements},
+        sort_order     = ${finalOrder},
+        gallery_images = ${finalGalleryImages},
+        cover_image    = ${finalCoverImage},
+        group_photo    = ${finalGroupPhoto}
       WHERE id = ${id}
       RETURNING *
     `;

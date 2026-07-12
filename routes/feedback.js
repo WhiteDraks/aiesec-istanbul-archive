@@ -29,10 +29,20 @@ router.post('/', async (req, res) => {
       message: message.trim(),
     });
 
+    const isAjax = req.xhr || req.headers['content-type'] === 'application/json';
+
+    if (isAjax) {
+      return res.json({ success: true, message: 'Geri bildiriminiz başarıyla iletildi. Teşekkür ederiz!' });
+    }
+
     req.flash('success', 'Geri bildiriminiz başarıyla iletildi. Teşekkür ederiz!');
     res.redirect('/feedback');
   } catch (err) {
     console.error('Feedback submission error:', err);
+    const isAjax = req.xhr || req.headers['content-type'] === 'application/json';
+    if (isAjax) {
+      return res.status(500).json({ success: false, error: 'Geri bildirim gönderilirken bir hata oluştu.' });
+    }
     req.flash('error', 'Geri bildirim gönderilirken bir hata oluştu.');
     res.redirect('/feedback');
   }

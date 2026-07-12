@@ -22,11 +22,28 @@ const isLoggedIn = (req, res, next) => {
  * isApproved - Ensures user account is approved by admin.
  * Must be used AFTER isLoggedIn.
  */
-const isApproved = (req, res, next) => {
+const isApproved = async (req, res, next) => {
   const user = req.session.user;
   if (!user) {
     return res.redirect('/auth/login');
   }
+
+  // If user is pending in session, check database to see if status changed
+  if (user.status === 'pending') {
+    try {
+      const User = require('../models/User');
+      const dbUser = await User.findById(user.id);
+      if (dbUser && dbUser.status !== 'pending') {
+        req.session.user.status = dbUser.status;
+        req.session.user.role = dbUser.role;
+        user.status = dbUser.status;
+        user.role = dbUser.role;
+      }
+    } catch (err) {
+      console.error('Failed to sync user status in isApproved:', err);
+    }
+  }
+
   if (user.status === 'approved' || user.role === 'admin') {
     return next();
   }
