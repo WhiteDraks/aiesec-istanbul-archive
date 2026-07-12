@@ -24,9 +24,21 @@ app.set('trust proxy', 1);
 // CSP (Content Security Policy) devre dışı — EJS inline script yapısıyla çakışıyor.
 // Diğer tüm korumalar aktif: X-Frame-Options, HSTS, XSS, nosniff, Referrer-Policy...
 app.use(helmet({
-  contentSecurityPolicy:     false,   // CSP kapalı (EJS inline script uyumluluğu için)
-  crossOriginEmbedderPolicy: false,   // Vercel Blob CDN görselleri için
-  crossOriginResourcePolicy: false,   // Harici görsellerin yüklenmesine izin ver
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      "default-src": ["'self'"],
+      "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"],
+      "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"],
+      "font-src": ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
+      "img-src": ["'self'", "data:", "blob:", "https://*.public.blob.vercel-storage.com", "https://aiesec-blob-public.s3.amazonaws.com"],
+      "connect-src": ["'self'", "https://*.public.blob.vercel-storage.com"],
+      "object-src": ["'none'"],
+      "upgrade-insecure-requests": []
+    }
+  },
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: false,
 }));
 
 // ─── Rate Limiting ────────────────────────────────────────────────────────────
@@ -55,6 +67,7 @@ app.use(methodOverride('_method'));
 
 // ─── Session ──────────────────────────────────────────────────────────────────
 const sessionConfig = {
+  name: 'sid_aiesec_portal',
   secret: process.env.SESSION_SECRET || 'aiesec-istanbul-fallback-secret-change-me',
   resave: false,
   saveUninitialized: false,
