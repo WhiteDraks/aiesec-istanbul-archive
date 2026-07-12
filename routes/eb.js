@@ -17,22 +17,22 @@ router.get('/', async (req, res) => {
   try {
     const sql = getSQL();
 
-    // Get all unique years that at least one approved user has listed in roles_history
-    const yearRows = await sql`
-      SELECT DISTINCT (role_entry->>'year') AS year, COUNT(*) AS member_count
-      FROM users,
-           LATERAL jsonb_array_elements(
-             CASE WHEN roles_history IS NULL OR roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE roles_history END
-           ) AS role_entry
-      WHERE status = 'approved'
-        AND (role_entry->>'year') IS NOT NULL
-        AND (role_entry->>'year') <> ''
-      GROUP BY (role_entry->>'year')
-      ORDER BY (role_entry->>'year') DESC
-    `;
-
-    // Get any admin-created team metadata (description, achievements, gallery)
-    const teamMetas = await EBTeam.findAll();
+    // Parallelize DB queries on EB list route
+    const [yearRows, teamMetas] = await Promise.all([
+      sql`
+        SELECT DISTINCT (role_entry->>'year') AS year, COUNT(*) AS member_count
+        FROM users,
+             LATERAL jsonb_array_elements(
+               CASE WHEN roles_history IS NULL OR roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE roles_history END
+             ) AS role_entry
+        WHERE status = 'approved'
+          AND (role_entry->>'year') IS NOT NULL
+          AND (role_entry->>'year') <> ''
+        GROUP BY (role_entry->>'year')
+        ORDER BY (role_entry->>'year') DESC
+      `,
+      EBTeam.findAll()
+    ]);
     const metaByYear = {};
     teamMetas.forEach(t => { metaByYear[t.year] = t; });
 
@@ -68,47 +68,47 @@ router.get('/:year', isLoggedIn, isApproved, async (req, res) => {
     const sql = getSQL();
     const year = req.params.year;
 
-    // Find all approved users that have this year in their roles_history
-    const members = await sql`
-      SELECT
-        u.id,
-        u.name,
-        u.photo,
-        u.department,
-        u.school,
-        u.email,
-        u.linkedin,
-        u.phone,
-        u.sector,
-        u.aiesec_journey,
-        u.roles_history,
-        -- Extract the specific role for this year
-        (
-          SELECT role_entry->>'role'
-          FROM jsonb_array_elements(
-            CASE WHEN u.roles_history IS NULL OR u.roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE u.roles_history END
-          ) AS role_entry
-          WHERE role_entry->>'year' = ${year}
-          LIMIT 1
-        ) AS current_role
-      FROM users u
-      WHERE u.status = 'approved'
-        AND EXISTS (
-          SELECT 1
-          FROM jsonb_array_elements(
-            CASE WHEN u.roles_history IS NULL OR u.roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE u.roles_history END
-          ) AS role_entry
-          WHERE role_entry->>'year' = ${year}
-        )
-      ORDER BY u.name ASC
-    `;
+    // Parallelize members query, team metas query, and memories query
+    const [members, teamMetas, memories] = await Promise.all([
+      sql`
+        SELECT
+          u.id,
+          u.name,
+          u.photo,
+          u.department,
+          u.school,
+          u.email,
+          u.linkedin,
+          u.phone,
+          u.show_phone,
+          u.sector,
+          u.aiesec_journey,
+          u.roles_history,
+          -- Extract the specific role for this year
+          (
+            SELECT role_entry->>'role'
+            FROM jsonb_array_elements(
+              CASE WHEN u.roles_history IS NULL OR u.roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE u.roles_history END
+            ) AS role_entry
+            WHERE role_entry->>'year' = ${year}
+            LIMIT 1
+          ) AS current_role
+        FROM users u
+        WHERE u.status = 'approved'
+          AND EXISTS (
+            SELECT 1
+            FROM jsonb_array_elements(
+              CASE WHEN u.roles_history IS NULL OR u.roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE u.roles_history END
+            ) AS role_entry
+            WHERE role_entry->>'year' = ${year}
+          )
+        ORDER BY u.name ASC
+      `,
+      EBTeam.findAll(),
+      Memory.findByYear(year)
+    ]);
 
-    // Get admin-provided metadata for this period (if any)
-    const teamMetas = await EBTeam.findAll();
     const meta = teamMetas.find(t => t.year === year) || null;
-
-    // Get memories for this period
-    const memories = await Memory.findByYear(year);
 
     const team = {
       year,
