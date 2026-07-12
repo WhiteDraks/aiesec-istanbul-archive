@@ -115,10 +115,17 @@ app.use((req, res, next) => {
   next();
 });
 
+// ─── Global Template Locals ───────────────────────────────────────────────────
+app.use((req, res, next) => {
+  res.locals.csrfToken = "";
+  next();
+});
+app.use(setLocals);
+
 // ─── CSRF Protection via Origin & Referer Verification ────────────────────────
 app.use((req, res, next) => {
   if (['POST', 'PUT', 'DELETE'].includes(req.method)) {
-    const origin = req.headers.origin;
+    const origin = req.headers.origin === 'null' ? null : req.headers.origin;
     const referer = req.headers.referer;
     const host = req.headers.host; // E.g. aiesec-istanbul-archive.vercel.app
 
@@ -163,13 +170,6 @@ const contentLimiter = rateLimit({
   legacyHeaders: false,
   skip: (req) => req.method === 'GET',
 });
-
-// ─── Global Template Locals ───────────────────────────────────────────────────
-app.use((req, res, next) => {
-  res.locals.csrfToken = "";
-  next();
-});
-app.use(setLocals);
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use('/',         require('./routes/index'));
