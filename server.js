@@ -67,7 +67,6 @@ app.use(methodOverride('_method'));
 
 // ─── Session ──────────────────────────────────────────────────────────────────
 const sessionConfig = {
-  name: 'sid_aiesec_portal',
   secret: process.env.SESSION_SECRET || 'aiesec-istanbul-fallback-secret-change-me',
   resave: false,
   saveUninitialized: false,
