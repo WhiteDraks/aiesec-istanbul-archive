@@ -1,7 +1,7 @@
 const { getSQL } = require('../config/database');
 const { Resend } = require('resend');
 
-async function sendWeeklyDigest(customSubject = null, customIntro = null) {
+async function sendWeeklyDigest(customSubject = null, customIntro = null, extraTitle = null, extraContent = null) {
   const sql = getSQL();
   
   // 1. Fetch site settings to get custom sender address
@@ -112,6 +112,16 @@ async function sendWeeklyDigest(customSubject = null, customIntro = null) {
       `;
     });
     htmlContent += `</div>`;
+  }
+
+  // Extra custom section from admin
+  if (extraTitle && extraTitle.trim() || extraContent && extraContent.trim()) {
+    htmlContent += `
+      <div style="margin-bottom: 2rem;">
+        <h2 style="color: #fff; font-size: 1.2rem; border-left: 4px solid #a78bfa; padding-left: 0.5rem; margin-bottom: 1rem;">${extraTitle ? extraTitle.trim() : '📌 Editörden'}</h2>
+        <div style="background-color: #111827; padding: 1.25rem; border-radius: 8px; border: 1px solid #1f2937; font-size: 0.9rem; line-height: 1.7; color: #f3f4f6; white-space: pre-wrap;">${extraContent ? extraContent.trim() : ''}</div>
+      </div>
+    `;
   }
 
   htmlContent += `
