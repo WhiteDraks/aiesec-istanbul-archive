@@ -179,9 +179,31 @@ async function sendWelcomePendingEmail(email, name) {
   return await sendMailHelper({ to: email, subject: 'AIESEC İstanbul Mezunlar Portalı - Kayıt Talebiniz Alındı 📩', html });
 }
 
+/**
+ * Yeni üye adayı başvurduğunda yöneticiye bildirim maili gönderir
+ */
+async function sendAdminNotificationEmail(candidateName, candidateEmail) {
+  const htmlContent = `
+    <h2 style="color: #111827; font-size: 20px; margin-top: 0;">Sayın Yönetici,</h2>
+    <p>AIESEC İstanbul Alumni Archive sistemine yeni bir üye adayı kayıt başvurusu yapmıştır.</p>
+    <p><strong>Aday Detayları:</strong></p>
+    <ul>
+      <li><strong>Ad Soyad:</strong> ${candidateName}</li>
+      <li><strong>E-posta:</strong> ${candidateEmail}</li>
+    </ul>
+    <p>Başvuruyu değerlendirmek, onaylamak veya reddetmek için lütfen admin paneline giriş yapınız:</p>
+    <div style="text-align: center; margin: 35px 0;">
+      <a href="https://aiesec-istanbul-archive.vercel.app/admin" style="background-color: #037ef3; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px rgba(3,126,243,0.2);">Admin Paneline Git</a>
+    </div>
+  `;
+  const html = getEmailTemplate('Yeni Üye Kayıt Başvurusu 🔔', htmlContent);
+  return await sendMailHelper({ to: 'elifkrnz963@gmail.com', subject: 'AIESEC İstanbul Mezunlar Portalı - Yeni Üye Kayıt Başvurusu 🔔', html });
+}
+
 module.exports = {
   sendApprovalEmail,
   sendResetPasswordEmail,
   sendWelcomePendingEmail,
+  sendAdminNotificationEmail,
   sendMailHelper,
 };

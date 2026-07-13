@@ -92,12 +92,15 @@ router.post('/register', async (req, res) => {
       }
     }
 
-    // Kullanıcıya kayıt bilgilendirme/bekleme maili gönder
+    // Kullanıcıya kayıt bilgilendirme/bekleme maili gönder ve yöneticiye bildirim yap
     try {
-      const { sendWelcomePendingEmail } = require('../utils/email');
-      await sendWelcomePendingEmail(email, name);
+      const { sendWelcomePendingEmail, sendAdminNotificationEmail } = require('../utils/email');
+      await Promise.all([
+        sendWelcomePendingEmail(email, name),
+        sendAdminNotificationEmail(name, email)
+      ]);
     } catch (mailErr) {
-      console.error('Welcome pending email failed to send:', mailErr);
+      console.error('Registration notification emails failed to send:', mailErr);
     }
 
     req.flash('success', 'Kaydınız başarıyla alındı! Admin onayı bekleniyor. Onay sonrası giriş yapabilirsiniz.');
