@@ -1,6 +1,6 @@
 {
   "name": "aiesec-istanbul-archive",
-  "version": "1.2.131",
+  "version": "1.2.132",
   "description": "AIESEC İstanbul Alumni Archive - Executive Board Arşiv Web Sitesi",
   "main": "server.js",
   "scripts": {
@@ -10,6 +10,7 @@
     "version:update": "node scripts/update-version.js"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@neondatabase/serverless": "^1.1.0",
     "@vercel/blob": "^2.6.1",
     "bcryptjs": "^2.4.3",

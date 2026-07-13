@@ -195,6 +195,7 @@ app.use('/admin',    require('./routes/admin'));
 app.use('/admin/eb', require('./routes/admin-eb'));
 app.use('/timeline', require('./routes/timeline'));
 app.use('/archive',  require('./routes/archive'));
+app.use('/ai-assistant', require('./routes/ai'));
 app.use('/profile',  require('./routes/profile'));
 app.use('/alumni',   require('./routes/alumni'));
 app.use('/feedback', contentLimiter, require('./routes/feedback'));

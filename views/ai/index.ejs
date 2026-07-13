@@ -1,0 +1,268 @@
+<%- include('../layout/header', { currentPage: 'ai' }) %>
+
+<section class="page-hero page-hero-sm">
+  <div class="page-hero-bg"></div>
+  <div class="container">
+    <div class="page-header">
+      <div>
+        <h1 class="page-hero-title">🤖 AI Alumni Asistanı</h1>
+        <p class="page-hero-sub">AIESEC İstanbul'un 70 yıllık mirası, mezunları ve arşivleri hakkında yapay zeka rehberiniz.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div style="max-width: 900px; margin: 0 auto;">
+      
+      <!-- AI Status Check -->
+      <% if (!hasApiKey) { %>
+        <div class="alert alert-error" style="margin-bottom: 2rem;">
+          <strong>⚠️ Kurulum Gerekli:</strong> Sunucuda <code>GEMINI_API_KEY</code> tanımlanmamış. AI Asistanının çalışabilmesi için lütfen ortam değişkenini yapılandırın.
+        </div>
+      <% } %>
+
+      <div class="profile-card" style="display: flex; flex-direction: column; height: 600px; padding: 0; overflow: hidden; border: 1px solid var(--border); background: rgba(17, 24, 39, 0.6); backdrop-filter: blur(20px);">
+        
+        <!-- Chat Header -->
+        <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02);">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, #00aeef 100%); display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+              🤖
+            </div>
+            <div>
+              <h3 style="margin: 0; font-size: 1.05rem; color: #fff;">Liderlik Asistanı</h3>
+              <p style="margin: 0; font-size: 0.8rem; color: #10b981; display: flex; align-items: center; gap: 0.25rem;">
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span> Çevrimiçi • Bilgi Tabanı Aktif
+              </p>
+            </div>
+          </div>
+          <button onclick="clearChat()" class="btn btn-outline btn-xs" style="padding: 0.35rem 0.75rem; border-color: rgba(255,255,255,0.1); color: var(--text-muted);">Sohbeti Temizle 🗑️</button>
+        </div>
+
+        <!-- Chat Messages Container -->
+        <div id="chat-messages" style="flex: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.25rem;">
+          
+          <!-- System Welcome Message -->
+          <div style="display: flex; gap: 0.75rem; max-width: 80%;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.9rem; border: 1px solid var(--border);">
+              🤖
+            </div>
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); padding: 0.85rem 1.1rem; border-radius: 4px 16px 16px 16px; color: var(--text-lighter); font-size: 0.95rem; line-height: 1.5;">
+              Merhaba! Ben AIESEC İstanbul Alumni platformunun yapay zeka rehberiyim. 
+              <br><br>
+              Tarih şeridimizdeki kilometre taşları, EB dönemlerimiz, mezunlarımızın mentörlük/iş alanları veya arşivdeki dokümanlar hakkında bana sorular sorabilirsiniz. Size nasıl yardımcı olabilirim?
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Suggestions / Quick Prompts -->
+        <div id="chat-suggestions" style="padding: 0.75rem 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap; border-top: 1px solid var(--border); background: rgba(0,0,0,0.1);">
+          <button onclick="sendSuggestion('1990 yılı LCP\'si kimdi?')" class="btn btn-outline btn-xs" style="font-size: 0.8rem; border-radius: 20px; border-color: rgba(255,255,255,0.1); color: var(--text-lighter);">1990 yılı LCP'si kimdi? 👑</button>
+          <button onclick="sendSuggestion('Arşivde ne tür belgeler var?')" class="btn btn-outline btn-xs" style="font-size: 0.8rem; border-radius: 20px; border-color: rgba(255,255,255,0.1); color: var(--text-lighter);">Arşivde ne tür belgeler var? 📁</button>
+          <button onclick="sendSuggestion('Girişimci olan mezunlarımızı listeler misin?')" class="btn btn-outline btn-xs" style="font-size: 0.8rem; border-radius: 20px; border-color: rgba(255,255,255,0.1); color: var(--text-lighter);">Girişimci mezunlarımız kimler? 💼</button>
+          <button onclick="sendSuggestion('AIESEC İstanbul ne zaman kuruldu?')" class="btn btn-outline btn-xs" style="font-size: 0.8rem; border-radius: 20px; border-color: rgba(255,255,255,0.1); color: var(--text-lighter);">LC ne zaman kuruldu? ⏳</button>
+        </div>
+
+        <!-- Chat Input Form -->
+        <div style="padding: 1.25rem 1.5rem; border-top: 1px solid var(--border); background: rgba(255,255,255,0.01);">
+          <form id="chat-form" onsubmit="handleChatSubmit(event)" style="display: flex; gap: 0.75rem;">
+            <input type="text" id="chat-input" class="form-input" placeholder="Sorunuzu buraya yazın... (Örn: 2012 döneminin başarıları nelerdir?)" required autocomplete="off" style="margin: 0; flex: 1;" <%= !hasApiKey ? 'disabled' : '' %>>
+            <button type="submit" class="btn btn-primary" style="padding-left: 1.5rem; padding-right: 1.5rem; display: flex; align-items: center; gap: 0.5rem;" <%= !hasApiKey ? 'disabled' : '' %>>
+              Gönder <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Import Markdown Parser for Premium Text Rendering -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script>
+  let chatHistory = [];
+  const chatMessages = document.getElementById('chat-messages');
+  const chatInput = document.getElementById('chat-input');
+  const chatSuggestions = document.getElementById('chat-suggestions');
+
+  // Configure marked for safe parsing
+  marked.setOptions({
+    breaks: true,
+    gfm: true
+  });
+
+  function scrollToBottom() {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function clearChat() {
+    if (confirm('Sohbet geçmişini temizlemek istediğinizden emin misiniz?')) {
+      chatMessages.innerHTML = `
+        <div style="display: flex; gap: 0.75rem; max-width: 80%;">
+          <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.9rem; border: 1px solid var(--border);">
+            🤖
+          </div>
+          <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); padding: 0.85rem 1.1rem; border-radius: 4px 16px 16px 16px; color: var(--text-lighter); font-size: 0.95rem; line-height: 1.5;">
+            Sohbet geçmişi temizlendi. Size nasıl yardımcı olabilirim?
+          </div>
+        </div>
+      `;
+      chatHistory = [];
+      chatSuggestions.style.display = 'flex';
+    }
+  }
+
+  function appendMessage(sender, text) {
+    const msgWrapper = document.createElement('div');
+    msgWrapper.style.display = 'flex';
+    msgWrapper.style.gap = '0.75rem';
+    msgWrapper.style.maxWidth = '80%';
+    
+    if (sender === 'user') {
+      msgWrapper.style.alignSelf = 'flex-end';
+      msgWrapper.style.flexDirection = 'row-reverse';
+    }
+
+    const avatar = document.createElement('div');
+    avatar.style.width = '32px';
+    avatar.style.height = '32px';
+    avatar.style.borderRadius = '50%';
+    avatar.style.display = 'flex';
+    avatar.style.alignItems = 'center';
+    avatar.style.justifyContent = 'center';
+    avatar.style.flexShrink = '0';
+    avatar.style.fontSize = '0.9rem';
+    avatar.style.border = '1px solid var(--border)';
+
+    if (sender === 'user') {
+      avatar.style.background = 'var(--primary)';
+      avatar.innerText = '👤';
+    } else {
+      avatar.style.background = 'rgba(255,255,255,0.05)';
+      avatar.innerText = '🤖';
+    }
+
+    const bubble = document.createElement('div');
+    bubble.style.padding = '0.85rem 1.1rem';
+    bubble.style.fontSize = '0.95rem';
+    bubble.style.lineHeight = '1.5';
+
+    if (sender === 'user') {
+      bubble.style.background = 'rgba(3, 126, 243, 0.15)';
+      bubble.style.border = '1px solid rgba(3, 126, 243, 0.3)';
+      bubble.style.borderRadius = '16px 4px 16px 16px';
+      bubble.style.color = '#fff';
+      bubble.innerText = text;
+    } else {
+      bubble.style.background = 'rgba(255, 255, 255, 0.03)';
+      bubble.style.border = '1px solid var(--border)';
+      bubble.style.borderRadius = '4px 16px 16px 16px';
+      bubble.style.color = 'var(--text-lighter)';
+      // Parse markdown to HTML
+      bubble.innerHTML = marked.parse(text);
+    }
+
+    msgWrapper.appendChild(avatar);
+    msgWrapper.appendChild(bubble);
+    chatMessages.appendChild(msgWrapper);
+    scrollToBottom();
+  }
+
+  function appendTypingIndicator() {
+    const indicator = document.createElement('div');
+    indicator.id = 'typing-indicator';
+    indicator.style.display = 'flex';
+    indicator.style.gap = '0.75rem';
+    indicator.style.maxWidth = '80%';
+
+    indicator.innerHTML = `
+      <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.9rem; border: 1px solid var(--border);">🤖</div>
+      <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); padding: 0.85rem 1.1rem; border-radius: 4px 16px 16px 16px; color: var(--text-muted); font-size: 0.95rem; display: flex; align-items: center; gap: 0.25rem;">
+        Yazıyor<span class="dot-typing">.</span><span class="dot-typing">.</span><span class="dot-typing">.</span>
+      </div>
+    `;
+
+    // Mini animation style
+    const style = document.createElement('style');
+    style.id = 'typing-styles';
+    style.innerHTML = `
+      @keyframes blink { 0% { opacity: 0.2; } 20% { opacity: 1; } 100% { opacity: 0.2; } }
+      .dot-typing { animation: blink 1.4s infinite both; }
+      .dot-typing:nth-child(2) { animation-delay: .2s; }
+      .dot-typing:nth-child(3) { animation-delay: .4s; }
+      #chat-messages p { margin-bottom: 0.75rem; }
+      #chat-messages p:last-child { margin-bottom: 0; }
+      #chat-messages ul, #chat-messages ol { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+      #chat-messages li { margin-bottom: 0.25rem; }
+    `;
+    document.head.appendChild(style);
+
+    chatMessages.appendChild(indicator);
+    scrollToBottom();
+  }
+
+  function removeTypingIndicator() {
+    const indicator = document.getElementById('typing-indicator');
+    if (indicator) indicator.remove();
+    const style = document.getElementById('typing-styles');
+    if (style) style.remove();
+  }
+
+  function sendSuggestion(text) {
+    chatInput.value = text;
+    chatSuggestions.style.display = 'none';
+    document.getElementById('chat-form').dispatchEvent(new Event('submit', { cancelable: true }));
+  }
+
+  async function handleChatSubmit(event) {
+    event.preventDefault();
+    const message = chatInput.value.trim();
+    if (!message) return;
+
+    // Display user message
+    appendMessage('user', message);
+    chatInput.value = '';
+    chatInput.focus();
+
+    // Show typing loader
+    appendTypingIndicator();
+
+    try {
+      const response = await fetch('/ai-assistant/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: message,
+          history: chatHistory
+        })
+      });
+
+      const data = await response.json();
+      removeTypingIndicator();
+
+      if (data.reply) {
+        // Display AI response
+        appendMessage('model', data.reply);
+        // Save to client history
+        chatHistory.push({ role: 'user', text: message });
+        chatHistory.push({ role: 'model', text: data.reply });
+      } else {
+        appendMessage('model', 'Üzgünüm, yanıt alırken beklenmedik bir hata oluştu.');
+      }
+    } catch (err) {
+      console.error(err);
+      removeTypingIndicator();
+      appendMessage('model', 'Bağlantı hatası: Sunucuya ulaşılamıyor.');
+    }
+  }
+</script>
+
+<%- include('../layout/footer') %>
