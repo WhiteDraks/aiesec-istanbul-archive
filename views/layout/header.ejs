@@ -437,7 +437,7 @@
       <% if (currentUser) { %>
         <% if (isApproved || isAdmin) { %>
           <li class="nav-item-dropdown">
-            <a href="#" class="nav-link <%= typeof currentPage !== 'undefined' && ['alumni', 'jobs', 'events'].includes(currentPage) ? 'active' : '' %>" style="display: flex; align-items: center; gap: 0.25rem;">
+            <a href="#" class="nav-link <%= typeof currentPage !== 'undefined' && ['alumni', 'jobs', 'events', 'timeline', 'archive'].includes(currentPage) ? 'active' : '' %>" style="display: flex; align-items: center; gap: 0.25rem;">
               Topluluk 👥
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="margin-top: 2px;"><polyline points="6 9 12 15 18 9"/></svg>
             </a>
@@ -445,6 +445,8 @@
               <a href="/alumni" class="dropdown-item <%= typeof currentPage !== 'undefined' && currentPage === 'alumni' ? 'active' : '' %>">👥 Alumni Rehberi</a>
               <a href="/jobs" class="dropdown-item <%= typeof currentPage !== 'undefined' && currentPage === 'jobs' ? 'active' : '' %>">💼 Kariyer Panosu</a>
               <a href="/events" class="dropdown-item <%= typeof currentPage !== 'undefined' && currentPage === 'events' ? 'active' : '' %>">📅 Etkinlikler</a>
+              <a href="/timeline" class="dropdown-item <%= typeof currentPage !== 'undefined' && currentPage === 'timeline' ? 'active' : '' %>">⏳ Tarih Şeridi</a>
+              <a href="/archive" class="dropdown-item <%= typeof currentPage !== 'undefined' && currentPage === 'archive' ? 'active' : '' %>">📁 Belge Arşivi</a>
             </div>
           </li>
         <% } %>

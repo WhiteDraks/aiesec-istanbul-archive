@@ -5,6 +5,8 @@ const upload = require('../middleware/upload');
 const { uploadToBlob } = require('../utils/blob');
 const { isLoggedIn, isAdmin } = require('../middleware/auth');
 const { sendApprovalEmail } = require('../utils/email');
+const TimelineMilestone = require('../models/TimelineMilestone');
+const HeritageDocument = require('../models/HeritageDocument');
 
 // All admin routes require login + admin role
 router.use(isLoggedIn, isAdmin);
@@ -343,6 +345,230 @@ router.post('/digest/trigger', async (req, res) => {
     req.flash('error', 'Bülten gönderilirken sistemsel bir hata oluştu.');
   }
   res.redirect('/admin');
+});
+
+// ─── Timeline Milestones Management ──────────────────────────────────────────
+router.get('/timeline', async (req, res) => {
+  try {
+    const milestones = await TimelineMilestone.findAll();
+    res.render('admin/timeline', {
+      title: 'Zaman Tüneli Yönetimi',
+      milestones,
+      activeTab: 'timeline'
+    });
+  } catch (err) {
+    console.error('Failed to get milestones:', err);
+    req.flash('error', 'Kilometre taşları yüklenirken hata oluştu.');
+    res.redirect('/admin');
+  }
+});
+
+router.get('/timeline/create', (req, res) => {
+  res.render('admin/timeline-create', {
+    title: 'Yeni Kilometre Taşı Ekle'
+  });
+});
+
+router.post('/timeline/create', upload.single('image'), async (req, res) => {
+  try {
+    const { year, title, description } = req.body;
+    let imageUrl = '';
+    if (req.file) {
+      imageUrl = await uploadToBlob(req.file.buffer, req.file.originalname, 'timeline/');
+    }
+    await TimelineMilestone.create({
+      year: parseInt(year, 10),
+      title,
+      description,
+      image_url: imageUrl
+    });
+    req.flash('success', 'Kilometre taşı başarıyla eklendi.');
+    res.redirect('/admin/timeline');
+  } catch (err) {
+    console.error('Failed to create milestone:', err);
+    req.flash('error', 'Kilometre taşı oluşturulurken hata oluştu.');
+    res.redirect('/admin/timeline');
+  }
+});
+
+router.get('/timeline/:id/edit', async (req, res) => {
+  try {
+    const milestone = await TimelineMilestone.findById(req.params.id);
+    if (!milestone) {
+      req.flash('error', 'Kilometre taşı bulunamadı.');
+      return res.redirect('/admin/timeline');
+    }
+    res.render('admin/timeline-edit', {
+      title: 'Kilometre Taşını Düzenle',
+      milestone
+    });
+  } catch (err) {
+    console.error('Failed to get milestone:', err);
+    req.flash('error', 'Yüklenirken hata oluştu.');
+    res.redirect('/admin/timeline');
+  }
+});
+
+router.post('/timeline/:id/edit', upload.single('image'), async (req, res) => {
+  try {
+    const { year, title, description, existing_image } = req.body;
+    let imageUrl = existing_image || '';
+    if (req.file) {
+      imageUrl = await uploadToBlob(req.file.buffer, req.file.originalname, 'timeline/');
+    }
+    await TimelineMilestone.update(req.params.id, {
+      year: parseInt(year, 10),
+      title,
+      description,
+      image_url: imageUrl
+    });
+    req.flash('success', 'Kilometre taşı güncellendi.');
+    res.redirect('/admin/timeline');
+  } catch (err) {
+    console.error('Failed to update milestone:', err);
+    req.flash('error', 'Güncellenirken hata oluştu.');
+    res.redirect('/admin/timeline');
+  }
+});
+
+router.post('/timeline/:id/delete', async (req, res) => {
+  try {
+    await TimelineMilestone.delete(req.params.id);
+    req.flash('success', 'Kilometre taşı silindi.');
+  } catch (err) {
+    console.error('Failed to delete milestone:', err);
+    req.flash('error', 'Silinirken hata oluştu.');
+  }
+  res.redirect('/admin/timeline');
+});
+
+// ─── Heritage Documents Management ──────────────────────────────────────────
+const multer = require('multer');
+const docUpload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: (req, file, cb) => {
+    if (file && file.mimetype && (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf')) {
+      if (file.mimetype === 'image/svg+xml') {
+        cb(new Error('Güvenlik nedeniyle SVG formatında dosya yüklenemez.'), false);
+      } else {
+        cb(null, true);
+      }
+    } else {
+      cb(new Error('Lütfen sadece resim (JPG, PNG) veya PDF belgesi yükleyin.'), false);
+    }
+  },
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  }
+});
+
+router.get('/archive', async (req, res) => {
+  try {
+    const documents = await HeritageDocument.findAll();
+    res.render('admin/archive', {
+      title: 'Tarihi Arşiv Yönetimi',
+      documents,
+      activeTab: 'archive'
+    });
+  } catch (err) {
+    console.error('Failed to get archive:', err);
+    req.flash('error', 'Arşiv belgeleri yüklenirken hata oluştu.');
+    res.redirect('/admin');
+  }
+});
+
+router.get('/archive/create', (req, res) => {
+  res.render('admin/archive-create', {
+    title: 'Yeni Arşiv Dosyası Yükle'
+  });
+});
+
+router.post('/archive/create', docUpload.single('file'), async (req, res) => {
+  try {
+    const { title, description, category, year } = req.body;
+    if (!req.file) {
+      req.flash('error', 'Lütfen yüklenecek bir dosya veya resim seçin.');
+      return res.redirect('/admin/archive/create');
+    }
+
+    const fileUrl = await uploadToBlob(req.file.buffer, req.file.originalname, 'archive/');
+    const fileType = req.file.mimetype === 'application/pdf' ? 'pdf' : 'image';
+
+    await HeritageDocument.create({
+      title,
+      description,
+      category,
+      year,
+      file_url: fileUrl,
+      file_type: fileType,
+      uploaded_by: req.session.userId
+    });
+
+    req.flash('success', 'Arşiv belgesi başarıyla yüklendi.');
+    res.redirect('/admin/archive');
+  } catch (err) {
+    console.error('Failed to create archive document:', err);
+    req.flash('error', err.message || 'Belge yüklenirken hata oluştu.');
+    res.redirect('/admin/archive/create');
+  }
+});
+
+router.get('/archive/:id/edit', async (req, res) => {
+  try {
+    const document = await HeritageDocument.findById(req.params.id);
+    if (!document) {
+      req.flash('error', 'Belge bulunamadı.');
+      return res.redirect('/admin/archive');
+    }
+    res.render('admin/archive-edit', {
+      title: 'Arşiv Belgesini Düzenle',
+      document
+    });
+  } catch (err) {
+    console.error('Failed to get document:', err);
+    req.flash('error', 'Yüklenirken hata oluştu.');
+    res.redirect('/admin/archive');
+  }
+});
+
+router.post('/archive/:id/edit', docUpload.single('file'), async (req, res) => {
+  try {
+    const { title, description, category, year, existing_file_url, existing_file_type } = req.body;
+    let fileUrl = existing_file_url;
+    let fileType = existing_file_type;
+
+    if (req.file) {
+      fileUrl = await uploadToBlob(req.file.buffer, req.file.originalname, 'archive/');
+      fileType = req.file.mimetype === 'application/pdf' ? 'pdf' : 'image';
+    }
+
+    await HeritageDocument.update(req.params.id, {
+      title,
+      description,
+      category,
+      year,
+      file_url: fileUrl,
+      file_type: fileType
+    });
+
+    req.flash('success', 'Arşiv belgesi güncellendi.');
+    res.redirect('/admin/archive');
+  } catch (err) {
+    console.error('Failed to update document:', err);
+    req.flash('error', err.message || 'Güncellenirken hata oluştu.');
+    res.redirect('/admin/archive');
+  }
+});
+
+router.post('/archive/:id/delete', async (req, res) => {
+  try {
+    await HeritageDocument.delete(req.params.id);
+    req.flash('success', 'Arşiv belgesi silindi.');
+  } catch (err) {
+    console.error('Failed to delete document:', err);
+    req.flash('error', 'Silinirken hata oluştu.');
+  }
+  res.redirect('/admin/archive');
 });
 
 module.exports = router;

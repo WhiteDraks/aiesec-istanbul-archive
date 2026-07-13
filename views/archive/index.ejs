@@ -1,0 +1,258 @@
+<%- include('../layout/header') %>
+
+<style>
+  .archive-hero {
+    padding: 5rem 0 3rem 0;
+    text-align: center;
+    background: radial-gradient(circle at center, rgba(168, 85, 247, 0.08) 0%, transparent 70%);
+  }
+
+  .archive-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #fff 0%, #a855f7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .search-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    border-radius: 16px;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+  }
+
+  .archive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.75rem;
+  }
+
+  .archive-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .archive-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 8px 30px rgba(3, 126, 243, 0.12);
+  }
+
+  .archive-preview {
+    height: 180px;
+    background: #05080f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .archive-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .pdf-fallback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+  }
+
+  .pdf-icon-badge {
+    font-size: 3rem;
+    color: #ef4444;
+  }
+
+  .archive-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .archive-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .doc-category-badge {
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.75rem;
+  }
+
+  .cat-magazine { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
+  .cat-booklet { background: rgba(168, 85, 247, 0.1); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.2); }
+  .cat-photo { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+  .cat-document { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
+  .cat-other { background: rgba(107, 114, 128, 0.1); color: #9ca3af; border: 1px solid rgba(107, 114, 128, 0.2); }
+
+  .doc-year-badge {
+    background: rgba(255,255,255,0.04);
+    color: var(--text-lighter);
+    border: 1px solid var(--border);
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+
+  .archive-body h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+  }
+
+  .archive-body p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 1.25rem;
+    flex-grow: 1;
+  }
+
+  .archive-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.03);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .archive-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    max-width: 500px;
+    margin: 2rem auto;
+  }
+</style>
+
+<div class="archive-hero">
+  <div class="container">
+    <h1>📁 Tarihi Belge & Yayın Arşivi</h1>
+    <p style="color: var(--text-lighter); max-width: 600px; margin: 0 auto;">AIESEC İstanbul'un bültenlerini, kongre kitapçıklarını, nostaljik fotoğraflarını ve resmi belgelerini dijital olarak inceleyin.</p>
+  </div>
+</div>
+
+<section class="section" style="padding-top: 1rem;">
+  <div class="container">
+
+    <!-- Search / Filter Bar -->
+    <div class="search-panel">
+      <form action="/archive" method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) auto; gap: 1rem; align-items: end; width: 100%;">
+        
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="font-size: 0.75rem; margin-bottom: 0.25rem;">Kelime Ara</label>
+          <input type="text" name="search" class="form-input" placeholder="Başlık veya açıklama..." value="<%= activeSearch %>" style="padding: 0.6rem 0.9rem;">
+        </div>
+
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="font-size: 0.75rem; margin-bottom: 0.25rem;">Kategori</label>
+          <select name="category" class="form-input" style="padding: 0.6rem 0.9rem;">
+            <option value="">Tüm Kategoriler</option>
+            <% Object.keys(categoriesMap).forEach(key => { %>
+              <option value="<%= key %>" <%= activeCategory === key ? 'selected' : '' %>><%= categoriesMap[key] %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="font-size: 0.75rem; margin-bottom: 0.25rem;">Dönem / Yıl</label>
+          <select name="year" class="form-input" style="padding: 0.6rem 0.9rem;">
+            <option value="">Tüm Dönemler</option>
+            <% availableYears.forEach(year => { %>
+              <option value="<%= year %>" <%= activeYear === year ? 'selected' : '' %>><%= year %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+          <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.25rem; font-size: 0.9rem;">Filtrele 🔍</button>
+          <% if (activeSearch || activeCategory || activeYear) { %>
+            <a href="/archive" class="btn btn-outline" style="padding: 0.65rem 1.25rem; font-size: 0.9rem;">Temizle</a>
+          <% } %>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Document List -->
+    <% if (documents.length === 0) { %>
+      <div class="archive-empty">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📁</div>
+        <h3 style="color: #fff; margin-bottom: 0.5rem;">Arşiv Belgesi Bulunamadı</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">Aradığınız kriterlere uygun herhangi bir tarihi belge bulunmuyor.</p>
+      </div>
+    <% } else { %>
+      <div class="archive-grid">
+        <% documents.forEach(doc => { %>
+          <div class="archive-card">
+            
+            <div class="archive-preview">
+              <% if (doc.file_type === 'pdf') { %>
+                <div class="pdf-fallback">
+                  <span class="pdf-icon-badge">📄</span>
+                  <span style="font-size: 0.8rem; font-weight: 500;">PDF DOSYASI</span>
+                </div>
+              <% } else { %>
+                <img src="<%= doc.file_url %>" alt="<%= doc.title %>">
+              <% } %>
+            </div>
+
+            <div class="archive-body">
+              <div class="archive-meta">
+                <span class="doc-category-badge cat-<%= doc.category %>">
+                  <%= categoriesMap[doc.category] || doc.category %>
+                </span>
+                <% if (doc.year) { %>
+                  <span class="doc-year-badge"><%= doc.year %></span>
+                <% } %>
+              </div>
+
+              <h3><%= doc.title %></h3>
+              <p><%= doc.description || 'Açıklama belirtilmemiş.' %></p>
+
+              <div class="archive-footer">
+                <span>Ekleyen: <%= doc.uploader_name || 'Bilinmiyor' %></span>
+                <a href="<%= doc.file_url %>" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; font-weight: 600; border-radius: 8px;">
+                  Görüntüle 🔍
+                </a>
+              </div>
+            </div>
+
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+
+  </div>
+</section>
+
+<%- include('../layout/footer') %>

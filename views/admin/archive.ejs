@@ -1,0 +1,95 @@
+<%- include('../layout/header', { currentPage: 'admin' }) %>
+
+<section class="page-hero page-hero-sm page-hero-admin">
+  <div class="page-hero-bg"></div>
+  <div class="container">
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 class="page-hero-title">🗄️ Tarihi Arşiv Yönetimi</h1>
+        <p class="page-hero-sub">AIESEC İstanbul Geçmiş Belgeleri ve Klasörleri</p>
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <a href="/admin" class="btn btn-outline">◀ Panele Geri Dön</a>
+        <a href="/admin/archive/create" class="btn btn-primary">➕ Yeni Belge Yükle</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-admin">
+  <div class="container">
+    
+    <% if (success && success.length > 0) { %>
+      <div class="alert alert-success" style="margin-bottom: 1.5rem;"><%= success %></div>
+    <% } %>
+    <% if (error && error.length > 0) { %>
+      <div class="alert alert-error" style="margin-bottom: 1.5rem;"><%= error %></div>
+    <% } %>
+
+    <div class="admin-panel">
+      <% if (documents.length === 0) { %>
+        <div class="empty-state">
+          <div class="empty-icon">🗄️</div>
+          <h3>Belge bulunmuyor</h3>
+          <p>Tarihi arşiv için henüz hiçbir belge yüklenmemiş.</p>
+          <a href="/admin/archive/create" class="btn btn-primary" style="margin-top: 1rem;">İlk Belgeyi Yükle</a>
+        </div>
+      <% } else { %>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width: 250px;">Başlık</th>
+                <th style="width: 100px;">Yıl</th>
+                <th style="width: 150px;">Kategori</th>
+                <th style="width: 150px;">Yükleyen</th>
+                <th style="width: 100px;">Dosya Tipi</th>
+                <th style="width: 150px; text-align: right;">İşlemler</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% documents.forEach(doc => { %>
+                <tr class="admin-row">
+                  <td><strong><%= doc.title %></strong></td>
+                  <td><%= doc.year %></td>
+                  <td>
+                    <% 
+                      const catLabels = {
+                        strategy: 'Strateji / Planlama',
+                        guide: 'Rehber / Eğitim',
+                        report: 'Rapor / Çıktı',
+                        memory: 'Anı / Fotoğraf',
+                        other: 'Diğer'
+                      };
+                    %>
+                    <span class="badge" style="background: rgba(255,255,255,0.1);"><%= catLabels[doc.category] || doc.category %></span>
+                  </td>
+                  <td><span style="font-size: 0.85rem;"><%= doc.uploader_name || 'Bilinmeyen' %></span></td>
+                  <td>
+                    <% if (doc.file_type === 'pdf') { %>
+                      <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #f87171;">PDF</span>
+                    <% } else { %>
+                      <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa;">Görsel</span>
+                    <% } %>
+                  </td>
+                  <td style="text-align: right;">
+                    <div style="display: inline-flex; gap: 0.5rem; justify-content: flex-end;">
+                      <a href="<%= doc.file_url %>" target="_blank" class="btn btn-outline btn-xs" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">İncele 👁️</a>
+                      <a href="/admin/archive/<%= doc.id %>/edit" class="btn btn-outline btn-xs" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Düzenle ✏️</a>
+                      <form action="/admin/archive/<%= doc.id %>/delete" method="POST" onsubmit="return confirm('Bu belgeyi silmek istediğinizden emin misiniz?')" style="display: inline;">
+                        <button type="submit" class="btn btn-outline btn-xs" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; border-color: rgba(239, 68, 68, 0.4); color: #ef4444; background: rgba(239, 68, 68, 0.02);">Sil 🗑️</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+
+  </div>
+</section>
+
+<%- include('../layout/footer') %>

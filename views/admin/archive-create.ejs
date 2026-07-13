@@ -1,0 +1,67 @@
+<%- include('../layout/header', { currentPage: 'admin' }) %>
+
+<section class="page-hero page-hero-sm page-hero-admin">
+  <div class="page-hero-bg"></div>
+  <div class="container">
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 class="page-hero-title">➕ Yeni Belge Yükle</h1>
+        <p class="page-hero-sub">Tarihi arşive yeni bir doküman veya fotoğraf ekleyin.</p>
+      </div>
+      <div>
+        <a href="/admin/archive" class="btn btn-outline">◀ İptal ve Geri Dön</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-admin">
+  <div class="container">
+    <% if (error && error.length > 0) { %>
+      <div class="alert alert-error" style="margin-bottom: 1.5rem;"><%= error %></div>
+    <% } %>
+    
+    <div class="admin-panel" style="max-width: 800px; margin: 0 auto;">
+      <form action="/admin/archive/create" method="POST" enctype="multipart/form-data" class="admin-form">
+        
+        <div class="form-group">
+          <label class="form-label">Başlık</label>
+          <input type="text" name="title" class="form-input" required placeholder="Örn: 2012 Yıllık Raporu">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Kategori</label>
+          <select name="category" class="form-input" required style="appearance: auto;">
+            <option value="strategy">Strateji / Planlama</option>
+            <option value="guide">Rehber / Eğitim</option>
+            <option value="report">Rapor / Çıktı</option>
+            <option value="memory">Anı / Fotoğraf</option>
+            <option value="other">Diğer</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Yıl (Opsiyonel)</label>
+          <input type="text" name="year" class="form-input" placeholder="Örn: 2012 veya 12.13">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Açıklama</label>
+          <textarea name="description" class="form-input" rows="4" placeholder="Belgenin içeriği hakkında kısa bilgi..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Dosya Seçin</label>
+          <input type="file" name="file" class="form-input" accept="image/*,application/pdf" required>
+          <p class="form-hint" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Sadece resim dosyaları (JPG, PNG) veya PDF dokümanları yüklenebilir. Maksimum boyut: 10MB.</p>
+        </div>
+
+        <div style="margin-top: 2rem;">
+          <button type="submit" class="btn btn-primary btn-block">Belgeyi Yükle ve Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<%- include('../layout/footer') %>

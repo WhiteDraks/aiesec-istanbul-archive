@@ -1,0 +1,81 @@
+<%- include('../layout/header', { currentPage: 'admin' }) %>
+
+<section class="page-hero page-hero-sm page-hero-admin">
+  <div class="page-hero-bg"></div>
+  <div class="container">
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 class="page-hero-title">⏳ Zaman Tüneli Yönetimi</h1>
+        <p class="page-hero-sub">AIESEC İstanbul Tarih Şeridi Kilometre Taşları</p>
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <a href="/admin" class="btn btn-outline">◀ Panele Geri Dön</a>
+        <a href="/admin/timeline/create" class="btn btn-primary">➕ Yeni Kilometre Taşı Ekle</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-admin">
+  <div class="container">
+    
+    <% if (success && success.length > 0) { %>
+      <div class="alert alert-success" style="margin-bottom: 1.5rem;"><%= success %></div>
+    <% } %>
+    <% if (error && error.length > 0) { %>
+      <div class="alert alert-error" style="margin-bottom: 1.5rem;"><%= error %></div>
+    <% } %>
+
+    <div class="admin-panel">
+      <% if (milestones.length === 0) { %>
+        <div class="empty-state">
+          <div class="empty-icon">⏳</div>
+          <h3>Kilometre taşı bulunmuyor</h3>
+          <p>Tarih şeridi için henüz hiçbir veri girilmemiş.</p>
+          <a href="/admin/timeline/create" class="btn btn-primary" style="margin-top: 1rem;">İlk Kilometre Taşını Ekle</a>
+        </div>
+      <% } else { %>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width: 100px;">Yıl</th>
+                <th style="width: 200px;">Başlık</th>
+                <th>Açıklama</th>
+                <th style="width: 100px;">Görsel</th>
+                <th style="width: 150px; text-align: right;">İşlemler</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% milestones.forEach(m => { %>
+                <tr class="admin-row">
+                  <td><strong><%= m.year %></strong></td>
+                  <td><span style="color: #fff; font-weight: 600;"><%= m.title %></span></td>
+                  <td><span style="font-size: 0.85rem; color: var(--text-lighter); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"><%= m.description %></span></td>
+                  <td>
+                    <% if (m.image_url) { %>
+                      <img src="<%= m.image_url %>" alt="preview" style="width: 50px; height: 35px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border);">
+                    <% } else { %>
+                      <span style="color: var(--text-muted); font-size: 0.8rem;">—</span>
+                    <% } %>
+                  </td>
+                  <td style="text-align: right;">
+                    <div style="display: inline-flex; gap: 0.5rem; justify-content: flex-end;">
+                      <a href="/admin/timeline/<%= m.id %>/edit" class="btn btn-outline btn-xs" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Düzenle ✏️</a>
+                      <form action="/admin/timeline/<%= m.id %>/delete" method="POST" onsubmit="return confirm('Bu kilometre taşını silmek istediğinizden emin misiniz?')" style="display: inline;">
+                        <button type="submit" class="btn btn-outline btn-xs" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; border-color: rgba(239, 68, 68, 0.4); color: #ef4444; background: rgba(239, 68, 68, 0.02);">Sil 🗑️</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+
+  </div>
+</section>
+
+<%- include('../layout/footer') %>

@@ -184,6 +184,33 @@ async function initDB() {
     )
   `;
 
+  // Interactive Timeline Milestones table
+  await sql`
+    CREATE TABLE IF NOT EXISTS timeline_milestones (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      year        INT NOT NULL,
+      title       VARCHAR(255) NOT NULL,
+      description TEXT NOT NULL,
+      image_url   TEXT,
+      created_at  TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  // Heritage Documents / Archives table
+  await sql`
+    CREATE TABLE IF NOT EXISTS heritage_documents (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      title       VARCHAR(255) NOT NULL,
+      description TEXT,
+      category    VARCHAR(50) NOT NULL,
+      year        VARCHAR(50),
+      file_url    TEXT NOT NULL,
+      file_type   VARCHAR(20) NOT NULL,
+      uploaded_by UUID REFERENCES users(id) ON DELETE SET NULL,
+      created_at  TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
   // Seed default settings if empty
   const countRes = await sql`SELECT COUNT(*) FROM site_settings`;
   if (parseInt(countRes[0].count, 10) === 0) {

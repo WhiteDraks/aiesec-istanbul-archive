@@ -1,0 +1,211 @@
+<%- include('../layout/header') %>
+
+<style>
+  /* Timeline Section Styles */
+  .timeline-hero {
+    padding: 5rem 0 3rem 0;
+    text-align: center;
+    background: radial-gradient(circle at center, rgba(3, 126, 243, 0.08) 0%, transparent 70%);
+  }
+  
+  .timeline-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .timeline-container {
+    position: relative;
+    max-width: 1000px;
+    margin: 3rem auto;
+    padding: 0 1rem;
+  }
+
+  /* Vertical Line in center */
+  .timeline-container::after {
+    content: '';
+    position: absolute;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--primary) 0%, rgba(3, 126, 243, 0.1) 100%);
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 2px;
+  }
+
+  .timeline-item {
+    padding: 1rem 0;
+    position: relative;
+    width: 50%;
+    clear: both;
+  }
+
+  /* Left/Right alignment */
+  .timeline-item.left {
+    float: left;
+    padding-right: 2.5rem;
+    text-align: right;
+  }
+
+  .timeline-item.right {
+    float: right;
+    padding-left: 2.5rem;
+    text-align: left;
+  }
+
+  /* Content Cards */
+  .timeline-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(5px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+
+  .timeline-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 8px 35px rgba(3, 126, 243, 0.15);
+  }
+
+  /* Circle markers */
+  .timeline-marker {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 4px solid var(--background);
+    top: 2rem;
+    z-index: 10;
+    box-shadow: 0 0 10px var(--primary);
+  }
+
+  .left .timeline-marker {
+    right: -9px;
+  }
+
+  .right .timeline-marker {
+    left: -9px;
+  }
+
+  /* Year badges */
+  .timeline-year {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+    display: inline-block;
+    padding: 0.2rem 0.8rem;
+    border-radius: 20px;
+    background: rgba(3, 126, 243, 0.08);
+    border: 1px solid rgba(3, 126, 243, 0.15);
+  }
+
+  .timeline-card h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: #fff;
+  }
+
+  .timeline-card p {
+    font-size: 0.95rem;
+    color: var(--text-lighter);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .timeline-image {
+    width: 100%;
+    max-height: 250px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-top: 1rem;
+    border: 1px solid var(--border);
+  }
+
+  /* Clearfix */
+  .timeline-container::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+  /* Fallback */
+  .timeline-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    max-width: 500px;
+    margin: 2rem auto;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .timeline-container::after {
+      left: 20px;
+    }
+
+    .timeline-item {
+      width: 100%;
+      float: none;
+      padding-left: 45px !important;
+      padding-right: 0 !important;
+      text-align: left !important;
+    }
+
+    .timeline-marker {
+      left: 11px !important;
+      right: auto !important;
+    }
+  }
+</style>
+
+<div class="timeline-hero">
+  <div class="container">
+    <h1>⏳ İnteraktif Tarih Şeridi</h1>
+    <p style="color: var(--text-lighter); max-width: 600px; margin: 0 auto;">AIESEC İstanbul'un 1954'teki kuruluşundan bugüne uzanan ilham verici kilometre taşlarını ve başarı hikayelerini keşfedin.</p>
+  </div>
+</div>
+
+<section class="section" style="padding-top: 1rem;">
+  <div class="container">
+    
+    <% if (milestones.length === 0) { %>
+      <div class="timeline-empty">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">⏳</div>
+        <h3 style="color: #fff; margin-bottom: 0.5rem;">Zaman Tüneli Boş</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">Henüz sisteme bir kilometre taşı eklenmemiş. Yöneticiler tarafından yakında güncellenecektir.</p>
+      </div>
+    <% } else { %>
+      <div class="timeline-container">
+        <% milestones.forEach((milestone, index) => { %>
+          <div class="timeline-item <%= index % 2 === 0 ? 'left' : 'right' %>">
+            <div class="timeline-marker"></div>
+            <div class="timeline-card">
+              <div class="timeline-year"><%= milestone.year %></div>
+              <h3><%= milestone.title %></h3>
+              <p><%= milestone.description %></p>
+              <% if (milestone.image_url) { %>
+                <img src="<%= milestone.image_url %>" alt="<%= milestone.title %>" class="timeline-image">
+              <% } %>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+
+  </div>
+</section>
+
+<%- include('../layout/footer') %>

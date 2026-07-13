@@ -1,0 +1,80 @@
+<%- include('../layout/header', { currentPage: 'admin' }) %>
+
+<section class="page-hero page-hero-sm page-hero-admin">
+  <div class="page-hero-bg"></div>
+  <div class="container">
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 class="page-hero-title">✏️ Arşiv Belgesini Düzenle</h1>
+        <p class="page-hero-sub"><%= document.title %></p>
+      </div>
+      <div>
+        <a href="/admin/archive" class="btn btn-outline">◀ İptal ve Geri Dön</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-admin">
+  <div class="container">
+    <% if (error && error.length > 0) { %>
+      <div class="alert alert-error" style="margin-bottom: 1.5rem;"><%= error %></div>
+    <% } %>
+    
+    <div class="admin-panel" style="max-width: 800px; margin: 0 auto;">
+      <form action="/admin/archive/<%= document.id %>/edit" method="POST" enctype="multipart/form-data" class="admin-form">
+        
+        <input type="hidden" name="existing_file_url" value="<%= document.file_url %>">
+        <input type="hidden" name="existing_file_type" value="<%= document.file_type %>">
+
+        <div class="form-group">
+          <label class="form-label">Başlık</label>
+          <input type="text" name="title" class="form-input" required value="<%= document.title %>">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Kategori</label>
+          <select name="category" class="form-input" required style="appearance: auto;">
+            <option value="strategy" <%= document.category === 'strategy' ? 'selected' : '' %>>Strateji / Planlama</option>
+            <option value="guide" <%= document.category === 'guide' ? 'selected' : '' %>>Rehber / Eğitim</option>
+            <option value="report" <%= document.category === 'report' ? 'selected' : '' %>>Rapor / Çıktı</option>
+            <option value="memory" <%= document.category === 'memory' ? 'selected' : '' %>>Anı / Fotoğraf</option>
+            <option value="other" <%= document.category === 'other' ? 'selected' : '' %>>Diğer</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Yıl (Opsiyonel)</label>
+          <input type="text" name="year" class="form-input" value="<%= document.year || '' %>">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Açıklama</label>
+          <textarea name="description" class="form-input" rows="4"><%= document.description || '' %></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Yeni Dosya Yükle (Opsiyonel)</label>
+          <div style="margin-bottom: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">Mevcut Dosya:</p>
+            <a href="<%= document.file_url %>" target="_blank" class="btn btn-outline btn-xs" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+              <% if (document.file_type === 'pdf') { %>
+                📄 PDF Belgesini Görüntüle
+              <% } else { %>
+                🖼️ Görseli Görüntüle
+              <% } %>
+            </a>
+          </div>
+          <input type="file" name="file" class="form-input" accept="image/*,application/pdf">
+          <p class="form-hint" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Yeni bir dosya yüklerseniz mevcut dosya ile değiştirilecektir. (JPG, PNG veya PDF)</p>
+        </div>
+
+        <div style="margin-top: 2rem;">
+          <button type="submit" class="btn btn-primary btn-block">Değişiklikleri Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<%- include('../layout/footer') %>
