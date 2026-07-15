@@ -100,15 +100,22 @@
     }
     @media (max-width: 991px) {
       .dropdown-menu {
+        display: none !important;
+        opacity: 0;
+        visibility: hidden;
         position: static;
         transform: none;
         background: rgba(255, 255, 255, 0.02);
         border: none;
         box-shadow: none;
         padding: 0.5rem 0 0.5rem 1rem;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+      .nav-item-dropdown.active-mobile .dropdown-menu {
+        display: flex !important;
         opacity: 1;
         visibility: visible;
-        display: flex;
       }
     }
 

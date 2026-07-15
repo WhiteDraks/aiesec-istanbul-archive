@@ -152,6 +152,22 @@
     max-width: 500px;
     margin: 2rem auto;
   }
+
+  @media (max-width: 768px) {
+    .search-panel form {
+      grid-template-columns: 1fr !important;
+    }
+    .search-panel form div:last-child {
+      justify-content: stretch !important;
+      width: 100%;
+    }
+    .search-panel form button, 
+    .search-panel form a {
+      width: 100%;
+      text-align: center;
+      justify-content: center;
+    }
+  }
 </style>
 
 <div class="archive-hero">

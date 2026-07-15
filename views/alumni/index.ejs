@@ -17,7 +17,7 @@
 
   <!-- Gelişmiş Filtreleme & Arama Formu -->
   <form action="/alumni" method="GET" style="background: var(--surface); border: 1px solid var(--border); padding: 1.5rem; border-radius: 16px; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 1rem;">
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+    <div class="alumni-grid-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
       
       <!-- Text Search -->
       <div class="form-group" style="margin: 0; grid-column: span 2;">
@@ -335,6 +335,15 @@
 }
 .alumni-link:not(:last-child) {
   border-right: 1px solid var(--border);
+}
+
+@media (max-width: 768px) {
+  .alumni-grid-form {
+    grid-template-columns: 1fr !important;
+  }
+  .alumni-grid-form .form-group {
+    grid-column: span 1 !important;
+  }
 }
 </style>
 

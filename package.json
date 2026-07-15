@@ -1,6 +1,6 @@
 {
   "name": "aiesec-istanbul-archive",
-  "version": "1.2.133",
+  "version": "1.2.134",
   "description": "AIESEC İstanbul Alumni Archive - Executive Board Arşiv Web Sitesi",
   "main": "server.js",
   "scripts": {

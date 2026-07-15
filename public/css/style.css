@@ -2110,6 +2110,7 @@ input, textarea, select { font-family: inherit; }
     gap: var(--space-1);
     border-bottom: 1px solid rgba(255,255,255,0.06);
     z-index: 999;
+    flex-wrap: nowrap !important;
   }
 
   .nav-links.open { display: flex; }
@@ -2122,7 +2123,8 @@ input, textarea, select { font-family: inherit; }
 
   /* Layout */
   .hero-content { padding-block: var(--space-12); }
-  .hero-stats { flex-wrap: wrap; gap: var(--space-4); }
+  .hero-stats { flex-wrap: wrap; gap: var(--space-4) var(--space-6); justify-content: center; }
+  .stat-divider { display: none !important; }
   .hero-actions { flex-direction: column; align-items: flex-start; }
 
   .section { padding-block: var(--space-12); }
@@ -2155,6 +2157,8 @@ input, textarea, select { font-family: inherit; }
   :root { --space-6: 1rem; }
   .admin-stats { grid-template-columns: repeat(2, 1fr); }
   .flash { right: var(--space-4); left: var(--space-4); max-width: 100%; }
+  .logo-text small { display: none !important; }
+  .logo-text { font-size: 0.8rem !important; }
 }
 
 /* ── 22. Utilities ───────────────────────────────────────────────────────── */

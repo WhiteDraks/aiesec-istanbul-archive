@@ -37,6 +37,23 @@ if (hamburger && navLinks) {
   });
 }
 
+// ── Mobile Dropdown Toggle ───────────────────────────────────────────────────
+document.querySelectorAll('.nav-item-dropdown > a').forEach(toggle => {
+  toggle.addEventListener('click', (e) => {
+    if (window.innerWidth <= 991) {
+      e.preventDefault();
+      const parent = toggle.parentElement;
+      
+      // Close other mobile active dropdowns
+      document.querySelectorAll('.nav-item-dropdown').forEach(item => {
+        if (item !== parent) item.classList.remove('active-mobile');
+      });
+      
+      parent.classList.toggle('active-mobile');
+    }
+  });
+});
+
 // ── Admin tabs ───────────────────────────────────────────────────────────────
 const adminTabs = document.querySelectorAll('.admin-tab');
 if (adminTabs.length) {
