@@ -2173,3 +2173,12 @@ input, textarea, select { font-family: inherit; }
   white-space: nowrap;
   border-width: 0;
 }
+
+/* Instagram Links Highlight */
+a[href*="instagram.com"] {
+  color: var(--blue-sky, #00AEEF) !important;
+}
+a[href*="instagram.com"] svg {
+  color: var(--blue-sky, #00AEEF) !important;
+  stroke: var(--blue-sky, #00AEEF) !important;
+}
