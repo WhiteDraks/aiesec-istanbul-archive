@@ -13,7 +13,11 @@
           <% } else { %>
             <div class="logo-emblem logo-emblem-sm"><%= _fs.site_logo_emblem || 'A' %></div>
           <% } %>
+          <% if (currentUser) { %>
           <span><strong><%= _fs.site_logo_text || 'AIESEC' %></strong> <%= _fs.site_logo_sub || 'İstanbul' %></span>
+          <% } else { %>
+          <span><strong>İstanbul</strong> Alumni Archive</span>
+          <% } %>
         </div>
         <p class="footer-tagline">Liderlik deneyimini paylaş,<br />geleceği birlikte inşa et.</p>
       </div>
@@ -46,7 +50,8 @@
         </ul>
       </div>
 
-      <!-- AIESEC Info -->
+      <!-- AIESEC Info (sadece giriş yapmış kullanıcılara) -->
+      <% if (currentUser) { %>
       <div class="footer-col">
         <h4 class="footer-heading">AIESEC</h4>
         <ul class="footer-links">
@@ -54,8 +59,10 @@
           <li><a href="https://aiesec.org.tr" target="_blank" rel="noopener">aiesec.org.tr</a></li>
         </ul>
       </div>
+      <% } %>
 
-      <!-- Instagram / Sosyal Medya -->
+      <!-- Instagram / Sosyal Medya (sadece giriş yapmış kullanıcılara) -->
+      <% if (currentUser) { %>
       <div class="footer-col" style="grid-column: span 1;">
         <h4 class="footer-heading">Instagram</h4>
         <ul class="footer-links" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.5rem var(--space-4);">
@@ -121,10 +128,15 @@
           </li>
         </ul>
       </div>
+      <% } %>
     </div>
 
     <div class="footer-bottom">
+      <% if (currentUser) { %>
       <p>&copy; <%= new Date().getFullYear() %> <%= _fs.site_logo_text || 'AIESEC' %> <%= _fs.site_logo_sub || 'İstanbul' %> Alumni Archive. Tüm hakları saklıdır. <span style="margin-left: 0.5rem; color: var(--text-muted); font-size: 0.75rem; background: rgba(255,255,255,0.05); padding: 0.15rem 0.4rem; border-radius: 4px; border: 1px solid var(--border); vertical-align: middle; display: inline-block;">v<%= typeof appVersion !== 'undefined' ? appVersion : '1.0.0' %></span></p>
+      <% } else { %>
+      <p>&copy; <%= new Date().getFullYear() %> İstanbul Alumni Archive. Tüm hakları saklıdır.</p>
+      <% } %>
       
       <!-- Dynamic Footer Style Injection -->
       <style>

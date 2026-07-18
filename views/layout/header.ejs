@@ -369,10 +369,17 @@
       <% } else { %>
         <div class="logo-emblem"><%= _s.site_logo_emblem || 'A' %></div>
       <% } %>
+      <% if (currentUser) { %>
       <span class="logo-text">
         <strong><%= _s.site_logo_text || 'AIESEC' %></strong> <%= _s.site_logo_sub || 'İstanbul' %>
         <small><%= _s.site_title || 'Alumni Archive' %></small>
       </span>
+      <% } else { %>
+      <span class="logo-text">
+        <strong>İstanbul</strong>
+        <small>Alumni Archive</small>
+      </span>
+      <% } %>
     </a>
 
     <!-- Hamburger & Mobile Theme Toggle -->
@@ -392,7 +399,8 @@
       <li><a href="/" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'home' ? 'active' : '' %>">Ana Sayfa</a></li>
       <li><a href="/eb" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'eb' ? 'active' : '' %>">EB Takımları</a></li>
 
-      <!-- Instagram Dropdown -->
+      <!-- Instagram Dropdown (sadece giriş yapmış kullanıcılara) -->
+      <% if (currentUser) { %>
       <li class="nav-item-dropdown">
         <a href="#" class="nav-link" style="display: flex; align-items: center; gap: 0.25rem;">
           Instagram
@@ -441,6 +449,7 @@
           </a>
         </div>
       </li>
+      <% } %>
 
       <li><a href="/feedback" class="nav-link nav-link-highlight <%= typeof currentPage !== 'undefined' && currentPage === 'feedback' ? 'active' : '' %>" style="color: var(--primary) !important; font-weight: 600;">Geri Bildirim 💬</a></li>
 
