@@ -102,7 +102,7 @@
     <div class="section-header">
       <span class="section-label">Ekip</span>
       <h2 class="section-title">EB Üyeleri</h2>
-      <p class="section-desc"><%= team.year %> döneminde AIESEC İstanbul'u yöneten liderler.</p>
+      <p class="section-desc"><%= team.year %> döneminde topluluğu yöneten liderler.</p>
     </div>
 
     <% if (members && members.length > 0) { %>
@@ -157,7 +157,7 @@
                 <%# Show all AIESEC roles %>
                 <% if (allRoles.length > 0) { %>
                   <div class="detail-section">
-                    <h4>AIESEC Görevleri</h4>
+                    <h4>Topluluk Görevleri</h4>
                     <% allRoles.forEach(r => { %>
                       <div style="display: flex; gap: 0.5rem; margin-bottom: 0.35rem; font-size: 0.875rem; align-items: center;">
                         <span class="member-role" style="font-size: 0.7rem; padding: 0.1rem 0.5rem; white-space: nowrap;"><%= r.year %></span>
@@ -170,7 +170,7 @@
                 <%# AIESEC journey %>
                 <% if (member.aiesec_journey) { %>
                   <div class="detail-section">
-                    <h4>AIESEC Yolculuğu</h4>
+                    <h4>Topluluk Yolculuğu</h4>
                     <p><%= member.aiesec_journey %></p>
                   </div>
                 <% } %>
