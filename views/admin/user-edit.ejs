@@ -96,8 +96,8 @@
 
       <!-- AIESEC -->
       <div class="form-section">
-        <h3>Topluluk Kariyeri</h3>
-        <p class="form-hint" style="margin-bottom: 1rem;">Geçmiş EB ve diğer topluluk görevlerini ekleyebilirsin. Örn: 26.27 - LCP, 25.26 - LCVP B2C</p>
+        <h3>AIESEC Kariyeri</h3>
+        <p class="form-hint" style="margin-bottom: 1rem;">Geçmiş EB ve diğer AIESEC görevlerini ekleyebilirsin. Örn: 26.27 - LCP, 25.26 - LCVP B2C</p>
         <div id="roles-container">
           <% const roles = (user.roles_history && Array.isArray(user.roles_history) && user.roles_history.length > 0) ? user.roles_history : []; %>
           <% if (roles.length === 0) { %>
@@ -120,7 +120,7 @@
         <button type="button" class="btn btn-outline btn-sm" onclick="addRoleRow()" style="margin-top: 0.5rem; margin-bottom: 1.5rem;">+ Yeni Görev Ekle</button>
 
         <div class="form-group">
-          <label for="aiesec_journey" class="form-label">Topluluk Yolculuğu (Roller, Deneyimler)</label>
+          <label for="aiesec_journey" class="form-label">AIESEC Yolculuğu (Roller, Deneyimler)</label>
           <textarea id="aiesec_journey" name="aiesec_journey" class="form-input" rows="4"><%= user.aiesec_journey || '' %></textarea>
         </div>
       </div>

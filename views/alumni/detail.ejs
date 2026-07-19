@@ -65,7 +65,7 @@
   <% const roles = (person.roles_history && Array.isArray(person.roles_history)) ? person.roles_history.filter(r => r.year || r.role) : []; %>
   <% if (roles.length > 0) { %>
     <div class="profile-card" style="margin-bottom: 1.5rem;">
-      <h3 style="margin-bottom: 1rem;">Topluluk Kariyeri</h3>
+      <h3 style="margin-bottom: 1rem;">AIESEC Kariyeri</h3>
       <div style="display: flex; flex-direction: column; gap: 0.6rem;">
         <% roles.forEach(r => { %>
           <div style="display: flex; gap: 0.75rem; align-items: baseline;">
@@ -79,7 +79,7 @@
 
   <% if (person.aiesec_journey) { %>
     <div class="profile-card" style="margin-bottom: 1.5rem;">
-      <h3 style="margin-bottom: 1rem;">Topluluk Yolculuğu</h3>
+      <h3 style="margin-bottom: 1rem;">AIESEC Yolculuğu</h3>
       <p style="color: var(--text-lighter); line-height: 1.7; white-space: pre-line; margin: 0;"><%= person.aiesec_journey %></p>
     </div>
   <% } %>

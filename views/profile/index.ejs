@@ -9,7 +9,7 @@
       <span>Profilim</span>
     </div>
     <h1 class="page-hero-title">Profilim</h1>
-    <p class="page-hero-sub">Kişisel bilgilerinizi ve topluluk geçmişinizi güncelleyin.</p>
+    <p class="page-hero-sub">Kişisel bilgilerinizi ve AIESEC geçmişinizi güncelleyin.</p>
   </div>
 </section>
 
@@ -121,7 +121,7 @@
       <!-- Mentorluk -->
       <div class="form-section">
         <h3>Mentorluk Programı</h3>
-        <p class="form-hint" style="margin-bottom: 1.5rem;">topluluk ağında diğer mezunlara mentorluk yapabilir ya da mentorluk desteği talep edebilirsiniz.</p>
+        <p class="form-hint" style="margin-bottom: 1.5rem;">AIESEC ağında diğer mezunlara mentorluk yapabilir ya da mentorluk desteği talep edebilirsiniz.</p>
         
         <div style="display: flex; gap: 2rem; margin-bottom: 1.5rem;">
           <label style="display: inline-flex; align-items: center; gap: 0.5rem; color: var(--text); cursor: pointer;">
@@ -184,8 +184,8 @@
 
       <!-- AIESEC -->
       <div class="form-section">
-        <h3>Topluluk Kariyeri</h3>
-        <p class="form-hint" style="margin-bottom: 1rem;">Geçmiş EB ve diğer topluluk görevlerinizi ekleyebilirsiniz. Örn: 26.27 - LCP, 25.26 - LCVP B2C</p>
+        <h3>AIESEC Kariyeri</h3>
+        <p class="form-hint" style="margin-bottom: 1rem;">Geçmiş EB ve diğer AIESEC görevlerinizi ekleyebilirsiniz. Örn: 26.27 - LCP, 25.26 - LCVP B2C</p>
         <div id="roles-container">
           <% const roles = (user.roles_history && Array.isArray(user.roles_history) && user.roles_history.length > 0) ? user.roles_history : [{year: '', role: ''}]; %>
           <% roles.forEach((r) => { %>
@@ -205,8 +205,8 @@
         <button type="button" class="btn btn-outline btn-sm" onclick="addRoleRow()" style="margin-top: 0.5rem; margin-bottom: 1.5rem;">+ Yeni Görev Ekle</button>
 
         <div class="form-group">
-          <label for="aiesec_journey" class="form-label">Topluluk Yolculuğunuz (Roller, Deneyimler)</label>
-          <textarea id="aiesec_journey" name="aiesec_journey" class="form-input" rows="4" placeholder="topluluktaki görevlerinizden kısaca bahsedebilirsiniz..."><%= user.aiesec_journey || '' %></textarea>
+          <label for="aiesec_journey" class="form-label">AIESEC Yolculuğunuz (Roller, Deneyimler)</label>
+          <textarea id="aiesec_journey" name="aiesec_journey" class="form-input" rows="4" placeholder="AIESEC içerisindeki görevlerinizden kısaca bahsedebilirsiniz..."><%= user.aiesec_journey || '' %></textarea>
         </div>
       </div>
 

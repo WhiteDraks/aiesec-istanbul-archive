@@ -80,8 +80,8 @@
           
           <div class="form-group" style="margin: 0;">
             <label for="site_logo_text" class="form-label">Logo Ana Metni</label>
-            <input type="text" id="site_logo_text" name="site_logo_text" class="form-input" value="<%= settings.site_logo_text %>" placeholder="Alumni" style="margin-bottom: 0.35rem;">
-            <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="resetField('site_logo_text', 'Alumni')">↩ Varsayılana Dön</button>
+            <input type="text" id="site_logo_text" name="site_logo_text" class="form-input" value="<%= settings.site_logo_text %>" placeholder="AIESEC" style="margin-bottom: 0.35rem;">
+            <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="resetField('site_logo_text', 'AIESEC')">↩ Varsayılana Dön</button>
           </div>
         </div>
 
@@ -133,7 +133,7 @@
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
           <div class="form-group" style="margin: 0;">
             <label for="hero_title" class="form-label">Hero Başlığı (Normal Metin)</label>
-            <input type="text" id="hero_title" name="hero_title" class="form-input" value="<%= settings.hero_title || 'Alumni' %>" placeholder="Alumni" style="margin-bottom: 0.35rem;">
+            <input type="text" id="hero_title" name="hero_title" class="form-input" value="<%= settings.hero_title || 'Alumni' %>" placeholder="AIESEC" style="margin-bottom: 0.35rem;">
             <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" onclick="resetField('hero_title', 'Alumni')">↩ Varsayılana Dön</button>
           </div>
           <div class="form-group" style="margin: 0;">
@@ -192,8 +192,8 @@
         
         <div class="form-group" style="margin: 0;">
           <label for="email_from" class="form-label">Gönderici Adresi (Resend 'From')</label>
-          <input type="text" id="email_from" name="email_from" class="form-input" value="<%= settings.email_from || 'Alumni Archive <onboarding@resend.dev>' %>" placeholder="İstanbul Alumni Archive <arsiv@aiesec-istanbul.com>" style="margin-bottom: 0.35rem;">
-          <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; margin-bottom: 0.5rem;" onclick="resetField('email_from', 'Alumni Archive <onboarding@resend.dev>')">↩ Varsayılana Dön</button>
+          <input type="text" id="email_from" name="email_from" class="form-input" value="<%= settings.email_from || 'AIESEC Alumni <onboarding@resend.dev>' %>" placeholder="İstanbul Alumni Archive <arsiv@aiesec-istanbul.com>" style="margin-bottom: 0.35rem;">
+          <button type="button" class="btn btn-outline btn-xs" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; margin-bottom: 0.5rem;" onclick="resetField('email_from', 'AIESEC Alumni <onboarding@resend.dev>')">↩ Varsayılana Dön</button>
           <p class="form-hint" style="margin-top: 0.5rem;">
             ⚠️ Resend üzerinde kendi alan adınızı (domain) doğrulamadıysanız bu değerin sonu <strong>&lt;onboarding@resend.dev&gt;</strong> ile bitmelidir. Doğrulanmış alan adınız olduğunda <strong>İstanbul Alumni Archive &lt;arsiv@domaininiz.com&gt;</strong> formatında yazabilirsiniz.
           </p>
