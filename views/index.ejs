@@ -12,7 +12,7 @@
   <div class="container hero-content">
     <div class="hero-badge">
       <span class="badge-dot"></span>
-      AIESEC İstanbul
+      <% if (currentUser) { %>İstanbul Alumni Archive<% } else { %>Alumni Archive<% } %>
     </div>
 
     <h1 class="hero-title">
@@ -22,7 +22,7 @@
     </h1>
 
     <p class="hero-subtitle">
-      <%= siteSettings.hero_subtitle || 'AIESEC İstanbul\'un geçmiş Executive Board dönemlerini, liderlik hikayelerini ve başarılarını keşfedin. Her dönem, bir neslin izlerini taşıyor.' %>
+      <%= siteSettings.hero_subtitle || 'Geçmişin liderlerini, başarılarını ve hikayelerini bir araya getiren dijital arşiv platformu. Her dönem, bir neslin izlerini taşıyor.' %>
     </p>
 
     <div class="hero-actions">
@@ -44,7 +44,7 @@
       </div>
       <div class="stat-divider"></div>
       <div class="stat-item">
-        <span class="stat-num">AIESEC</span>
+        <span class="stat-num"><% if (currentUser) { %>AIESEC<% } else { %>Alumni<% } %></span>
         <span class="stat-label">İstanbul</span>
       </div>
       <div class="stat-divider"></div>
@@ -68,13 +68,13 @@
         <span class="section-label">Hakkımızda</span>
         <h2 class="section-title">Liderlik Mirası</h2>
         <p>
-          AIESEC İstanbul Alumni Archive, organizasyonun köklü tarihini yaşatmak amacıyla
+          İstanbul Alumni Archive, organizasyonun köklü tarihini yaşatmak amacıyla
           oluşturulmuş bir dijital arşivdir. Her Executive Board dönemi; üyelerin
           hikayeleri, başarıları ve katkılarıyla burada kalıcı hale getiriliyor.
         </p>
         <p>
           Bu platformda eski EB üyelerini, görevlerini, okul bilgilerini ve
-          AIESEC yolculuklarını bulabilirsiniz.
+          yolculuklarını bulabilirsiniz.
         </p>
         <a href="/eb" class="btn btn-primary">Tüm Dönemleri Gör</a>
       </div>
@@ -82,7 +82,7 @@
         <div class="intro-card intro-card-blue">
           <div class="intro-card-icon">🌍</div>
           <h3>Global Etki</h3>
-          <p>Dünya genelinde 100+ ülkede faaliyet gösteren AIESEC'in İstanbul ayağı</p>
+          <p>Dünya genelinde 100+ ülkede faaliyet gösteren uluslararası liderlik platformunun İstanbul ayağı</p>
         </div>
         <div class="intro-card intro-card-navy">
           <div class="intro-card-icon">🎯</div>
@@ -106,7 +106,7 @@
       <span class="section-label">Geçmiş Dönemler</span>
       <h2 class="section-title">Executive Board Takımları</h2>
       <p class="section-desc">
-        AIESEC İstanbul'un her dönemde organizasyonu yöneten Executive Board takımlarını keşfedin.
+        İstanbul Alumni Archive'in her dönemde organizasyonu yöneten Executive Board takımlarını keşfedin.
       </p>
     </div>
 
@@ -126,7 +126,7 @@
             <div class="team-card-body">
               <h3 class="team-card-title"><%= team.title %></h3>
               <p class="team-card-desc">
-                <%= team.description ? team.description.substring(0, 100) + (team.description.length > 100 ? '...' : '') : 'AIESEC İstanbul Executive Board dönemi.' %>
+                <%= team.description ? team.description.substring(0, 100) + (team.description.length > 100 ? '...' : '') : 'İstanbul Alumni Archive Executive Board dönemi.' %>
               </p>
               <div class="team-card-footer">
                 <% if (currentUser && isApproved) { %>
