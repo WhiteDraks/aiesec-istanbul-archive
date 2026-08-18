@@ -197,7 +197,7 @@ async function sendAdminNotificationEmail(candidateName, candidateEmail) {
     </div>
   `;
   const html = getEmailTemplate('Yeni Üye Kayıt Başvurusu 🔔', htmlContent);
-  return await sendMailHelper({ to: 'elifkrnz963@gmail.com', subject: 'AIESEC İstanbul Mezunlar Portalı - Yeni Üye Kayıt Başvurusu 🔔', html });
+  return await sendMailHelper({ to: 'lcpist@gmail.com', subject: 'AIESEC İstanbul Mezunlar Portalı - Yeni Üye Kayıt Başvurusu 🔔', html });
 }
 
 module.exports = {
