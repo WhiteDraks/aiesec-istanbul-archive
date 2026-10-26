@@ -18,11 +18,10 @@
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
   <!-- Main Stylesheet -->
   <link rel="stylesheet" href="/css/style.css?v=1.0.5" />
-  <link rel="stylesheet" href="/css/humanize.css?v=1.0.0" />
 
   <!-- Cropper.js for image resizing/cropping -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
@@ -32,23 +31,22 @@
   <style>
     :root {
       <% const _s = (typeof siteSettings !== 'undefined' && siteSettings) ? siteSettings : {}; %>
-      <% const _legacy = ['#090d16', '#111827', '#0a2540', '#037ef3']; %>
-      <% if (_s.theme_primary && !_legacy.includes(String(_s.theme_primary).toLowerCase())) { %>
+      <% if (_s.theme_primary) { %>
         --blue-500: <%= _s.theme_primary %>;
         --blue-600: <%= _s.theme_primary %>dd;
         --blue-700: <%= _s.theme_primary %>bb;
         --primary: <%= _s.theme_primary %>;
         --primary-hover: <%= _s.theme_primary %>ee;
       <% } %>
-      <% if (_s.theme_background && !_legacy.includes(String(_s.theme_background).toLowerCase())) { %>
+      <% if (_s.theme_background) { %>
         --navy-900: <%= _s.theme_background %>;
         --background: <%= _s.theme_background %>;
       <% } %>
-      <% if (_s.theme_surface && !_legacy.includes(String(_s.theme_surface).toLowerCase())) { %>
+      <% if (_s.theme_surface) { %>
         --navy-800: <%= _s.theme_surface %>;
         --surface: <%= _s.theme_surface %>;
       <% } %>
-      <% if (_s.theme_secondary && !_legacy.includes(String(_s.theme_secondary).toLowerCase())) { %>
+      <% if (_s.theme_secondary) { %>
         --navy-700: <%= _s.theme_secondary %>;
         --secondary: <%= _s.theme_secondary %>;
       <% } %>

@@ -1,7 +1,7 @@
 <%- include('./layout/header', { currentPage: 'home' }) %>
 
 <!-- ── Hero Section ── -->
-<section class="hero" id="hero" style="<%= siteSettings.hero_bg_image ? `background-image: linear-gradient(to bottom, rgba(26, 23, 20, 0.78), rgba(26, 23, 20, 0.94)), url('${siteSettings.hero_bg_image}'); background-size: cover; background-position: center; background-attachment: fixed;` : '' %>">
+<section class="hero" id="hero" style="<%= siteSettings.hero_bg_image ? `background-image: linear-gradient(to bottom, rgba(4, 13, 26, 0.8), rgba(4, 13, 26, 0.95)), url('${siteSettings.hero_bg_image}'); background-size: cover; background-position: center; background-attachment: fixed;` : '' %>">
   <div class="hero-bg" style="<%= siteSettings.hero_bg_image ? 'display: none;' : '' %>">
     <div class="hero-orb hero-orb-1"></div>
     <div class="hero-orb hero-orb-2"></div>
@@ -68,38 +68,34 @@
   <div class="container">
     <div class="intro-grid">
       <div class="intro-text">
-        <span class="section-label"><%= siteSettings.about_label || 'Hakkımızda' %></span>
-        <h2 class="section-title"><%= siteSettings.about_title || 'Liderlik Mirası' %></h2>
-        <% if (siteSettings.about_text_1) { %><p><%= siteSettings.about_text_1 %></p><% } else { %>
+        <span class="section-label">Hakkımızda</span>
+        <h2 class="section-title">Liderlik Mirası</h2>
         <p>
           <% if (currentUser) { %>AIESEC İstanbul Alumni Archive<% } else { %>İstanbul Alumni Archive<% } %>, organizasyonun köklü tarihini yaşatmak amacıyla
           oluşturulmuş bir dijital arşivdir. Her Executive Board dönemi; üyelerin
           hikayeleri, başarıları ve katkılarıyla burada kalıcı hale getiriliyor.
         </p>
-        <% } %>
-        <% if (siteSettings.about_text_2) { %><p><%= siteSettings.about_text_2 %></p><% } else { %>
         <p>
           Bu platformda eski EB üyelerini, görevlerini, okul bilgilerini ve
           <% if (currentUser) { %>AIESEC yolculuklarını<% } else { %>yolculuklarını<% } %> bulabilirsiniz.
         </p>
-        <% } %>
         <a href="/eb" class="btn btn-primary">Tüm Dönemleri Gör</a>
       </div>
       <div class="intro-cards">
         <div class="intro-card intro-card-blue">
           <div class="intro-card-icon">🌍</div>
-          <h3><%= siteSettings.card1_title || 'Global Etki' %></h3>
-          <% if (siteSettings.card1_text) { %><p><%= siteSettings.card1_text %></p><% } else { %><p>Dünya genelinde 100+ ülkede faaliyet gösteren <% if (currentUser) { %>AIESEC'in<% } else { %>uluslararası liderlik platformunun<% } %> İstanbul ayağı</p><% } %>
+          <h3>Global Etki</h3>
+          <p>Dünya genelinde 100+ ülkede faaliyet gösteren <% if (currentUser) { %>AIESEC'in<% } else { %>uluslararası liderlik platformunun<% } %> İstanbul ayağı</p>
         </div>
         <div class="intro-card intro-card-navy">
           <div class="intro-card-icon">🎯</div>
-          <h3><%= siteSettings.card2_title || 'Liderlik Gelişimi' %></h3>
-          <p><%= siteSettings.card2_text || 'Her EB üyesi, pratik liderlik deneyimiyle organizasyonu şekillendirdi' %></p>
+          <h3>Liderlik Gelişimi</h3>
+          <p>Her EB üyesi, pratik liderlik deneyimiyle organizasyonu şekillendirdi</p>
         </div>
         <div class="intro-card intro-card-light">
           <div class="intro-card-icon">🤝</div>
-          <h3><%= siteSettings.card3_title || 'Alumni Ağı' %></h3>
-          <p><%= siteSettings.card3_text || 'Güçlü alumni ağıyla birbirine bağlı profesyoneller topluluğu' %></p>
+          <h3>Alumni Ağı</h3>
+          <p>Güçlü alumni ağıyla birbirine bağlı profesyoneller topluluğu</p>
         </div>
       </div>
     </div>
@@ -110,10 +106,10 @@
 <section class="section section-teams" id="teams">
   <div class="container">
     <div class="section-header">
-      <span class="section-label"><%= siteSettings.teams_label || 'Geçmiş Dönemler' %></span>
-      <h2 class="section-title"><%= siteSettings.teams_title || 'Executive Board Takımları' %></h2>
+      <span class="section-label">Geçmiş Dönemler</span>
+      <h2 class="section-title">Executive Board Takımları</h2>
       <p class="section-desc">
-        <% if (siteSettings.teams_desc) { %><%= siteSettings.teams_desc %><% } else { %><% if (currentUser) { %>AIESEC İstanbul'un<% } else { %>İstanbul Alumni Archive'in<% } %> her dönemde organizasyonu yöneten Executive Board takımlarını keşfedin.<% } %>
+        <% if (currentUser) { %>AIESEC İstanbul'un<% } else { %>İstanbul Alumni Archive'in<% } %> her dönemde organizasyonu yöneten Executive Board takımlarını keşfedin.
       </p>
     </div>
 
@@ -173,8 +169,8 @@
         <div class="cta-orb cta-orb-2"></div>
       </div>
       <div class="cta-banner-content">
-        <h2><%= siteSettings.cta_title || 'Topluluğa Katıl' %></h2>
-        <p><%= siteSettings.cta_text || 'Kayıt ol, admin onayından sonra tüm EB detaylarına ve üye bilgilerine eriş.' %></p>
+        <h2>Topluluğa Katıl</h2>
+        <p>Kayıt ol, admin onayından sonra tüm EB detaylarına ve üye bilgilerine eriş.</p>
         <div class="cta-banner-actions">
           <a href="/auth/register" class="btn btn-white btn-lg">Hemen Kayıt Ol</a>
           <a href="/auth/login" class="btn btn-ghost-white btn-lg">Giriş Yap</a>
