@@ -1,0 +1,111 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Gündüz (açık) tema düzeltmeleri — .light-theme sınıfı <html>/<body> üzerinde.
+   header.ejs içindeki temel açık tema değişkenlerini tamamlar: kontrast, hero
+   arka plan görseli, sabit yazılmış (inline) beyaz renkler ve yüzeyler.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+html { color-scheme: dark; }
+html.light-theme { color-scheme: light; }
+
+/* Tarayıcıya ait kontroller (scrollbar, tarih seçici vb.) temaya uysun */
+.light-theme body { background: #f8fafc; color: #0f172a; }
+.light-theme ::selection { background: rgba(3, 126, 243, 0.25); }
+
+/* ── Gece modu: footer yazıları koyu zeminde çok soluktu (kontrast ~2:1) ── */
+.footer-tagline, .footer-links a { color: var(--gray-400); }
+.footer-heading { color: var(--gray-300); }
+.footer-bottom { color: var(--gray-400); }
+.footer-sub { color: var(--gray-500) !important; }
+.footer-links a:hover { color: var(--blue-400); }
+
+/* ── Hero: arka plan görseli üzerindeki koyu örtü temaya göre değişir ── */
+.hero.has-bg-image { background-size: cover; background-position: center; background-attachment: fixed; }
+.hero.has-bg-image::before {
+  content: ''; position: absolute; inset: 0; z-index: 0;
+  background: linear-gradient(to bottom, rgba(4, 13, 26, 0.8), rgba(4, 13, 26, 0.95));
+}
+.light-theme .hero.has-bg-image::before {
+  background: linear-gradient(to bottom, rgba(248, 250, 252, 0.9), rgba(248, 250, 252, 0.97));
+}
+.hero .hero-content, .hero .hero-scroll-indicator { position: relative; z-index: 1; }
+
+/* ── Düşük kontrastlı metinler ── */
+.light-theme .section-label,
+.light-theme .hero-badge { color: #0b5fc4 !important; }
+.light-theme .hero-badge { background: rgba(3, 126, 243, 0.08); border-color: rgba(3, 126, 243, 0.25); }
+.light-theme .btn-outline { color: #0b5fc4; border-color: #0b5fc4; }
+.light-theme .btn-outline:hover { background: var(--blue-500); border-color: var(--blue-500); color: #fff !important; }
+.light-theme .btn-primary,
+.light-theme .btn-primary:hover { color: #fff !important; }
+.light-theme .table-link, .light-theme .detail-link-linkedin { color: #0b5fc4; }
+.light-theme .nav-link-highlight { color: #0b5fc4 !important; }
+.light-theme .nav-link-admin, .light-theme .nav-link-admin:hover { color: #b45309 !important; }
+
+/* Footer imzası: yönetici beyaz seçmiş olsa bile açık zeminde okunur kalsın */
+.light-theme .footer-credit-text { color: #334155 !important; text-shadow: none !important; }
+.light-theme .footer-credit-text[style*="transparent"] { -webkit-text-fill-color: transparent; }
+.light-theme .footer { background: #f1f5f9; border-top: 1px solid rgba(15, 23, 42, 0.08); }
+.light-theme .footer-heading { color: #0f172a; }
+.light-theme .footer-links a, .light-theme .footer-tagline { color: #475569; }
+.light-theme .footer-links a:hover { color: #0b5fc4; }
+.light-theme .footer-bottom { border-top-color: rgba(15, 23, 42, 0.08); color: #475569; }
+.light-theme .footer-sub { color: #64748b !important; }
+
+/* ── Ortak bileşen yüzeyleri ── */
+.light-theme .member-card, .light-theme .year-card, .light-theme .detail-section,
+.light-theme .admin-stat, .light-theme .admin-table-wrap, .light-theme .auth-container,
+.light-theme .access-notice, .light-theme .achievement-item, .light-theme .pending-card,
+.light-theme .empty-state, .light-theme .member-details {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.1);
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.05);
+  color: #1e293b;
+}
+.light-theme .admin-stat-pending  { background: #fffbeb; }
+.light-theme .admin-stat-approved { background: #f0fdf4; }
+.light-theme .admin-stat-rejected { background: #fef2f2; }
+.light-theme .admin-stat-total    { background: #eff6ff; }
+.light-theme .admin-table th { background: #f1f5f9; }
+.light-theme .admin-row:hover td { background: rgba(15, 23, 42, 0.03); }
+.light-theme .admin-tab { color: #475569; }
+.light-theme .admin-tab.active { color: #0b5fc4; }
+.light-theme .auth-panel-left { background: #eaf2fd; }
+.light-theme .auth-panel-quote, .light-theme .auth-brand { color: #0f172a; }
+.light-theme .member-name, .light-theme .year-card-title, .light-theme .team-card-title { color: #0f172a; }
+.light-theme .member-role, .light-theme .member-dept, .light-theme .member-meta,
+.light-theme .year-card-desc, .light-theme .team-card-desc { color: #475569; }
+.light-theme .team-card-year, .light-theme .year-badge, .light-theme .eb-year-badge { color: #fff; }
+.light-theme .detail-link { color: #1e293b; border-color: rgba(15, 23, 42, 0.15); background: rgba(15, 23, 42, 0.03); }
+.light-theme .flash { color: #0f172a; }
+.light-theme .form-label { color: #1e293b; }
+.light-theme .form-input::placeholder, .light-theme textarea::placeholder { color: #94a3b8; }
+.light-theme select, .light-theme textarea, .light-theme input[type="text"], .light-theme input[type="email"],
+.light-theme input[type="password"], .light-theme input[type="url"], .light-theme input[type="tel"],
+.light-theme input[type="date"], .light-theme input[type="datetime-local"], .light-theme input[type="number"] {
+  background: #f8fafc; color: #0f172a; border-color: rgba(15, 23, 42, 0.15);
+}
+
+/* EB kapak / hero görselleri üzerindeki yazılar koyu örtü üstünde kaldığı için beyaz kalır */
+.light-theme .eb-hero-content, .light-theme .eb-hero-title, .light-theme .eb-hero-desc,
+.light-theme .team-card-overlay, .light-theme .year-card-overlay { color: #fff; }
+.light-theme .eb-hero-content .breadcrumb, .light-theme .eb-hero-content .breadcrumb a { color: rgba(255,255,255,0.85); }
+
+/* ── Sayfa içine sabit yazılmış (inline) renkler ── */
+.light-theme [style*="color: #fff"]:not(.btn):not(.btn-primary):not([style*="background: var(--primary)"]),
+.light-theme [style*="color:#fff"]:not(.btn):not(.btn-primary),
+.light-theme [style*="color: white"]:not(.btn) { color: #0f172a !important; }
+
+.light-theme [style*="background: rgba(255,255,255,0.0"],
+.light-theme [style*="background: rgba(255, 255, 255, 0.0"],
+.light-theme [style*="background:rgba(255,255,255,0.0"] { background: rgba(15, 23, 42, 0.04) !important; }
+.light-theme [style*="border-color: rgba(255,255,255,0.1"],
+.light-theme [style*="border: 1px solid rgba(255,255,255,0.1"],
+.light-theme [style*="border: 1px solid rgba(255, 255, 255, 0.1"] { border-color: rgba(15, 23, 42, 0.12) !important; }
+
+/* Geri bildirim penceresi ve kırpma penceresi */
+.light-theme #feedback-widget-card { background: #fff !important; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18) !important; }
+.light-theme #feedback-widget-trigger { color: #fff !important; }
+.light-theme .dropdown-menu .dropdown-item svg { color: #0b5fc4 !important; }
+
+/* Koyu kalan, görsel üzerindeki düğmeler (kapak değiştir vb.) okunur kalsın */
+.light-theme .btn[style*="rgba(4,13,26"], .light-theme .btn[style*="rgba(4, 13, 26"] { color: #fff !important; border-color: rgba(255,255,255,0.5) !important; }

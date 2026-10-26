@@ -315,7 +315,9 @@
   <script>
     (function() {
       try {
-        const savedTheme = localStorage.getItem('theme');
+        // Kayıtlı tercih yoksa cihazın gece/gündüz ayarı kullanılır
+        const savedTheme = localStorage.getItem('theme')
+          || (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
         if (savedTheme === 'light') {
           document.documentElement.classList.add('light-theme');
         }
@@ -335,24 +337,29 @@
       document.querySelectorAll('.theme-toggle-icon-shared').forEach(icon => {
         icon.innerText = isLight ? '☀️' : '🌙';
       });
+      document.querySelectorAll('[data-theme-toggle]').forEach(b => {
+        b.setAttribute('aria-label', isLight ? 'Gece moduna geç' : 'Gündüz moduna geç');
+        b.setAttribute('title', isLight ? 'Gece moduna geç' : 'Gündüz moduna geç');
+      });
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      let isLight = false;
-      try {
-        const savedTheme = localStorage.getItem('theme');
-        isLight = savedTheme === 'light';
-      } catch (e) {
-        console.warn('LocalStorage is blocked by security settings:', e);
-      }
+      // <head> betiğinin <html> üzerine koyduğu sınıf tek doğru kaynaktır
+      const isLight = document.documentElement.classList.contains('light-theme');
       if (isLight) {
         document.body.classList.add('light-theme');
       }
+      document.querySelectorAll('[data-theme-toggle]').forEach(b => {
+        b.setAttribute('aria-label', isLight ? 'Gece moduna geç' : 'Gündüz moduna geç');
+        b.setAttribute('title', isLight ? 'Gece moduna geç' : 'Gündüz moduna geç');
+      });
       document.querySelectorAll('.theme-toggle-icon-shared').forEach(icon => {
         icon.innerText = isLight ? '☀️' : '🌙';
       });
     });
   </script>
+
+  <link rel="stylesheet" href="/css/theme-light.css?v=1.0.0" />
 
   <!-- Favicon -->
   <link class="favicon-icon" rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
@@ -378,7 +385,7 @@
     <!-- Hamburger & Mobile Theme Toggle -->
     <div style="display: flex; align-items: center; gap: 0.5rem;">
       <div class="theme-toggle-mobile-wrap">
-        <button onclick="toggleTheme()" class="btn btn-outline" style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; padding: 0; min-height: unset; cursor: pointer; border-radius: 50%; border-color: rgba(255,255,255,0.15); background: transparent;">
+        <button onclick="toggleTheme()" data-theme-toggle class="btn btn-outline" style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; padding: 0; min-height: unset; cursor: pointer; border-radius: 50%; border-color: rgba(255,255,255,0.15); background: transparent;">
           <span class="theme-toggle-icon-shared" style="font-size: 0.95rem; line-height: 1;">🌙</span>
         </button>
       </div>
@@ -479,7 +486,7 @@
         <li><a href="/auth/login" class="btn btn-primary btn-sm" id="nav-login-btn">Giriş Yap</a></li>
       <% } %>
       <li style="display: flex; align-items: center; margin-left: 0.5rem;">
-        <button id="theme-toggle-btn" onclick="toggleTheme()" class="btn btn-outline" style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; padding: 0; min-height: unset; cursor: pointer; border-radius: 50%; border-color: rgba(255,255,255,0.15); background: transparent;">
+        <button id="theme-toggle-btn" data-theme-toggle onclick="toggleTheme()" class="btn btn-outline" style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; padding: 0; min-height: unset; cursor: pointer; border-radius: 50%; border-color: rgba(255,255,255,0.15); background: transparent;">
           <span class="theme-toggle-icon-shared" style="font-size: 0.95rem; line-height: 1;">🌙</span>
         </button>
       </li>
