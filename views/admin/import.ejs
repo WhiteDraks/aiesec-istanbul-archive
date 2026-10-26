@@ -1,0 +1,135 @@
+<%- include('../layout/header', { currentPage: 'admin' }) %>
+
+<section class="page-hero page-hero-sm page-hero-admin">
+  <div class="page-hero-bg"></div>
+  <div class="container">
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 class="page-hero-title">Excel ile EB Verisi</h1>
+        <p class="page-hero-sub">EB üyelerini ve dönemlerini toplu içe/dışa aktarın</p>
+      </div>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <a href="/admin/eb" class="btn btn-outline">◀ EB Yönetimi</a>
+        <a href="/admin" class="btn btn-outline">Admin Paneli</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-admin">
+  <div class="container" style="display: grid; gap: 2rem;">
+
+    <% if (!pending) { %>
+      <div class="detail-section" style="padding: 1.5rem;">
+        <h2 class="section-title-sm">1. Şablonu indirin</h2>
+        <p class="form-hint">Şablonda örnek satırlar ve açıklamalar var. Aynı kişi birden fazla dönemde görev aldıysa her dönem için ayrı satır ekleyin.</p>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.75rem;">
+          <a href="/admin/import/template" class="btn btn-primary">⬇ Boş şablonu indir (.xlsx)</a>
+          <a href="/admin/import/export" class="btn btn-outline">⬇ Mevcut EB verisini indir (.xlsx)</a>
+        </div>
+        <p class="form-hint" style="margin-top: 0.75rem;">İpucu: Mevcut veriyi indirip Excel'de düzenleyerek aynı dosyayı geri yükleyebilirsiniz.</p>
+      </div>
+
+      <div class="detail-section" style="padding: 1.5rem;">
+        <h2 class="section-title-sm">2. Dolu dosyayı yükleyin</h2>
+        <p class="form-hint">Dosya önce <strong>kontrol edilir ve önizleme gösterilir</strong>; siz onaylamadan hiçbir şey kaydedilmez.</p>
+        <form action="/admin/import/preview" method="POST" enctype="multipart/form-data" class="auth-form" style="margin-top: 1rem; max-width: 520px;">
+          <div class="form-group">
+            <label class="form-label" for="file">Excel dosyası (.xlsx, en fazla 5 MB)</label>
+            <input class="form-input" type="file" id="file" name="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Dosyayı kontrol et</button>
+        </form>
+      </div>
+
+      <div class="detail-section" style="padding: 1.5rem;">
+        <h2 class="section-title-sm">Kurallar</h2>
+        <ul style="margin-left: 1.1rem; list-style: disc; display: grid; gap: 0.35rem;">
+          <li>Zorunlu sütunlar: <strong>Ad Soyad</strong>, <strong>Dönem</strong> (2025-2026), <strong>Görev</strong>.</li>
+          <li>Kişi, e-postayla mevcut kullanıcıyla eşleşir (e-posta yoksa tam adla). Eşleşme yoksa yeni, <strong>onaylı</strong> bir kişi oluşturulur ve EB sayfalarında görünür.</li>
+          <li>Mevcut kullanıcıların dolu bilgileri <strong>değiştirilmez</strong>; yalnızca boş alanlar doldurulur ve yeni dönem/görevler eklenir. Admin yetkileri hiçbir zaman değişmez.</li>
+          <li>Yeni kişiler parolayla giriş yapamaz; "Şifremi unuttum" ile hesaplarını sahiplenebilirler. Telefonlar varsayılan olarak gizlidir.</li>
+        </ul>
+      </div>
+    <% } else { %>
+      <% const s = plan.summary; %>
+      <div class="detail-section" style="padding: 1.5rem;">
+        <h2 class="section-title-sm">Önizleme: <%= pending.fileName %></h2>
+        <p class="form-hint">Henüz hiçbir şey kaydedilmedi. Aşağıdaki özeti kontrol edip onaylayın.</p>
+        <div class="admin-stats" style="margin-top: 1rem;">
+          <div class="admin-stat admin-stat-approved"><div class="admin-stat-num"><%= s.create %></div><div class="admin-stat-label">Yeni kişi</div></div>
+          <div class="admin-stat admin-stat-total"><div class="admin-stat-num"><%= s.update %></div><div class="admin-stat-label">Güncellenecek kişi</div></div>
+          <div class="admin-stat admin-stat-pending"><div class="admin-stat-num"><%= s.nochange + s.skip %></div><div class="admin-stat-label">Değişmeyen / atlanan</div></div>
+          <div class="admin-stat admin-stat-total"><div class="admin-stat-num"><%= s.newTeams %></div><div class="admin-stat-label">Yeni dönem</div></div>
+          <div class="admin-stat admin-stat-rejected"><div class="admin-stat-num"><%= pending.parsed.errors.length %></div><div class="admin-stat-label">Hatalı satır</div></div>
+        </div>
+        <% if (plan.newTeams.length) { %><p class="form-hint">Oluşturulacak dönemler: <%= plan.newTeams.join(', ') %></p><% } %>
+        <% if (s.teamUpdates) { %><p class="form-hint">"Dönemler" sayfasından <%= s.teamUpdates %> dönemin başlık/açıklama/başarıları güncellenecek.</p><% } %>
+
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;">
+          <% if (s.create + s.update + s.teamUpdates + s.newTeams > 0) { %>
+            <form action="/admin/import/apply" method="POST" onsubmit="return confirm('Bu değişiklikler sitede uygulanacak. Onaylıyor musunuz?')">
+              <button type="submit" class="btn btn-primary">✓ Onayla ve içe aktar</button>
+            </form>
+          <% } %>
+          <form action="/admin/import/cancel" method="POST"><button type="submit" class="btn btn-outline">İptal</button></form>
+        </div>
+      </div>
+
+      <% if (pending.parsed.errors.length) { %>
+        <div class="detail-section" style="padding: 1.5rem;">
+          <h3 class="section-title-sm">Hatalı satırlar (atlanacak)</h3>
+          <div class="admin-table-wrap"><table class="admin-table">
+            <thead><tr><th>Satır</th><th>Kişi</th><th>Sorun</th></tr></thead>
+            <tbody>
+              <% pending.parsed.errors.slice(0, 100).forEach(e => { %>
+                <tr class="admin-row"><td><%= e.sheet ? e.sheet + ' · ' : '' %><%= e.line %></td><td><%= e.name || '—' %></td><td><%= e.message %></td></tr>
+              <% }) %>
+            </tbody>
+          </table></div>
+        </div>
+      <% } %>
+
+      <% if (pending.parsed.warnings.length) { %>
+        <div class="detail-section" style="padding: 1.5rem;">
+          <h3 class="section-title-sm">Uyarılar</h3>
+          <ul style="margin-left: 1.1rem; list-style: disc;">
+            <% pending.parsed.warnings.slice(0, 50).forEach(w => { %><li>Satır <%= w.line %> — <%= w.name %>: <%= w.message %></li><% }) %>
+          </ul>
+        </div>
+      <% } %>
+
+      <div class="detail-section" style="padding: 1.5rem;">
+        <h3 class="section-title-sm">Kişiler (<%= plan.items.length %>)</h3>
+        <div class="admin-table-wrap"><table class="admin-table">
+          <thead><tr><th>İşlem</th><th>Ad Soyad</th><th>E-posta</th><th>Dönem / Görev</th><th>Not</th></tr></thead>
+          <tbody>
+            <% plan.items.slice(0, 300).forEach(it => { %>
+              <tr class="admin-row">
+                <td>
+                  <% if (it.action === 'create') { %><span class="tab-badge tab-badge-approved">Yeni</span>
+                  <% } else if (it.action === 'update') { %><span class="tab-badge tab-badge-pending">Güncelle</span>
+                  <% } else if (it.action === 'skip') { %><span class="tab-badge tab-badge-rejected">Atla</span>
+                  <% } else { %><span class="tab-badge">Aynı</span><% } %>
+                </td>
+                <td><%= it.person.name %></td>
+                <td><%= it.person.email || '—' %></td>
+                <td><%= it.person.roles.map(r => r.year + ': ' + r.role).join(' · ') %></td>
+                <td style="font-size: 0.85rem;">
+                  <% if (it.action === 'update') { %>
+                    <%= it.added ? it.added + ' yeni dönem' : '' %><%= it.changed ? ' ' + it.changed + ' görev değişti' : '' %><%= it.fills && it.fills.length ? ' · boş alan doldurulur: ' + it.fills.length : '' %>
+                  <% } %>
+                  <%= it.note || '' %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table></div>
+        <% if (plan.items.length > 300) { %><p class="form-hint">İlk 300 kişi gösteriliyor; onayladığınızda tamamı işlenir.</p><% } %>
+      </div>
+    <% } %>
+
+  </div>
+</section>
+
+<%- include('../layout/footer') %>

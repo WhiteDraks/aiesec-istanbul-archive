@@ -211,6 +211,7 @@ app.use('/',         require('./routes/index'));
 app.post('/auth/login', loginAccountLimiter);
 app.use('/auth',     authLimiter, require('./routes/auth'));  // Rate limit tüm auth rotalarına
 app.use('/eb',       require('./routes/eb'));
+app.use('/admin/import', require('./routes/admin-import'));
 app.use('/admin',    require('./routes/admin'));
 app.use('/admin/eb', require('./routes/admin-eb'));
 app.use('/timeline', require('./routes/timeline'));
