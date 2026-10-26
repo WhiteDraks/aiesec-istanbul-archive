@@ -317,7 +317,7 @@
 
 <%- include('../layout/footer') %>
 
-<script>
+<script nonce="<%= typeof cspNonce !== 'undefined' ? cspNonce : '' %>">
 function toggleEditAchievementsForm() {
   const formWrap = document.getElementById('edit-achievements-form-wrap');
   if (formWrap) {

@@ -305,7 +305,7 @@
 }
 </style>
 
-<script>
+<script nonce="<%= typeof cspNonce !== 'undefined' ? cspNonce : '' %>">
 function toggleCustomLocation(type) {
   const select = document.getElementById(type);
   const customInput = document.getElementById(type + '_custom');

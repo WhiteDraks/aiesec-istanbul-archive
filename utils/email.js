@@ -1,5 +1,6 @@
 const { Resend } = require('resend');
 const nodemailer = require('nodemailer');
+const { esc, SITE_URL } = require('./escape');
 
 // Resend ve SMTP istemcilerini ortam değişkenlerine göre başlat
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -28,7 +29,7 @@ function getEmailTemplate(title, content) {
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>${title}</title>
+      <title>${esc(title)}</title>
     </head>
     <body style="margin: 0; padding: 0; background-color: #f4f6f9; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
       <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f6f9; padding: 20px 0;">
@@ -135,11 +136,11 @@ async function sendMailHelper({ to, subject, html }) {
  */
 async function sendApprovalEmail(email, name) {
   const htmlContent = `
-    <h2 style="color: #111827; font-size: 20px; margin-top: 0;">Merhaba ${name},</h2>
+    <h2 style="color: #111827; font-size: 20px; margin-top: 0;">Merhaba ${esc(name)},</h2>
     <p>AIESEC İstanbul Alumni Archive sistemine yaptığınız kayıt başvurusu <strong>başarıyla onaylanmıştır!</strong></p>
     <p>Artık sisteme giriş yapabilir, geçmiş dönem takımlarını detaylıca inceleyebilir, diğer mezunların bilgilerine "Mezunlar Rehberi" üzerinden erişebilir ve kendi profil bilgilerinizi güncelleyebilirsiniz.</p>
     <div style="text-align: center; margin: 35px 0;">
-      <a href="https://aiesec-istanbul-archive.vercel.app/auth/login" style="background-color: #037ef3; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px rgba(3,126,243,0.2);">Sisteme Giriş Yap</a>
+      <a href="${SITE_URL}/auth/login" style="background-color: #037ef3; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px rgba(3,126,243,0.2);">Sisteme Giriş Yap</a>
     </div>
     <p style="margin-bottom: 0;">Aramıza tekrar hoş geldiniz!</p>
   `;
@@ -152,11 +153,11 @@ async function sendApprovalEmail(email, name) {
  */
 async function sendResetPasswordEmail(email, name, resetLink) {
   const htmlContent = `
-    <h2 style="color: #111827; font-size: 20px; margin-top: 0;">Merhaba ${name},</h2>
+    <h2 style="color: #111827; font-size: 20px; margin-top: 0;">Merhaba ${esc(name)},</h2>
     <p>Hesabınız için şifre sıfırlama talebinde bulundunuz.</p>
     <p>Aşağıdaki bağlantıya tıklayarak yeni şifrenizi belirleyebilirsiniz. Bu bağlantı güvenlik nedeniyle <strong>1 saat</strong> geçerli kalacaktır:</p>
     <div style="text-align: center; margin: 35px 0;">
-      <a href="${resetLink}" style="background-color: #037ef3; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px rgba(3,126,243,0.2);">Şifremi Sıfırla</a>
+      <a href="${esc(resetLink)}" style="background-color: #037ef3; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px rgba(3,126,243,0.2);">Şifremi Sıfırla</a>
     </div>
     <p style="margin-bottom: 0; color: #6b7280; font-size: 14px;">Eğer bu talebi siz yapmadıysanız bu e-postayı görmezden gelebilirsiniz.</p>
   `;
@@ -169,7 +170,7 @@ async function sendResetPasswordEmail(email, name, resetLink) {
  */
 async function sendWelcomePendingEmail(email, name) {
   const htmlContent = `
-    <h2 style="color: #111827; font-size: 20px; margin-top: 0;">Merhaba ${name},</h2>
+    <h2 style="color: #111827; font-size: 20px; margin-top: 0;">Merhaba ${esc(name)},</h2>
     <p>AIESEC İstanbul Alumni Archive platformuna yaptığınız kayıt talebi <strong>başarıyla alınmıştır.</strong></p>
     <p>Üyeliğinizin doğrulanması ve platformun güvenli kalması amacıyla başvurunuz yöneticilerimiz tarafından incelemeye alınmıştır.</p>
     <p>Hesabınız onaylandığında giriş yapabilmeniz için size yeni bir onay e-postası göndereceğiz.</p>
@@ -188,12 +189,12 @@ async function sendAdminNotificationEmail(candidateName, candidateEmail) {
     <p>AIESEC İstanbul Alumni Archive sistemine yeni bir üye adayı kayıt başvurusu yapmıştır.</p>
     <p><strong>Aday Detayları:</strong></p>
     <ul>
-      <li><strong>Ad Soyad:</strong> ${candidateName}</li>
-      <li><strong>E-posta:</strong> ${candidateEmail}</li>
+      <li><strong>Ad Soyad:</strong> ${esc(candidateName)}</li>
+      <li><strong>E-posta:</strong> ${esc(candidateEmail)}</li>
     </ul>
     <p>Başvuruyu değerlendirmek, onaylamak veya reddetmek için lütfen admin paneline giriş yapınız:</p>
     <div style="text-align: center; margin: 35px 0;">
-      <a href="https://aiesec-istanbul-archive.vercel.app/admin" style="background-color: #037ef3; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px rgba(3,126,243,0.2);">Admin Paneline Git</a>
+      <a href="${SITE_URL}/admin" style="background-color: #037ef3; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px rgba(3,126,243,0.2);">Admin Paneline Git</a>
     </div>
   `;
   const html = getEmailTemplate('Yeni Üye Kayıt Başvurusu 🔔', htmlContent);

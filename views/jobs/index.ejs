@@ -138,7 +138,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="<%= typeof cspNonce !== 'undefined' ? cspNonce : '' %>">
   function openJobModal() {
     const modal = document.getElementById('jobModal');
     const container = document.getElementById('jobModalContainer');

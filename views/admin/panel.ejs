@@ -333,7 +333,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="<%= typeof cspNonce !== 'undefined' ? cspNonce : '' %>">
 function openDigestModal() {
   document.getElementById('digestModal').style.display = 'flex';
 }

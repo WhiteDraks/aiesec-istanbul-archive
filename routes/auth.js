@@ -2,8 +2,10 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const crypto = require('crypto');
+const { SITE_URL } = require('../utils/escape');
 const { str, isSafeLocalPath } = require('../utils/security');
 const { stripTags } = require('../utils/sanitize');
+const { revokeUserSessions } = require('../utils/sessions');
 
 const sha256 = (v) => crypto.createHash('sha256').update(v).digest('hex');
 // Kullanıcı bulunamadığında da bcrypt çalıştırılır; böylece yanıt süresinden e-posta kaydı sızmaz
@@ -74,14 +76,9 @@ router.post('/register', async (req, res) => {
     // Check if email already exists
     const existingUser = await User.findByEmail(email);
     if (existingUser) {
-      const EBTeam = require('../models/EBTeam');
-      const dbTeams = await EBTeam.findAll();
-      return res.render('auth/register', {
-        title: 'Kayıt Ol - AIESEC İstanbul',
-        errors: ['Bu e-posta adresi zaten kayıtlıdır.'],
-        formData: { name, email, school, ebYear, ebRole },
-        dbTeams
-      });
+      // Hesabın var olduğunu ifşa etmemek için yeni kayıtla aynı yanıtı ver (kayıt oluşturma/e-posta yok)
+      req.flash('success', 'Kaydınız başarıyla alındı! Admin onayı bekleniyor. Onay sonrası giriş yapabilirsiniz.');
+      return res.redirect('/auth/login');
     }
 
     await User.create({
@@ -240,7 +237,7 @@ router.post('/forgot-password', async (req, res) => {
 
     // Send email
     const { sendResetPasswordEmail } = require('../utils/email');
-    const resetLink = `https://aiesec-istanbul-archive.vercel.app/auth/reset-password?token=${token}&email=${encodeURIComponent(user.email)}`;
+    const resetLink = `${SITE_URL}/auth/reset-password?token=${token}&email=${encodeURIComponent(user.email)}`;
     await sendResetPasswordEmail(user.email, user.name, resetLink);
 
     req.flash('success', genericMsg);
@@ -339,6 +336,7 @@ router.post('/reset-password', async (req, res) => {
           reset_token_expires = NULL
       WHERE id = ${userId}
     `;
+    await revokeUserSessions(userId);
 
     req.flash('success', 'Şifreniz başarıyla güncellendi! Yeni şifrenizle giriş yapabilirsiniz.');
     res.redirect('/auth/login');

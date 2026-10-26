@@ -1,4 +1,5 @@
 const { getSQL } = require('../config/database');
+const { esc, SITE_URL } = require('./escape');
 const { sendMailHelper } = require('./email');
 
 async function sendWeeklyDigest(customSubject = null, customIntro = null, extraTitle = null, extraContent = null, targetYears = null) {
@@ -78,7 +79,7 @@ async function sendWeeklyDigest(customSubject = null, customIntro = null, extraT
 
   if (customIntro && customIntro.trim()) {
     htmlContent += `
-      <div style="margin-bottom: 2rem; padding: 1.25rem; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); font-size: 0.95rem; line-height: 1.6; color: #f3f4f6; white-space: pre-wrap;">${customIntro}</div>
+      <div style="margin-bottom: 2rem; padding: 1.25rem; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); font-size: 0.95rem; line-height: 1.6; color: #f3f4f6; white-space: pre-wrap;">${esc(customIntro)}</div>
     `;
   }
 
@@ -91,8 +92,8 @@ async function sendWeeklyDigest(customSubject = null, customIntro = null, extraT
     newAlumni.forEach(al => {
       htmlContent += `
         <div style="background-color: #111827; padding: 0.75rem; border-radius: 8px; text-align: center; border: 1px solid #1f2937;">
-          <h4 style="margin: 0.5rem 0 0.25rem 0; color: #fff; font-size: 0.9rem;">${al.name}</h4>
-          <span style="font-size: 0.75rem; color: #037ef3;">EB ${al.eb_year || ''}</span>
+          <h4 style="margin: 0.5rem 0 0.25rem 0; color: #fff; font-size: 0.9rem;">${esc(al.name)}</h4>
+          <span style="font-size: 0.75rem; color: #037ef3;">EB ${esc(al.eb_year || '')}</span>
         </div>
       `;
     });
@@ -107,9 +108,9 @@ async function sendWeeklyDigest(customSubject = null, customIntro = null, extraT
     newJobs.forEach(job => {
       htmlContent += `
         <div style="background-color: #111827; padding: 1rem; border-radius: 8px; border: 1px solid #1f2937; margin-bottom: 0.75rem;">
-          <h3 style="margin: 0 0 0.25rem 0; color: #fff; font-size: 1.05rem;">${job.title}</h3>
-          <h4 style="margin: 0 0 0.5rem 0; color: #10b981; font-size: 0.9rem;">${job.company}</h4>
-          <p style="margin: 0; color: #9ca3af; font-size: 0.85rem; line-height: 1.4;">${job.description.substring(0, 120)}...</p>
+          <h3 style="margin: 0 0 0.25rem 0; color: #fff; font-size: 1.05rem;">${esc(job.title)}</h3>
+          <h4 style="margin: 0 0 0.5rem 0; color: #10b981; font-size: 0.9rem;">${esc(job.company)}</h4>
+          <p style="margin: 0; color: #9ca3af; font-size: 0.85rem; line-height: 1.4;">${esc(job.description.substring(0, 120))}...</p>
         </div>
       `;
     });
@@ -124,8 +125,8 @@ async function sendWeeklyDigest(customSubject = null, customIntro = null, extraT
     newMemories.forEach(mem => {
       htmlContent += `
         <div style="background-color: #111827; padding: 1rem; border-radius: 8px; border: 1px solid #1f2937; margin-bottom: 0.75rem;">
-          <p style="margin: 0 0 0.5rem 0; color: #f3f4f6; font-size: 0.9rem; font-style: italic;">"${mem.caption || ''}"</p>
-          <span style="font-size: 0.75rem; color: #9ca3af;">— ${mem.user_name} (${mem.team_year} Dönemi)</span>
+          <p style="margin: 0 0 0.5rem 0; color: #f3f4f6; font-size: 0.9rem; font-style: italic;">"${esc(mem.caption || '')}"</p>
+          <span style="font-size: 0.75rem; color: #9ca3af;">— ${esc(mem.user_name)} (${esc(mem.team_year)} Dönemi)</span>
         </div>
       `;
     });
@@ -136,8 +137,8 @@ async function sendWeeklyDigest(customSubject = null, customIntro = null, extraT
   if (extraTitle && extraTitle.trim() || extraContent && extraContent.trim()) {
     htmlContent += `
       <div style="margin-bottom: 2rem;">
-        <h2 style="color: #fff; font-size: 1.2rem; border-left: 4px solid #a78bfa; padding-left: 0.5rem; margin-bottom: 1rem;">${extraTitle ? extraTitle.trim() : '📌 Editörden'}</h2>
-        <div style="background-color: #111827; padding: 1.25rem; border-radius: 8px; border: 1px solid #1f2937; font-size: 0.9rem; line-height: 1.7; color: #f3f4f6; white-space: pre-wrap;">${extraContent ? extraContent.trim() : ''}</div>
+        <h2 style="color: #fff; font-size: 1.2rem; border-left: 4px solid #a78bfa; padding-left: 0.5rem; margin-bottom: 1rem;">${extraTitle ? esc(extraTitle.trim()) : '📌 Editörden'}</h2>
+        <div style="background-color: #111827; padding: 1.25rem; border-radius: 8px; border: 1px solid #1f2937; font-size: 0.9rem; line-height: 1.7; color: #f3f4f6; white-space: pre-wrap;">${extraContent ? esc(extraContent.trim()) : ''}</div>
       </div>
     `;
   }
@@ -145,7 +146,7 @@ async function sendWeeklyDigest(customSubject = null, customIntro = null, extraT
   htmlContent += `
       <div style="text-align: center; border-top: 1px solid #1f2937; padding-top: 1.5rem; margin-top: 2rem; font-size: 0.8rem; color: #6b7280;">
         <p>AIESEC İstanbul Mezunlar Arşivi topluluk bültenidir.</p>
-        <p style="margin: 0.25rem 0 0 0;">Yeni gelişmeleri kaçırmamak için <a href="https://aiesec-istanbul-archive.vercel.app" style="color: #037ef3; text-decoration: none;">Platformu Ziyaret Edin</a>.</p>
+        <p style="margin: 0.25rem 0 0 0;">Yeni gelişmeleri kaçırmamak için <a href="${SITE_URL}" style="color: #037ef3; text-decoration: none;">Platformu Ziyaret Edin</a>.</p>
       </div>
     </div>
   `;

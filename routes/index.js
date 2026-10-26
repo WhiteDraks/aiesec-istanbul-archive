@@ -46,7 +46,7 @@ router.get('/', async (req, res) => {
 // GET /sitemap.xml - Dynamic XML sitemap for search engines
 router.get('/sitemap.xml', async (req, res) => {
   try {
-    const domain = 'https://aiesec-istanbul-archive.vercel.app';
+    const domain = require('../utils/escape').SITE_URL;
     const staticPages = [
       '',
       '/eb',

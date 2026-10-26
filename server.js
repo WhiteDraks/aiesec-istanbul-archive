@@ -24,12 +24,19 @@ app.set('trust proxy', 1);
 // CSP, EJS'nin satır-içi <script> ve onclick="" yapısına izin verecek şekilde ayarlı
 // (script-src + script-src-attr: 'unsafe-inline'). Diğer tüm korumalar aktif:
 // X-Frame-Options, HSTS, XSS, nosniff, Referrer-Policy...
+// Her istek için CSP nonce'u üret (satır-içi <script> blokları nonce ile çalışır)
+const crypto = require('crypto');
+app.use((req, res, next) => {
+  res.locals.cspNonce = crypto.randomBytes(16).toString('base64');
+  next();
+});
+
 app.use(helmet({
   contentSecurityPolicy: {
     useDefaults: true,
     directives: {
       "default-src": ["'self'"],
-      "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
+      "script-src": ["'self'", (req, res) => `'nonce-${res.locals.cspNonce}'`, "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
       // script-src-attr, script-src'den AYRI bir CSP3 direktifidir ve helmet
       // useDefaults:true ile bunu açıkça belirtilmezse 'none' yapar — bu da
       // onclick="..." gibi tüm satır-içi olay tetikleyicilerini (tema anahtarı,
@@ -37,15 +44,25 @@ app.use(helmet({
       "script-src-attr": ["'unsafe-inline'"],
       "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"],
       "font-src": ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
-      "img-src": ["'self'", "data:", "blob:", "https://*.public.blob.vercel-storage.com", "https://aiesec-blob-public.s3.amazonaws.com", "https://www.google-analytics.com", "https://*.google-analytics.com"],
-      "connect-src": ["'self'", "https://*.public.blob.vercel-storage.com", "https://www.google-analytics.com", "https://*.google-analytics.com"],
+      "img-src": ["'self'", "data:", "blob:", "https://www.googletagmanager.com", "https://*.public.blob.vercel-storage.com", "https://aiesec-blob-public.s3.amazonaws.com", "https://www.google-analytics.com", "https://*.google-analytics.com"],
+      "connect-src": ["'self'", "https://www.googletagmanager.com", "https://*.public.blob.vercel-storage.com", "https://www.google-analytics.com", "https://*.google-analytics.com"],
       "object-src": ["'none'"],
+      "base-uri": ["'self'"],
+      "form-action": ["'self'"],
+      "frame-ancestors": ["'none'"],
       "upgrade-insecure-requests": []
     }
   },
   crossOriginEmbedderPolicy: false,
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   crossOriginResourcePolicy: false,
 }));
+
+// Tarayıcı özelliklerini kapat; oturum açıkken sayfalar önbelleğe alınmasın (geri tuşuyla sızıntıyı önler)
+app.use((req, res, next) => {
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
+  next();
+});
 
 // ─── Rate Limiting ────────────────────────────────────────────────────────────
 const authLimiter = rateLimit({
@@ -55,6 +72,20 @@ const authLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => req.method === 'GET', // Sadece POST isteklerine uygula
+});
+
+// Hesap bazlı kaba kuvvet koruması: farklı IP'lerden aynı e-postaya yapılan denemeleri de sınırlar
+const loginAccountLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 8,
+  standardHeaders: true,
+  legacyHeaders: false,
+  // Başarısız girişler 302 ile döndüğünden, "başarılı" yalnızca oturum açılmışsa sayılır
+  skipSuccessfulRequests: true,
+  requestWasSuccessful: (req) => !!(req.session && req.session.userId),
+  keyGenerator: (req) => 'acct:' + String((req.body && typeof req.body.email === 'string') ? req.body.email : '').toLowerCase().trim().slice(0, 254),
+  validate: { keyGeneratorIpFallback: false },
+  message: 'Bu hesap için çok fazla başarısız deneme yapıldı. Lütfen 15 dakika sonra tekrar deneyin.',
 });
 
 // ─── View Engine ─────────────────────────────────────────────────────────────
@@ -94,7 +125,7 @@ const sessionDbUrl =
 if (sessionDbUrl) {
   const sessionPool = new Pool({
     connectionString: sessionDbUrl,
-    ssl: { rejectUnauthorized: false },
+    ssl: { rejectUnauthorized: true },
     max: 2,
   });
   sessionConfig.store = new pgSession({
@@ -127,6 +158,10 @@ app.use((req, res, next) => {
   next();
 });
 app.use(setLocals);
+app.use((req, res, next) => {
+  if (req.session && req.session.userId) res.setHeader('Cache-Control', 'no-store');
+  next();
+});
 
 // ─── CSRF Protection via Origin & Referer Verification ────────────────────────
 // Durum değiştiren isteklerde Origin (yoksa Referer) başlığı, isteğin yapıldığı host ile
@@ -173,6 +208,7 @@ const contentLimiter = rateLimit({
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use('/',         require('./routes/index'));
+app.post('/auth/login', loginAccountLimiter);
 app.use('/auth',     authLimiter, require('./routes/auth'));  // Rate limit tüm auth rotalarına
 app.use('/eb',       require('./routes/eb'));
 app.use('/admin',    require('./routes/admin'));

@@ -5,6 +5,7 @@ const upload = require('../middleware/upload');
 const { uploadToBlob } = require('../utils/blob');
 const { isLoggedIn } = require('../middleware/auth');
 const { safeUrl, str } = require('../utils/security');
+const { revokeUserSessions } = require('../utils/sessions');
 
 // Bütün profile rotaları için giriş yapılmış olması zorunlu
 router.use(isLoggedIn);
@@ -170,6 +171,8 @@ router.post('/change-password', async (req, res) => {
     const { getSQL } = require('../config/database');
     const sql = getSQL();
     await sql`UPDATE users SET password = ${hashedPassword} WHERE id = ${user.id}`;
+    // Diğer cihazlardaki oturumları kapat, bu oturum açık kalsın
+    await revokeUserSessions(user.id, req.sessionID);
 
     req.flash('success', 'Şifreniz başarıyla güncellendi.');
     res.redirect('/profile');
@@ -184,6 +187,7 @@ router.post('/change-password', async (req, res) => {
 router.post('/delete', async (req, res) => {
   try {
     await User.delete(req.session.userId);
+    await revokeUserSessions(req.session.userId);
     req.session.destroy((err) => {
       if (err) console.error('Session destroy hatası:', err);
       res.redirect('/');

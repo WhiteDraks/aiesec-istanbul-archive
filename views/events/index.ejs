@@ -149,7 +149,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="<%= typeof cspNonce !== 'undefined' ? cspNonce : '' %>">
   function openEventModal() {
     const modal = document.getElementById('eventModal');
     const container = document.getElementById('eventModalContainer');

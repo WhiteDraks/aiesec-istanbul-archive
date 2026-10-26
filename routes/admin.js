@@ -6,6 +6,7 @@ const { uploadToBlob } = require('../utils/blob');
 const { isLoggedIn, isAdmin } = require('../middleware/auth');
 const { safeUrl, str } = require('../utils/security');
 const { stripTags } = require('../utils/sanitize');
+const { revokeUserSessions } = require('../utils/sessions');
 const { sendApprovalEmail } = require('../utils/email');
 const TimelineMilestone = require('../models/TimelineMilestone');
 const HeritageDocument = require('../models/HeritageDocument');
@@ -105,6 +106,7 @@ router.post('/reject/:id', async (req, res) => {
       return res.redirect('/admin');
     }
     await User.updateStatus(req.params.id, 'rejected');
+    await revokeUserSessions(req.params.id);
     req.flash('success', 'Kullanıcı reddedildi.');
   } catch (err) {
     console.error(err);
@@ -122,6 +124,7 @@ router.post('/delete/:id', async (req, res) => {
       return res.redirect('/admin');
     }
     await User.delete(req.params.id);
+    await revokeUserSessions(req.params.id);
     req.flash('success', 'Kullanıcı silindi.');
   } catch (err) {
     console.error(err);

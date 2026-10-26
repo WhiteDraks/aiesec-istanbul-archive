@@ -217,7 +217,7 @@
     </form>
   </div>
 
-  <script>
+  <script nonce="<%= typeof cspNonce !== 'undefined' ? cspNonce : '' %>">
   function toggleFeedbackWidget() {
     const card = document.getElementById('feedback-widget-card');
     const trigger = document.getElementById('feedback-widget-trigger');
@@ -306,7 +306,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="<%= typeof cspNonce !== 'undefined' ? cspNonce : '' %>">
 let cropperInstance = null;
 let currentFileInput = null;
 let currentPreviewImg = null;

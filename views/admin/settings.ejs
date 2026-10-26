@@ -249,7 +249,7 @@
   </div>
 </section>
 
-<script>
+<script nonce="<%= typeof cspNonce !== 'undefined' ? cspNonce : '' %>">
 function resetField(inputId, defaultValue, isColor = false) {
   const input = document.getElementById(inputId);
   if (input) {
