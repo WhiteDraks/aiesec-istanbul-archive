@@ -9,6 +9,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { initDB, getSQL } = require('./config/database');
 const { setLocals } = require('./middleware/auth');
+const PgRateLimitStore = require('./utils/pgRateLimitStore');
 
 // ─── Session Secret Guard ─────────────────────────────────────────────────────
 if (!process.env.SESSION_SECRET) {
@@ -66,6 +67,7 @@ app.use((req, res, next) => {
 
 // ─── Rate Limiting ────────────────────────────────────────────────────────────
 const authLimiter = rateLimit({
+  store: new PgRateLimitStore('auth'),
   windowMs: 15 * 60 * 1000,  // 15 dakika
   max: 20,                    // 15 dakikada en fazla 20 deneme
   message: 'Çok fazla istek gönderildi. Lütfen 15 dakika sonra tekrar deneyin.',
@@ -76,6 +78,7 @@ const authLimiter = rateLimit({
 
 // Hesap bazlı kaba kuvvet koruması: farklı IP'lerden aynı e-postaya yapılan denemeleri de sınırlar
 const loginAccountLimiter = rateLimit({
+  store: new PgRateLimitStore('login-acct'),
   windowMs: 15 * 60 * 1000,
   max: 8,
   standardHeaders: true,
@@ -198,6 +201,7 @@ app.use((req, res, next) => {
 
 // ─── Content Creation Rate Limiting (Anti-Spam) ───────────────────────────────
 const contentLimiter = rateLimit({
+  store: new PgRateLimitStore('content'),
   windowMs: 1 * 60 * 1000,  // 1 dakika
   max: 10,                   // 1 dakikada en fazla 10 içerik isteği
   message: 'Çok hızlı içerik oluşturuyorsunuz. Lütfen 1 dakika sonra tekrar deneyin.',

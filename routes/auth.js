@@ -355,12 +355,7 @@ router.post('/logout', (req, res) => {
   });
 });
 
-// GET /auth/logout - Geriye dönük uyumluluk (eski linkleri yönlendir)
-router.get('/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) console.error('Session destroy hatası:', err);
-    res.redirect('/');
-  });
-});
+// GET /auth/logout - Eski bağlantılar: oturumu KAPATMAZ (başka bir site <img src> ile zorla çıkış yaptıramasın)
+router.get('/logout', (req, res) => res.redirect('/'));
 
 module.exports = router;

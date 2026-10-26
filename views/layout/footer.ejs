@@ -38,7 +38,7 @@
               <li><a href="/admin">Admin Paneli</a></li>
               <li><a href="/admin/settings" style="color: var(--primary);">Site Ayarları ⚙️</a></li>
             <% } %>
-            <li><a href="/auth/logout">Çıkış Yap</a></li>
+            <li><form action="/auth/logout" method="POST" style="display:inline;"><button type="submit" style="background:none;border:0;padding:0;color:inherit;font:inherit;cursor:pointer;">Çıkış Yap</button></form></li>
           <% } else { %>
             <li><a href="/auth/register">Kayıt Ol</a></li>
             <li><a href="/auth/login">Giriş Yap</a></li>

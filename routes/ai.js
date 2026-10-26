@@ -6,7 +6,9 @@ const { getSystemContext } = require('../utils/aiContext');
 const rateLimit = require('express-rate-limit');
 
 // Gemini kotası/maliyeti ve kötüye kullanım için kullanıcı başına sınır
+const PgRateLimitStore = require('../utils/pgRateLimitStore');
 const aiLimiter = rateLimit({
+  store: new PgRateLimitStore('ai'),
   windowMs: 60 * 1000,
   max: 8,
   standardHeaders: true,
