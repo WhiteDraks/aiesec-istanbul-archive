@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Event = require('../models/Event');
 const { isLoggedIn, isApproved } = require('../middleware/auth');
+const { safeUrl, str } = require('../utils/security');
 
 // Require login + approval for all events actions
 router.use(isLoggedIn, isApproved);
@@ -37,7 +38,17 @@ router.get('/', async (req, res) => {
 // POST /events - Create a new event
 router.post('/', async (req, res) => {
   try {
-    const { title, description, event_date, location, link } = req.body;
+    const title = str(req.body.title, 150), description = str(req.body.description, 5000);
+    const event_date = str(req.body.event_date, 40), location = str(req.body.location, 200);
+    const link = safeUrl(str(req.body.link, 500));
+    if (req.body.link && str(req.body.link, 500) && !link) {
+      req.flash('error', 'Bağlantı geçerli bir http(s) adresi olmalıdır.');
+      return res.redirect('/events');
+    }
+    if (event_date && isNaN(new Date(event_date).getTime())) {
+      req.flash('error', 'Geçerli bir tarih girin.');
+      return res.redirect('/events');
+    }
 
     if (!title || !description || !event_date || !location) {
       req.flash('error', 'Lütfen tüm zorunlu alanları doldurun.');

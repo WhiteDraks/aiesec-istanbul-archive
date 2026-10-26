@@ -22,7 +22,7 @@ const HeritageDocument = {
     }
 
     if (search) {
-      const searchPattern = `%${search}%`;
+      const searchPattern = `%${String(search).slice(0, 100).replace(/[\\%_]/g, '\\$&')}%`;
       query = sql`${query} AND (hd.title ILIKE ${searchPattern} OR hd.description ILIKE ${searchPattern})`;
     }
 

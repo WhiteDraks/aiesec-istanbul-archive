@@ -29,7 +29,7 @@
       <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
         <a href="mailto:<%= person.email %>" class="btn btn-outline btn-sm">✉ İletişime Geç</a>
         <% if (person.linkedin) { %>
-          <a href="<%= person.linkedin %>" target="_blank" rel="noopener" class="btn btn-outline btn-sm">LinkedIn</a>
+          <a href="<%= safeUrl(person.linkedin) || '#' %>" target="_blank" rel="noopener" class="btn btn-outline btn-sm">LinkedIn</a>
         <% } %>
         <% if (person.show_phone && person.phone) { %>
           <a href="tel:<%= person.phone %>" class="btn btn-outline btn-sm">📞 <%= person.phone %></a>

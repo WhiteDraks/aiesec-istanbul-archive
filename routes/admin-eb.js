@@ -102,7 +102,7 @@ router.post('/:id/edit', async (req, res) => {
     
     // Split achievements by newline and clean up
     let achievementsArray = [];
-    if (achievements) {
+    if (typeof achievements === 'string') {
       achievementsArray = achievements.split('\n').map(a => a.trim()).filter(a => a.length > 0);
     }
 

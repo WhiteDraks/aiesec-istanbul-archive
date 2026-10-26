@@ -4,6 +4,7 @@ const User = require('../models/User');
 const upload = require('../middleware/upload');
 const { uploadToBlob } = require('../utils/blob');
 const { isLoggedIn } = require('../middleware/auth');
+const { safeUrl, str } = require('../utils/security');
 
 // Bütün profile rotaları için giriş yapılmış olması zorunlu
 router.use(isLoggedIn);
@@ -37,7 +38,14 @@ router.get('/', async (req, res) => {
 router.post('/', upload.single('photo'), async (req, res) => {
   try {
     const { stripTags } = require('../utils/sanitize');
-    const { name, school, department, linkedin, workplaces, sector, phone, show_phone, aiesec_journey, role_years, role_years_custom, role_titles, remove_photo, city, city_custom, country, country_custom, is_mentor, is_mentee, mentorship_details } = req.body;
+    const b = req.body;
+    const { show_phone, role_years, role_titles, remove_photo, is_mentor, is_mentee } = b;
+    const name = str(b.name, 100), school = str(b.school, 150), department = str(b.department, 150);
+    const workplaces = str(b.workplaces, 300), sector = str(b.sector, 100), phone = str(b.phone, 30);
+    const aiesec_journey = str(b.aiesec_journey, 5000), mentorship_details = str(b.mentorship_details, 2000);
+    const city = str(b.city, 100), city_custom = str(b.city_custom, 100);
+    const country = str(b.country, 100), country_custom = str(b.country_custom, 100);
+    const linkedin = safeUrl(str(b.linkedin, 300));
     let photoUrl = null;
 
     // Fotoğraf temizlendiyse veya yüklendiyse
@@ -54,10 +62,11 @@ router.post('/', upload.single('photo'), async (req, res) => {
       const titles = Array.isArray(role_titles) ? role_titles : [role_titles];
       for (let i = 0; i < years.length; i++) {
         const resolvedYear = years[i];
-        if (resolvedYear.trim() || titles[i].trim()) {
+        const yr = str(resolvedYear, 20), ttl = str(titles[i], 150);
+        if (yr || ttl) {
           // XSS koruması: Rol başlığını temizle
-          const cleanYear = stripTags(resolvedYear.trim());
-          const cleanTitle = stripTags(titles[i].trim());
+          const cleanYear = stripTags(yr);
+          const cleanTitle = stripTags(ttl);
           roles_history.push({ year: cleanYear, role: cleanTitle });
         }
       }
@@ -122,7 +131,9 @@ router.post('/', upload.single('photo'), async (req, res) => {
 // POST /profile/change-password - Şifre Değiştirme
 router.post('/change-password', async (req, res) => {
   try {
-    const { current_password, new_password, confirm_password } = req.body;
+    const current_password = typeof req.body.current_password === 'string' ? req.body.current_password : '';
+    const new_password = typeof req.body.new_password === 'string' ? req.body.new_password : '';
+    const confirm_password = typeof req.body.confirm_password === 'string' ? req.body.confirm_password : '';
     
     if (!current_password || !new_password || !confirm_password) {
       req.flash('error', 'Lütfen tüm şifre alanlarını doldurun.');
@@ -134,8 +145,8 @@ router.post('/change-password', async (req, res) => {
       return res.redirect('/profile');
     }
 
-    if (new_password.length < 6) {
-      req.flash('error', 'Yeni şifre en az 6 karakter olmalıdır.');
+    if (new_password.length < 8 || new_password.length > 128) {
+      req.flash('error', 'Yeni şifre 8-128 karakter arasında olmalıdır.');
       return res.redirect('/profile');
     }
 

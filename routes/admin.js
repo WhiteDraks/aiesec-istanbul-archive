@@ -4,6 +4,8 @@ const User = require('../models/User');
 const upload = require('../middleware/upload');
 const { uploadToBlob } = require('../utils/blob');
 const { isLoggedIn, isAdmin } = require('../middleware/auth');
+const { safeUrl, str } = require('../utils/security');
+const { stripTags } = require('../utils/sanitize');
 const { sendApprovalEmail } = require('../utils/email');
 const TimelineMilestone = require('../models/TimelineMilestone');
 const HeritageDocument = require('../models/HeritageDocument');
@@ -97,6 +99,11 @@ router.post('/approve/:id', async (req, res) => {
 // POST /admin/reject/:id - Kullanıcı reddet
 router.post('/reject/:id', async (req, res) => {
   try {
+    const target = await User.findById(req.params.id);
+    if (target && target.role === 'admin') {
+      req.flash('error', 'Admin hesabının durumu değiştirilemez.');
+      return res.redirect('/admin');
+    }
     await User.updateStatus(req.params.id, 'rejected');
     req.flash('success', 'Kullanıcı reddedildi.');
   } catch (err) {
@@ -109,6 +116,11 @@ router.post('/reject/:id', async (req, res) => {
 // POST /admin/delete/:id - Kullanıcı sil (opsiyonel)
 router.post('/delete/:id', async (req, res) => {
   try {
+    const target = await User.findById(req.params.id);
+    if (target && (target.role === 'admin' || String(target.id) === String(req.session.userId))) {
+      req.flash('error', 'Admin hesapları buradan silinemez.');
+      return res.redirect('/admin');
+    }
     await User.delete(req.params.id);
     req.flash('success', 'Kullanıcı silindi.');
   } catch (err) {
@@ -145,7 +157,12 @@ router.get('/user/:id/edit', async (req, res) => {
 // POST /admin/user/:id/edit - Kullanıcı bilgilerini güncelle
 router.post('/user/:id/edit', upload.single('photo'), async (req, res) => {
   try {
-    const { name, school, department, linkedin, workplaces, sector, phone, aiesec_journey, role_years, role_years_custom, role_titles } = req.body;
+    const b = req.body;
+    const { role_years, role_titles } = b;
+    const name = stripTags(str(b.name, 100)), school = stripTags(str(b.school, 150)), department = stripTags(str(b.department, 150));
+    const workplaces = stripTags(str(b.workplaces, 300)), sector = stripTags(str(b.sector, 100)), phone = stripTags(str(b.phone, 30));
+    const aiesec_journey = stripTags(str(b.aiesec_journey, 5000));
+    const linkedin = safeUrl(str(b.linkedin, 300));
     let photoUrl = null;
 
     if (req.file) {
@@ -158,8 +175,9 @@ router.post('/user/:id/edit', upload.single('photo'), async (req, res) => {
       const titles = Array.isArray(role_titles) ? role_titles : [role_titles];
       for (let i = 0; i < years.length; i++) {
         const resolvedYear = years[i];
-        if (resolvedYear.trim() || titles[i].trim()) {
-          roles_history.push({ year: resolvedYear.trim(), role: titles[i].trim() });
+        const yr = stripTags(str(resolvedYear, 20)), ttl = stripTags(str(titles[i], 150));
+        if (yr || ttl) {
+          roles_history.push({ year: yr, role: ttl });
         }
       }
 
@@ -210,6 +228,11 @@ router.post('/user/:id/edit', upload.single('photo'), async (req, res) => {
 // POST /admin/reset/:id - Rejected → Pending yap (tekrar değerlendirme)
 router.post('/reset/:id', async (req, res) => {
   try {
+    const target = await User.findById(req.params.id);
+    if (target && target.role === 'admin') {
+      req.flash('error', 'Admin hesabının durumu değiştirilemez.');
+      return res.redirect('/admin');
+    }
     await User.updateStatus(req.params.id, 'pending');
     req.flash('success', 'Kullanıcı tekrar değerlendirme listesine alındı.');
   } catch (err) {
@@ -248,9 +271,13 @@ router.post('/settings', upload.fields([
       'hero_title', 'hero_title_gradient', 'hero_subtitle', 'hero_cta_text'
     ];
 
+    const colorFields = ['theme_primary', 'theme_secondary', 'theme_background', 'theme_surface', 'footer_credit_color'];
     for (const field of fields) {
-      if (req.body[field] !== undefined) {
-        await SiteSetting.update(field, req.body[field].trim());
+      if (typeof req.body[field] === 'string') {
+        let val = req.body[field].trim().slice(0, 500);
+        // Renk alanları <style> içine yazılır: yalnızca #RRGGBB kabul et (CSS enjeksiyonunu önler)
+        if (colorFields.includes(field) && !/^#[0-9a-fA-F]{6}$/.test(val)) continue;
+        await SiteSetting.update(field, val);
       }
     }
 

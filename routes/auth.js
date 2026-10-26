@@ -1,6 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const crypto = require('crypto');
+const { str, isSafeLocalPath } = require('../utils/security');
+const { stripTags } = require('../utils/sanitize');
+
+const sha256 = (v) => crypto.createHash('sha256').update(v).digest('hex');
+// Kullanıcı bulunamadığında da bcrypt çalıştırılır; böylece yanıt süresinden e-posta kaydı sızmaz
+const DUMMY_HASH = '$2a$12$/bRFwWmKmNp4CmrCBcyMReWpeVmb.E48CwirI63RpiR6jh0Uw.kHK';
+const MAX_PASSWORD = 128;
 
 // GET /auth/register - Kayıt formu
 router.get('/register', async (req, res) => {
@@ -27,13 +35,18 @@ router.get('/register', async (req, res) => {
 router.post('/register', async (req, res) => {
   if (req.session.userId) return res.redirect('/');
 
-  const { name, email, password, passwordConfirm, school, ebYear, ebRole, kvkk } = req.body;
+  let { name, email, password, passwordConfirm, school, ebYear, ebRole, kvkk } = req.body;
+  name = str(name, 100); email = str(email, 254).toLowerCase(); school = str(school, 150);
+  ebYear = str(ebYear, 20); ebRole = str(ebRole, 100);
+  password = typeof password === 'string' ? password : '';
+  passwordConfirm = typeof passwordConfirm === 'string' ? passwordConfirm : '';
 
   // Validation
   const errors = [];
   if (!name || name.trim().length < 2) errors.push('Ad Soyad en az 2 karakter olmalıdır.');
   if (!email || !/^\S+@\S+\.\S+$/.test(email)) errors.push('Geçerli bir e-posta adresi giriniz.');
   if (!password || password.length < 8) errors.push('Şifre en az 8 karakter olmalıdır.');
+  if (password.length > MAX_PASSWORD) errors.push('Şifre en fazla 128 karakter olabilir.');
   if (password !== passwordConfirm) errors.push('Şifreler eşleşmiyor.');
   if (!kvkk) errors.push('KVKK Aydınlatma Metnini onaylamanız gerekmektedir.');
 
@@ -72,12 +85,12 @@ router.post('/register', async (req, res) => {
     }
 
     await User.create({
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
+      name: stripTags(name),
+      email,
       password,
-      school: school ? school.trim() : '',
-      eb_year: ebYear ? ebYear.trim() : '',
-      eb_role: ebRole ? ebRole.trim() : '',
+      school: stripTags(school),
+      eb_year: stripTags(ebYear),
+      eb_role: stripTags(ebRole),
       status: 'pending',
       role: 'user',
     });
@@ -139,9 +152,10 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res) => {
   if (req.session.userId) return res.redirect('/');
 
-  const { email, password } = req.body;
+  const email = str(req.body.email, 254);
+  const password = typeof req.body.password === 'string' ? req.body.password : '';
 
-  if (!email || !password) {
+  if (!email || !password || password.length > MAX_PASSWORD) {
     req.flash('error', 'E-posta ve şifre gereklidir.');
     return res.redirect('/auth/login');
   }
@@ -150,13 +164,8 @@ router.post('/login', async (req, res) => {
     // Find user
     const user = await User.findByEmail(email);
 
-    if (!user) {
-      req.flash('error', 'E-posta veya şifre hatalı.');
-      return res.redirect('/auth/login');
-    }
-
-    const isMatch = await User.comparePassword(password, user.password);
-    if (!isMatch) {
+    const isMatch = await User.comparePassword(password, user ? user.password : DUMMY_HASH);
+    if (!user || !isMatch) {
       req.flash('error', 'E-posta veya şifre hatalı.');
       return res.redirect('/auth/login');
     }
@@ -165,7 +174,7 @@ router.post('/login', async (req, res) => {
     // Open Redirect koruması: sadece göreceli (relative) URL'lere izin ver
     const rawRedirect = req.session.redirectTo || '/';
     delete req.session.redirectTo;
-    const safeRedirect = rawRedirect.startsWith('/') && !rawRedirect.startsWith('//') ? rawRedirect : '/';
+    const safeRedirect = isSafeLocalPath(rawRedirect) ? rawRedirect : '/';
 
     // Session Fixation koruması: giriş sonrası yeni session ID üret
     req.session.regenerate((regenErr) => {
@@ -202,21 +211,22 @@ router.get('/forgot-password', (req, res) => {
 // POST /auth/forgot-password - Şifre sıfırlama talebi
 router.post('/forgot-password', async (req, res) => {
   try {
-    const { email } = req.body;
+    const email = str(req.body.email, 254);
     if (!email) {
       req.flash('error', 'Lütfen e-posta adresinizi girin.');
       return res.redirect('/auth/forgot-password');
     }
+    // Hesap var/yok bilgisini sızdırmamak için her durumda aynı mesaj gösterilir
+    const genericMsg = 'Eğer bu e-posta adresi kayıtlıysa, şifre sıfırlama bağlantısı gönderilmiştir.';
 
     const user = await User.findByEmail(email);
     if (!user) {
       // Güvenlik amacıyla e-posta bulunmasa bile başarılıymış gibi genel mesaj verilir
-      req.flash('success', 'Eğer bu e-posta adresi kayıtlıysa, şifre sıfırlama bağlantısı gönderilmiştir.');
+      req.flash('success', genericMsg);
       return res.redirect('/auth/forgot-password');
     }
 
     // Generate crypto token
-    const crypto = require('crypto');
     const token = crypto.randomBytes(32).toString('hex');
     const expires = new Date(Date.now() + 3600000); // 1 saat geçerli
 
@@ -224,7 +234,7 @@ router.post('/forgot-password', async (req, res) => {
     const sql = getSQL();
     await sql`
       UPDATE users
-      SET reset_token = ${token}, reset_token_expires = ${expires}
+      SET reset_token = ${sha256(token)}, reset_token_expires = ${expires}
       WHERE id = ${user.id}
     `;
 
@@ -233,11 +243,12 @@ router.post('/forgot-password', async (req, res) => {
     const resetLink = `https://aiesec-istanbul-archive.vercel.app/auth/reset-password?token=${token}&email=${encodeURIComponent(user.email)}`;
     await sendResetPasswordEmail(user.email, user.name, resetLink);
 
-    req.flash('success', 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.');
+    req.flash('success', genericMsg);
     res.redirect('/auth/forgot-password');
   } catch (err) {
     console.error('Forgot password error:', err);
-    req.flash('error', 'Bir hata oluştu. Lütfen tekrar deneyin.');
+    // Hata durumunda da aynı mesaj: e-postanın kayıtlı olup olmadığı anlaşılmasın
+    req.flash('success', 'Eğer bu e-posta adresi kayıtlıysa, şifre sıfırlama bağlantısı gönderilmiştir.');
     res.redirect('/auth/forgot-password');
   }
 });
@@ -245,7 +256,8 @@ router.post('/forgot-password', async (req, res) => {
 // GET /auth/reset-password - Şifre sıfırlama formu
 router.get('/reset-password', async (req, res) => {
   try {
-    const { token, email } = req.query;
+    const token = str(req.query.token, 200);
+    const email = str(req.query.email, 254);
     if (!token || !email) {
       req.flash('error', 'Geçersiz şifre sıfırlama talebi.');
       return res.redirect('/auth/login');
@@ -256,7 +268,7 @@ router.get('/reset-password', async (req, res) => {
     const rows = await sql`
       SELECT id FROM users
       WHERE email = ${email.toLowerCase().trim()}
-        AND reset_token = ${token}
+        AND reset_token = ${sha256(token)}
         AND reset_token_expires > NOW()
     `;
 
@@ -280,21 +292,25 @@ router.get('/reset-password', async (req, res) => {
 // POST /auth/reset-password - Yeni şifre kaydetme
 router.post('/reset-password', async (req, res) => {
   try {
-    const { token, email, password, passwordConfirm } = req.body;
-    
+    const token = str(req.body.token, 200);
+    const email = str(req.body.email, 254);
+    const password = typeof req.body.password === 'string' ? req.body.password : '';
+    const passwordConfirm = typeof req.body.passwordConfirm === 'string' ? req.body.passwordConfirm : '';
+
     if (!token || !email || !password || !passwordConfirm) {
       req.flash('error', 'Lütfen tüm alanları doldurun.');
-      return res.redirect(`/auth/reset-password?token=${token}&email=${encodeURIComponent(email)}`);
+      return res.redirect('/auth/login');
     }
+    const back = `/auth/reset-password?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`;
 
     if (password !== passwordConfirm) {
       req.flash('error', 'Şifreler eşleşmiyor.');
-      return res.redirect(`/auth/reset-password?token=${token}&email=${encodeURIComponent(email)}`);
+      return res.redirect(back);
     }
 
-    if (password.length < 6) {
-      req.flash('error', 'Şifre en az 6 karakter olmalıdır.');
-      return res.redirect(`/auth/reset-password?token=${token}&email=${encodeURIComponent(email)}`);
+    if (password.length < 8 || password.length > MAX_PASSWORD) {
+      req.flash('error', 'Şifre 8-128 karakter arasında olmalıdır.');
+      return res.redirect(back);
     }
 
     const { getSQL } = require('../config/database');
@@ -302,7 +318,7 @@ router.post('/reset-password', async (req, res) => {
     const rows = await sql`
       SELECT id FROM users
       WHERE email = ${email.toLowerCase().trim()}
-        AND reset_token = ${token}
+        AND reset_token = ${sha256(token)}
         AND reset_token_expires > NOW()
     `;
 

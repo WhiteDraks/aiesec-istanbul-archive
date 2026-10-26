@@ -79,7 +79,7 @@ const User = {
 
   async searchApproved({ query, sector, city, country, is_mentor }) {
     const sql = getSQL();
-    const q = query ? `%${query.trim()}%` : null;
+    const q = query ? `%${query.trim().replace(/[\\%_]/g, '\\$&')}%` : null;
     const sect = sector ? sector.trim() : null;
     const c = city ? city.trim() : null;
     const co = country ? country.trim() : null;

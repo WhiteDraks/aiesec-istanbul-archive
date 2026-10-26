@@ -1,6 +1,6 @@
 const { put } = require('@vercel/blob');
 const crypto = require('crypto');
-const path = require('path');
+const { detectImage, isPdf } = require('./security');
 
 /**
  * Uploads a file buffer to Vercel Blob and returns the public URL.
@@ -12,7 +12,15 @@ const path = require('path');
  */
 async function uploadToBlob(buffer, originalName, prefix = 'uploads/') {
   // Generate a unique filename
-  const ext = path.extname(originalName);
+  // Dosya türü istemcinin bildirdiği ad/MIME'a değil, gerçek içeriğe (magic bytes) göre belirlenir.
+  // Böylece "x.html" adıyla yüklenen sahte görsel/komut dosyaları Blob'a yazılamaz.
+  const img = detectImage(buffer);
+  let ext;
+  if (img) ext = `.${img.ext}`;
+  else if (isPdf(buffer)) ext = '.pdf';
+  else throw new Error('Geçersiz dosya içeriği. Yalnızca JPG, PNG, GIF, WEBP veya PDF yüklenebilir.');
+  // prefix içinde istemci kaynaklı değerler (örn. yıl) olabilir: yol geçişini engelle
+  prefix = String(prefix).replace(/[^A-Za-z0-9_\-\/\.]/g, '_').replace(/\.\.+/g, '_');
   const uniqueId = crypto.randomBytes(8).toString('hex');
   const filename = `${prefix}${uniqueId}${ext}`;
 
@@ -26,6 +34,7 @@ async function uploadToBlob(buffer, originalName, prefix = 'uploads/') {
   const result = await put(filename, buffer, {
     access: 'public',
     token: token,
+    addRandomSuffix: true,
   });
 
   return result.url;

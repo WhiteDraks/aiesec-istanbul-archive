@@ -1,2 +1,18 @@
 public/uploads/*
 !public/uploads/.gitkeep
+
+# Secrets & deps
+.env
+.env.*
+!.env.example
+node_modules/
+.DS_Store
+
+# Yerel yardımcı / hata ayıklama betikleri (kimlik bilgisi içerebilir)
+check_admin.js
+check_user.js
+clear_sessions.js
+fix_roles.js
+make_admin.js
+test_array_update.js
+scratch/

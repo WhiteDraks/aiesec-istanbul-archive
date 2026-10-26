@@ -12,8 +12,8 @@ const isLoggedIn = (req, res, next) => {
     return next();
   }
   // Save intended URL for redirect after login
-  const redirectUrl = req.originalUrl;
-  req.session.redirectTo = redirectUrl;
+  // Yalnızca GET istekleri için geri dönüş adresi sakla (POST hedefine GET ile dönülemez)
+  if (req.method === 'GET') req.session.redirectTo = req.originalUrl;
   req.flash('error', 'Bu sayfayı görüntülemek için giriş yapmanız gerekmektedir.');
   return res.redirect(`/auth/login`);
 };
@@ -76,6 +76,10 @@ const setLocals = async (req, res, next) => {
           status: dbUser.status,
           photo: dbUser.photo,
         };
+      } else {
+        // Hesap silinmiş (admin veya kullanıcı tarafından): eski oturum yetkisini kaybeder
+        delete req.session.userId;
+        delete req.session.user;
       }
     } catch (err) {
       console.error('Failed to sync user details in setLocals:', err);
@@ -95,6 +99,7 @@ const setLocals = async (req, res, next) => {
     res.locals.siteSettings = {};
   }
   
+  res.locals.safeUrl = require('../utils/security').safeUrl;
   res.locals.appVersion = require('../package.json').version;
   next();
 };

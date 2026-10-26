@@ -9,8 +9,10 @@ router.use(isLoggedIn, isApproved);
 // GET /alumni - Mezunlar dizini
 router.get('/', async (req, res) => {
   try {
-    const { query, sector, city, country, is_mentor } = req.query;
-    const selectedYears = req.query.years ? (Array.isArray(req.query.years) ? req.query.years : [req.query.years]) : [];
+    const q = req.query;
+    const s1 = (v) => (typeof v === 'string' ? v.slice(0, 100) : '');
+    const query = s1(q.query), sector = s1(q.sector), city = s1(q.city), country = s1(q.country), is_mentor = s1(q.is_mentor);
+    const selectedYears = (req.query.years ? (Array.isArray(req.query.years) ? req.query.years : [req.query.years]) : []).filter(y => typeof y === 'string');
     const { getSQL } = require('../config/database');
     const sql = getSQL();
 

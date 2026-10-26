@@ -3,6 +3,18 @@ const router = express.Router();
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { isLoggedIn, isApproved } = require('../middleware/auth');
 const { getSystemContext } = require('../utils/aiContext');
+const rateLimit = require('express-rate-limit');
+
+// Gemini kotası/maliyeti ve kötüye kullanım için kullanıcı başına sınır
+const aiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 8,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => String(req.session?.userId || req.ip),
+  validate: { keyGeneratorIpFallback: false },
+  message: { error: 'Çok fazla istek gönderdiniz. Lütfen bir dakika sonra tekrar deneyin.' },
+});
 
 // Initialize Gemini API client if API key is provided
 let genAI = null;
@@ -20,9 +32,10 @@ router.get('/', isLoggedIn, isApproved, (req, res) => {
 });
 
 // POST /ai-assistant/chat - Process Chat Message
-router.post('/chat', isLoggedIn, isApproved, async (req, res) => {
+router.post('/chat', isLoggedIn, isApproved, aiLimiter, async (req, res) => {
   try {
-    const { message, history } = req.body;
+    const history = req.body.history;
+    const message = typeof req.body.message === 'string' ? req.body.message.slice(0, 2000) : '';
 
     if (!message || message.trim() === '') {
       return res.status(400).json({ error: 'Mesaj boş olamaz.' });
@@ -76,12 +89,12 @@ Cevapları temiz markdown formatında yaz.
 
     // Append chat history from client
     if (history && Array.isArray(history)) {
-      history.forEach(item => {
-        if (item.role === 'user' || item.role === 'model') {
+      history.slice(-20).forEach(item => {
+        if (item && typeof item.text === 'string' && (item.role === 'user' || item.role === 'model')) {
           // Map model to model, user to user
           contents.push({
             role: item.role,
-            parts: [{ text: item.text }]
+            parts: [{ text: item.text.slice(0, 4000) }]
           });
         }
       });

@@ -70,7 +70,7 @@
           <!-- Apply Action -->
           <% if (job.link) { %>
             <div style="margin-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1.25rem;">
-              <a href="<%= job.link %>" target="_blank" rel="noopener" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600;">
+              <a href="<%= safeUrl(job.link) || '#' %>" target="_blank" rel="noopener" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600;">
                 Başvur / İletişime Geç 
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
               </a>

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Job = require('../models/Job');
 const { isLoggedIn, isApproved } = require('../middleware/auth');
+const { safeUrl, str } = require('../utils/security');
 
 // Require login + approval for all jobs actions
 router.use(isLoggedIn, isApproved);
@@ -25,7 +26,14 @@ router.get('/', async (req, res) => {
 // POST /jobs - Add a new career opportunity
 router.post('/', async (req, res) => {
   try {
-    const { title, company, location, type, description, link } = req.body;
+    const title = str(req.body.title, 150), company = str(req.body.company, 150);
+    const location = str(req.body.location, 150), type = str(req.body.type, 50);
+    const description = str(req.body.description, 5000);
+    const link = safeUrl(str(req.body.link, 500));
+    if (req.body.link && str(req.body.link, 500) && !link) {
+      req.flash('error', 'Bağlantı geçerli bir http(s) adresi olmalıdır.');
+      return res.redirect('/jobs');
+    }
     
     if (!title || !company || !type || !description) {
       req.flash('error', 'Lütfen tüm zorunlu alanları doldurun.');

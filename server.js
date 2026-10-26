@@ -65,8 +65,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ─── Body Parsing ─────────────────────────────────────────────────────────────
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: '200kb', parameterLimit: 200 }));
+app.use(express.json({ limit: '200kb' }));
 
 // ─── Method Override ──────────────────────────────────────────────────────────
 app.use(methodOverride('_method'));
@@ -77,7 +77,7 @@ const sessionConfig = {
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.NODE_ENV === 'production' || !!process.env.VERCEL,
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 24, // 24 hours (1 day)
     sameSite: 'lax',
@@ -129,44 +129,28 @@ app.use((req, res, next) => {
 app.use(setLocals);
 
 // ─── CSRF Protection via Origin & Referer Verification ────────────────────────
+// Durum değiştiren isteklerde Origin (yoksa Referer) başlığı, isteğin yapıldığı host ile
+// BİREBİR eşleşmelidir. İkisi de yoksa istek reddedilir. (Önceden herhangi bir *.vercel.app
+// kaynağı ve başlıksız istekler kabul ediliyordu.)
+const normHost = (h) => (h || '').toLowerCase().replace(/^www\./, '');
 app.use((req, res, next) => {
-  if (['POST', 'PUT', 'DELETE'].includes(req.method)) {
-    const origin = req.headers.origin === 'null' ? null : req.headers.origin;
-    const referer = req.headers.referer;
-    const host = req.headers.host; // E.g. aiesec-istanbul-archive.vercel.app
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+    const allowed = new Set([normHost(req.headers.host)]);
+    if (req.headers['x-forwarded-host']) {
+      allowed.add(normHost(String(req.headers['x-forwarded-host']).split(',')[0].trim()));
+    }
 
-    let isValid = true;
-    const cleanHost = host ? host.replace('www.', '').toLowerCase() : '';
+    const source = req.headers.origin && req.headers.origin !== 'null'
+      ? req.headers.origin
+      : req.headers.referer;
 
-    const checkHost = (targetHost) => {
-      if (!targetHost) return false;
-      const cleanTarget = targetHost.replace('www.', '').toLowerCase();
-      // Exact match or subdomain match or vercel preview URL match
-      return cleanTarget === cleanHost ||
-             cleanTarget.endsWith('.' + cleanHost) ||
-             cleanHost.endsWith('.' + cleanTarget) ||
-             cleanTarget.endsWith('.vercel.app') ||
-             (req.headers['x-forwarded-host'] && cleanTarget === req.headers['x-forwarded-host'].replace('www.', '').toLowerCase());
-    };
-
-    if (origin) {
-      try {
-        const originUrl = new URL(origin);
-        isValid = checkHost(originUrl.host);
-      } catch (e) {
-        isValid = false;
-      }
-    } else if (referer) {
-      try {
-        const refererUrl = new URL(referer);
-        isValid = checkHost(refererUrl.host);
-      } catch (e) {
-        isValid = false;
-      }
+    let isValid = false;
+    if (source) {
+      try { isValid = allowed.has(normHost(new URL(source).host)); } catch (e) { isValid = false; }
     }
 
     if (!isValid) {
-      console.warn(`[CSRF Blocked] Request to ${req.path} from external origin. Origin: ${origin}, Referer: ${referer}, Host: ${host}`);
+      console.warn(`[CSRF Blocked] ${req.method} ${req.path} Origin: ${req.headers.origin}, Referer: ${req.headers.referer}, Host: ${req.headers.host}`);
       return res.status(403).render('error', {
         title: '403 - Yetkisiz İstek',
         statusCode: 403,
@@ -213,10 +197,14 @@ app.use((req, res) => {
 
 // ─── Global Error Handler ─────────────────────────────────────────────────────
 app.use((err, req, res, next) => {
-  console.error('Uygulama hatası:', err);
-  res.status(500).render('error', {
-    title: '500 - Sunucu Hatası',
-    statusCode: 500,
+  console.error('Uygulama hatası:', err.message);
+  const status = err.status === 413 ? 413 : 500;
+  // Hata, setLocals'tan önce (örn. body parser) oluşmuş olabilir: şablonun ihtiyaç duyduğu varsayılanlar
+  const d = { currentUser: null, isAdmin: false, isApproved: false, siteSettings: {}, success: [], error: [], csrfToken: '', safeUrl: (v) => '', appVersion: '' };
+  for (const k of Object.keys(d)) if (res.locals[k] === undefined) res.locals[k] = d[k];
+  res.status(status).render('error', {
+    title: status === 413 ? '413 - İstek Çok Büyük' : '500 - Sunucu Hatası',
+    statusCode: status,
     message: 'Bir şeyler ters gitti. Lütfen daha sonra tekrar deneyin.',
   });
 });

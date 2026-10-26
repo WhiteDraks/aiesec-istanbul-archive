@@ -48,7 +48,7 @@ router.get('/', async (req, res) => {
     periods.sort((a, b) => b.year.localeCompare(a.year));
 
     // Filter by selected years checklist if specified
-    const selectedYears = req.query.years ? (Array.isArray(req.query.years) ? req.query.years : [req.query.years]) : [];
+    const selectedYears = (req.query.years ? (Array.isArray(req.query.years) ? req.query.years : [req.query.years]) : []).filter(y => typeof y === 'string');
 
     let filteredPeriods = periods;
     if (selectedYears.length > 0) {
@@ -74,6 +74,8 @@ router.get('/', async (req, res) => {
  * Also shows memories uploaded by approved members.
  * Requires login + approval.
  */
+router.param('year', (req, res, next, year) => (/^[\w.\-]{1,20}$/.test(year) ? next() : res.status(404).render('error', { title: '404', statusCode: 404, message: 'Aradığınız sayfa bulunamadı.' })));
+
 router.get('/:year', isLoggedIn, isApproved, async (req, res) => {
   try {
     const sql = getSQL();
@@ -179,7 +181,7 @@ router.post('/:year/memories', isLoggedIn, isApproved, upload.single('photo'), a
       team_year: year,
       user_id: req.session.userId,
       photo_url: photoUrl,
-      caption: caption ? caption.trim() : '',
+      caption: typeof caption === 'string' ? caption.trim().slice(0, 300) : '',
     });
 
     req.flash('success', 'Anınız başarıyla eklendi!');
@@ -245,7 +247,7 @@ router.post('/:year/achievements', isLoggedIn, isApproved, async (req, res) => {
 
     // Clean up achievements list from text input
     let achievementsArray = [];
-    if (achievements) {
+    if (typeof achievements === 'string') {
       achievementsArray = achievements.split('\n').map(a => a.trim()).filter(a => a.length > 0);
     }
 

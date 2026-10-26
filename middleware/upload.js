@@ -41,10 +41,11 @@ const upload = {
             if (matches && matches.length === 3) {
               const mimeType = matches[1];
 
-              if (mimeType === 'image/svg+xml') {
-                console.warn('Blocked SVG base64 upload attempt.');
+              if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(mimeType)) {
+                console.warn('Blocked non-image base64 upload attempt:', mimeType);
               } else {
                 const buffer = Buffer.from(matches[2], 'base64');
+                if (buffer.length > 5 * 1024 * 1024) throw new Error('Dosya çok büyük');
 
                 req.file = {
                   fieldname: fieldName,

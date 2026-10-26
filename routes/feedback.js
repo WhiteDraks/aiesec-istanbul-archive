@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Feedback = require('../models/Feedback');
-const { sendApprovalEmail } = require('../utils/email'); // We can reuse email helper or construct one
+const { str } = require('../utils/security');
 
 // GET /feedback - Geri bildirim formu sayfası
 router.get('/', (req, res) => {
@@ -13,7 +13,7 @@ router.get('/', (req, res) => {
 // POST /feedback - Geri bildirimi kaydetme
 router.post('/', async (req, res) => {
   try {
-    const { name, email, message } = req.body;
+    const name = str(req.body.name, 100), email = str(req.body.email, 254), message = str(req.body.message, 3000);
     const user_id = req.session.userId || null;
 
     if (!message || message.trim() === '') {
