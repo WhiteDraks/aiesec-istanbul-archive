@@ -1,0 +1,121 @@
+<%- include('../layout/header', { currentPage: 'admin' }) %>
+
+<section class="page-hero page-hero-sm page-hero-admin">
+  <div class="page-hero-bg"></div>
+  <div class="container">
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 class="page-hero-title">İçerik & Yetkiler</h1>
+        <p class="page-hero-sub">İş ilanları, etkinlikler, anılar ve admin hesapları</p>
+      </div>
+      <a href="/admin" class="btn btn-outline">◀ Panele Geri Dön</a>
+    </div>
+  </div>
+</section>
+
+<section class="section section-admin">
+  <div class="container" style="display: grid; gap: 3rem;">
+
+    <!-- Adminler -->
+    <div>
+      <h2 class="section-title-sm">Adminler</h2>
+      <p class="form-hint">Yeni admin atamak için panelde onaylı kullanıcının yanındaki “Admin Yap” düğmesini kullanın. Kendi yetkinizi değiştiremezsiniz.</p>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead><tr><th>Ad</th><th>E-posta</th><th>İşlem</th></tr></thead>
+          <tbody>
+            <% admins.forEach(a => { %>
+              <tr class="admin-row">
+                <td><%= a.name %><% if (currentUser && a.id === currentUser.id) { %> <small>(siz)</small><% } %></td>
+                <td><%= a.email %></td>
+                <td class="action-cell">
+                  <% if (!currentUser || a.id !== currentUser.id) { %>
+                    <form action="/admin/role/<%= a.id %>" method="POST" style="display:inline" onsubmit="return confirm('Bu kişinin admin yetkisi alınacak. Emin misiniz?')">
+                      <input type="hidden" name="role" value="user">
+                      <button type="submit" class="btn btn-reject btn-xs">Yetkiyi Al</button>
+                    </form>
+                  <% } %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- İş ilanları -->
+    <div>
+      <h2 class="section-title-sm">İş İlanları (<%= jobs.length %>)</h2>
+      <% if (jobs.length === 0) { %><p class="form-hint">Henüz ilan yok.</p><% } %>
+      <% jobs.forEach(j => { %>
+        <details class="detail-section" style="margin-bottom: 0.75rem; padding: 0.9rem 1.1rem;">
+          <summary style="cursor: pointer; font-weight: 600;"><%= j.title %> — <%= j.company %> <small style="font-weight: 400;">· <%= j.user_name || 'silinmiş kullanıcı' %></small></summary>
+          <form action="/admin/jobs/<%= j.id %>/edit" method="POST" class="auth-form" style="margin-top: 1rem;">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Başlık</label><input class="form-input" name="title" value="<%= j.title %>" maxlength="150" required></div>
+              <div class="form-group"><label class="form-label">Şirket</label><input class="form-input" name="company" value="<%= j.company %>" maxlength="150" required></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Konum</label><input class="form-input" name="location" value="<%= j.location || '' %>" maxlength="150"></div>
+              <div class="form-group"><label class="form-label">Tür</label><input class="form-input" name="type" value="<%= j.type %>" maxlength="50" required></div>
+            </div>
+            <div class="form-group"><label class="form-label">Bağlantı</label><input class="form-input" name="link" value="<%= j.link || '' %>" maxlength="500"></div>
+            <div class="form-group"><label class="form-label">Açıklama</label><textarea class="form-input" name="description" rows="4" maxlength="5000" required><%= j.description %></textarea></div>
+            <div style="display: flex; gap: 0.5rem;">
+              <button type="submit" class="btn btn-primary btn-sm">Kaydet</button>
+            </div>
+          </form>
+          <form action="/admin/content/jobs/<%= j.id %>/delete" method="POST" style="margin-top: 0.5rem;" onsubmit="return confirm('Bu ilan silinecek. Emin misiniz?')">
+            <button type="submit" class="btn btn-delete btn-sm">Sil</button>
+          </form>
+        </details>
+      <% }) %>
+    </div>
+
+    <!-- Etkinlikler -->
+    <div>
+      <h2 class="section-title-sm">Etkinlikler (<%= events.length %>)</h2>
+      <% if (events.length === 0) { %><p class="form-hint">Henüz etkinlik yok.</p><% } %>
+      <% events.forEach(e => { %>
+        <details class="detail-section" style="margin-bottom: 0.75rem; padding: 0.9rem 1.1rem;">
+          <summary style="cursor: pointer; font-weight: 600;"><%= e.title %> <small style="font-weight: 400;">· <%= new Date(e.event_date).toLocaleDateString('tr-TR') %> · <%= e.creator_name || 'silinmiş kullanıcı' %></small></summary>
+          <form action="/admin/events/<%= e.id %>/edit" method="POST" class="auth-form" style="margin-top: 1rem;">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Başlık</label><input class="form-input" name="title" value="<%= e.title %>" maxlength="150" required></div>
+              <div class="form-group"><label class="form-label">Tarih</label><input class="form-input" type="datetime-local" name="event_date" value="<%= new Date(e.event_date).toISOString().slice(0, 16) %>" required></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Yer</label><input class="form-input" name="location" value="<%= e.location %>" maxlength="200" required></div>
+              <div class="form-group"><label class="form-label">Bağlantı</label><input class="form-input" name="link" value="<%= e.link || '' %>" maxlength="500"></div>
+            </div>
+            <div class="form-group"><label class="form-label">Açıklama</label><textarea class="form-input" name="description" rows="4" maxlength="5000" required><%= e.description %></textarea></div>
+            <button type="submit" class="btn btn-primary btn-sm">Kaydet</button>
+          </form>
+          <form action="/admin/content/events/<%= e.id %>/delete" method="POST" style="margin-top: 0.5rem;" onsubmit="return confirm('Bu etkinlik silinecek. Emin misiniz?')">
+            <button type="submit" class="btn btn-delete btn-sm">Sil</button>
+          </form>
+        </details>
+      <% }) %>
+    </div>
+
+    <!-- Anılar -->
+    <div>
+      <h2 class="section-title-sm">Son Anılar (<%= memories.length %>)</h2>
+      <% if (memories.length === 0) { %><p class="form-hint">Henüz anı yok.</p><% } %>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;">
+        <% memories.forEach(m => { %>
+          <div class="detail-section" style="padding: 0.6rem;">
+            <img src="<%= m.photo_url %>" alt="<%= m.caption || 'Anı' %>" style="width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px;" loading="lazy">
+            <p style="font-size: 0.8rem; margin: 0.4rem 0;"><%= m.team_year %> · <%= m.user_name || '—' %><br><%= m.caption || '' %></p>
+            <form action="/admin/content/memories/<%= m.id %>/delete" method="POST" onsubmit="return confirm('Bu anı silinecek. Emin misiniz?')">
+              <button type="submit" class="btn btn-delete btn-xs">Sil</button>
+            </form>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<%- include('../layout/footer') %>

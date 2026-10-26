@@ -236,6 +236,35 @@
         </div>
       </div>
 
+      <div class="form-divider" style="margin: 2rem 0; border-top: 1px dashed var(--border);"></div>
+
+      <!-- Ana Sayfa Metinleri -->
+      <div class="form-section">
+        <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;">Ana Sayfa Metinleri</h3>
+        <p class="form-hint" style="margin-bottom: 1.5rem;">Boş bıraktığınız alanlarda sitedeki varsayılan metin gösterilir.</p>
+        <% const hp = [
+          ['about_label', 'Hakkımızda etiketi', 'input'], ['about_title', 'Hakkımızda başlığı', 'input'],
+          ['about_text_1', 'Hakkımızda 1. paragraf', 'textarea'], ['about_text_2', 'Hakkımızda 2. paragraf', 'textarea'],
+          ['card1_title', '1. kart başlığı', 'input'], ['card1_text', '1. kart metni', 'textarea'],
+          ['card2_title', '2. kart başlığı', 'input'], ['card2_text', '2. kart metni', 'textarea'],
+          ['card3_title', '3. kart başlığı', 'input'], ['card3_text', '3. kart metni', 'textarea'],
+          ['teams_label', 'Dönemler etiketi', 'input'], ['teams_title', 'Dönemler başlığı', 'input'], ['teams_desc', 'Dönemler açıklaması', 'textarea'],
+          ['cta_title', 'Katıl bandı başlığı', 'input'], ['cta_text', 'Katıl bandı metni', 'textarea']
+        ]; %>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
+          <% hp.forEach(([key, label, kind]) => { %>
+            <div class="form-group" style="margin: 0;">
+              <label for="<%= key %>" class="form-label"><%= label %></label>
+              <% if (kind === 'textarea') { %>
+                <textarea id="<%= key %>" name="<%= key %>" class="form-input" rows="3" maxlength="1500"><%= settings[key] || '' %></textarea>
+              <% } else { %>
+                <input type="text" id="<%= key %>" name="<%= key %>" class="form-input" maxlength="200" value="<%= settings[key] || '' %>">
+              <% } %>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+
       <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">Ayarları Kaydet ve Uygula</button>
     </form>
 

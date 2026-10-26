@@ -268,13 +268,16 @@ router.post('/settings', upload.fields([
       'theme_primary', 'theme_secondary', 'theme_background', 'theme_surface',
       'site_title', 'site_logo_emblem', 'site_logo_text', 'site_logo_sub', 'footer_credit',
       'footer_credit_color', 'footer_credit_effect', 'email_from',
-      'hero_title', 'hero_title_gradient', 'hero_subtitle', 'hero_cta_text'
+      'hero_title', 'hero_title_gradient', 'hero_subtitle', 'hero_cta_text',
+      'about_label', 'about_title', 'about_text_1', 'about_text_2',
+      'card1_title', 'card1_text', 'card2_title', 'card2_text', 'card3_title', 'card3_text',
+      'teams_label', 'teams_title', 'teams_desc', 'cta_title', 'cta_text'
     ];
 
     const colorFields = ['theme_primary', 'theme_secondary', 'theme_background', 'theme_surface', 'footer_credit_color'];
     for (const field of fields) {
       if (typeof req.body[field] === 'string') {
-        let val = req.body[field].trim().slice(0, 500);
+        let val = req.body[field].trim().slice(0, 1500);
         // Renk alanları <style> içine yazılır: yalnızca #RRGGBB kabul et (CSS enjeksiyonunu önler)
         if (colorFields.includes(field) && !/^#[0-9a-fA-F]{6}$/.test(val)) continue;
         await SiteSetting.update(field, val);
@@ -596,6 +599,115 @@ router.post('/archive/:id/delete', async (req, res) => {
     req.flash('error', 'Silinirken hata oluştu.');
   }
   res.redirect('/admin/archive');
+});
+
+// ─── Rol Yönetimi (admin atama / geri alma) ─────────────────────────────────
+router.post('/role/:id', async (req, res) => {
+  try {
+    const role = req.body.role === 'admin' ? 'admin' : 'user';
+    if (String(req.params.id) === String(req.session.userId)) {
+      req.flash('error', 'Kendi yetkinizi değiştiremezsiniz.');
+      return res.redirect('/admin/content');
+    }
+    const target = await User.findById(req.params.id);
+    if (!target) {
+      req.flash('error', 'Kullanıcı bulunamadı.');
+      return res.redirect('/admin/content');
+    }
+    if (role === 'admin' && target.status !== 'approved') {
+      req.flash('error', 'Yalnızca onaylı kullanıcılar admin yapılabilir.');
+      return res.redirect('/admin');
+    }
+    await User.setRole(req.params.id, role);
+    req.flash('success', `${target.name} artık ${role === 'admin' ? 'admin' : 'normal kullanıcı'}.`);
+  } catch (err) {
+    console.error('Role change error:', err);
+    req.flash('error', 'Yetki değiştirilirken bir hata oluştu.');
+  }
+  res.redirect('/admin/content');
+});
+
+// ─── İçerik Yönetimi: iş ilanları, etkinlikler, anılar, adminler ────────────
+router.get('/content', async (req, res) => {
+  try {
+    const { getSQL } = require('../config/database');
+    const sql = getSQL();
+    const [jobs, events, memories, admins] = await Promise.all([
+      sql`SELECT j.*, u.name AS user_name FROM jobs j LEFT JOIN users u ON j.user_id = u.id ORDER BY j.created_at DESC`,
+      sql`SELECT e.*, u.name AS creator_name FROM events e LEFT JOIN users u ON e.created_by = u.id ORDER BY e.event_date DESC`,
+      sql`SELECT m.*, u.name AS user_name FROM eb_memories m LEFT JOIN users u ON m.user_id = u.id ORDER BY m.created_at DESC LIMIT 100`,
+      User.findAdmins(),
+    ]);
+    res.render('admin/content', {
+      title: 'İçerik Yönetimi - Admin Paneli',
+      jobs, events, memories, admins,
+    });
+  } catch (err) {
+    console.error('Content page error:', err);
+    req.flash('error', 'İçerik yönetimi yüklenirken bir hata oluştu.');
+    res.redirect('/admin');
+  }
+});
+
+router.post('/jobs/:id/edit', async (req, res) => {
+  try {
+    const { getSQL } = require('../config/database');
+    const sql = getSQL();
+    const link = safeUrl(str(req.body.link, 500));
+    await sql`
+      UPDATE jobs SET
+        title = ${str(req.body.title, 150)}, company = ${str(req.body.company, 150)},
+        location = ${str(req.body.location, 150) || null}, type = ${str(req.body.type, 50)},
+        description = ${str(req.body.description, 5000)}, link = ${link || null}
+      WHERE id = ${req.params.id}
+    `;
+    req.flash('success', 'İş ilanı güncellendi.');
+  } catch (err) {
+    console.error('Job edit error:', err);
+    req.flash('error', 'İş ilanı güncellenemedi.');
+  }
+  res.redirect('/admin/content');
+});
+
+router.post('/events/:id/edit', async (req, res) => {
+  try {
+    const { getSQL } = require('../config/database');
+    const sql = getSQL();
+    const date = new Date(str(req.body.event_date, 40));
+    if (isNaN(date.getTime())) {
+      req.flash('error', 'Geçerli bir tarih girin.');
+      return res.redirect('/admin/content');
+    }
+    const link = safeUrl(str(req.body.link, 500));
+    await sql`
+      UPDATE events SET
+        title = ${str(req.body.title, 150)}, description = ${str(req.body.description, 5000)},
+        event_date = ${date}, location = ${str(req.body.location, 200)}, link = ${link || null}
+      WHERE id = ${req.params.id}
+    `;
+    req.flash('success', 'Etkinlik güncellendi.');
+  } catch (err) {
+    console.error('Event edit error:', err);
+    req.flash('error', 'Etkinlik güncellenemedi.');
+  }
+  res.redirect('/admin/content');
+});
+
+router.post('/content/:kind/:id/delete', async (req, res) => {
+  try {
+    const { getSQL } = require('../config/database');
+    const sql = getSQL();
+    const { kind, id } = req.params;
+    if (kind === 'jobs') await sql`DELETE FROM jobs WHERE id = ${id}`;
+    else if (kind === 'events') await sql`DELETE FROM events WHERE id = ${id}`;
+    else if (kind === 'memories') await sql`DELETE FROM eb_memories WHERE id = ${id}`;
+    else return res.status(404).redirect('/admin/content');
+    req.flash('success', 'Kayıt silindi.');
+  } catch (err) {
+    console.error('Content delete error:', err);
+    req.flash('error', 'Silme işlemi başarısız oldu.');
+  }
+  res.redirect('/admin/content');
 });
 
 module.exports = router;

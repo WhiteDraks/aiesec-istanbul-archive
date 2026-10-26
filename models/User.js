@@ -153,6 +153,17 @@ const User = {
     return rows;
   },
 
+  async setRole(id, role) {
+    const sql = getSQL();
+    const rows = await sql`UPDATE users SET role = ${role}, updated_at = NOW() WHERE id = ${id} RETURNING id, name, email, role`;
+    return rows[0];
+  },
+
+  async findAdmins() {
+    const sql = getSQL();
+    return await sql`SELECT id, name, email, created_at FROM users WHERE role = 'admin' ORDER BY name ASC`;
+  },
+
   async countByRole(role = 'user') {
     const sql = getSQL();
     const rows = await sql`SELECT COUNT(*) AS total FROM users WHERE role = ${role}`;

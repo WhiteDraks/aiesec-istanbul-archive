@@ -1,0 +1,198 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   İstanbul Alumni Archive — "İnsani" tema katmanı
+   style.css'in üzerine biner. Neon/gradyan/cam efektlerini kaldırır; sıcak
+   renkler, serif başlıklar, düz yüzeyler ve sakin hareketler kullanır.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Sıcak, hafif kahverengimsi koyu zemin (lacivert/neon yerine) */
+  --navy-900: #1a1714;
+  --navy-800: #221e1a;
+  --navy-700: #2b2621;
+  --navy-600: #38322b;
+  --navy-500: #4a423a;
+
+  /* Sıcak gri tonları */
+  --gray-100: #f3eee6;
+  --gray-200: #e6dfd3;
+  --gray-300: #c9c0b1;
+  --gray-400: #a39a8b;
+  --gray-500: #81796c;
+
+  /* Marka mavisi biraz sakinleştirildi; sıcak vurgu eklendi */
+  --blue-400: #5b9bea;
+  --blue-500: #2f6fcf;
+  --blue-600: #2559ab;
+  --blue-sky: #6aa7e8;
+  --accent:   #e2a65a;
+
+  /* Gradyanlar ve parlamalar düz renge çevrildi */
+  --gradient-hero:  var(--navy-900);
+  --gradient-blue:  var(--blue-500);
+  --gradient-card:  linear-gradient(180deg, transparent 55%, rgba(26, 23, 20, 0.88) 100%);
+  --gradient-glass: var(--navy-800);
+
+  --font-display: 'Fraunces', 'Georgia', 'Times New Roman', serif;
+
+  --radius-lg:  8px;
+  --radius-xl:  10px;
+  --radius-2xl: 14px;
+
+  --shadow-sm:  0 1px 2px rgba(0,0,0,0.25);
+  --shadow-md:  0 2px 10px rgba(0,0,0,0.25);
+  --shadow-lg:  0 8px 24px rgba(0,0,0,0.28);
+  --shadow-xl:  0 12px 32px rgba(0,0,0,0.32);
+  --shadow-blue: none;
+  --shadow-glow: none;
+}
+
+body { line-height: 1.75; letter-spacing: 0; }
+
+/* ── Başlıklar: serif ── */
+h1, h2, h3,
+.hero-title, .section-title, .page-hero-title, .eb-hero-title,
+.team-card-title, .year-card-title, .auth-form-header h1, .auth-form-header h2,
+.cta-banner-content h2, .error-title, .member-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* ── Navbar: düz, cam yok ── */
+.navbar,
+.navbar.scrolled {
+  background: var(--navy-900);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  border-bottom: 1px solid var(--navy-600);
+}
+.logo-emblem { box-shadow: none; border-radius: 8px; }
+.nav-logo:hover .logo-emblem { transform: none; }
+.nav-link { border-radius: 6px; font-weight: 500; }
+.nav-link:hover, .nav-link.active { background: var(--navy-700); }
+.nav-link.active { box-shadow: inset 0 -2px 0 var(--accent); border-radius: 6px 6px 0 0; }
+.nav-link-highlight { color: var(--accent) !important; }
+.admin-dot { animation: none; }
+.dropdown-menu { backdrop-filter: none !important; background: var(--navy-800) !important; border: 1px solid var(--navy-600) !important; box-shadow: var(--shadow-md) !important; }
+
+/* ── Butonlar: düz renk, parlama/zıplama yok ── */
+.btn { border-width: 1px; border-radius: 8px; font-weight: 600; transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast); }
+.btn:hover, .btn:active { transform: none !important; }
+.btn-primary { background: var(--blue-500); box-shadow: none; }
+.btn-primary:hover { background: var(--blue-600); box-shadow: none; filter: none; }
+.btn-outline { color: var(--gray-200); border-color: var(--navy-500); }
+.btn-outline:hover { background: var(--navy-700); border-color: var(--gray-400); color: var(--white); }
+.btn-ghost { backdrop-filter: none; background: transparent; border-color: var(--navy-500); color: var(--gray-100); }
+.btn-ghost:hover { background: var(--navy-700); }
+.btn-white { background: var(--gray-100); color: var(--navy-900); }
+.btn-white:hover { background: var(--white); box-shadow: none; }
+.btn-lg { border-radius: 8px; }
+
+/* ── Hero: sola yaslı, sakin ── */
+.hero { min-height: 0; padding-block: calc(var(--navbar-h) + 4.5rem) 4.5rem; border-bottom: 1px solid var(--navy-600); }
+.hero-bg { background: var(--navy-900); }
+.hero-orb, .hero-grid, .hero-scroll-indicator { display: none !important; }
+.hero-content { text-align: left; max-width: 820px; margin-inline: 0 auto; }
+.hero-badge {
+  background: none; border: 0; padding: 0; border-radius: 0;
+  color: var(--accent); font-size: 0.85rem; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+.badge-dot { display: none; }
+.hero-title { font-size: clamp(2.4rem, 6vw, 4rem); line-height: 1.12; font-weight: 600; }
+.hero-title-gradient {
+  background: none; -webkit-background-clip: initial; background-clip: initial;
+  -webkit-text-fill-color: currentColor;
+  color: var(--accent); font-style: italic; font-weight: 500;
+}
+.hero-subtitle { color: var(--gray-300); font-size: 1.1rem; max-width: 58ch; }
+.hero-actions { justify-content: flex-start; }
+.hero-stats { justify-content: flex-start; border-top: 1px solid var(--navy-600); }
+.stat-num { font-family: var(--font-display); font-weight: 600; }
+.stat-divider { background: var(--navy-600); }
+
+/* ── Bölüm başlıkları ── */
+.section-label {
+  background: none; border: 0; padding: 0; border-radius: 0;
+  color: var(--accent); font-size: 0.8rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+.section-title { font-size: clamp(1.7rem, 3.6vw, 2.4rem); }
+.section-desc { color: var(--gray-300); }
+.section-header { text-align: left; margin-inline: 0; }
+
+/* ── Kartlar: düz yüzey, ince çerçeve ── */
+.intro-card, .team-card, .year-card, .member-card, .admin-stat, .pending-card,
+.auth-container, .access-notice, .achievement-item, .detail-section,
+.empty-state, .admin-table-wrap, .cta-banner {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--navy-800);
+  border: 1px solid var(--navy-600);
+  box-shadow: none;
+  border-radius: 10px;
+}
+.team-card:hover, .year-card:hover, .member-card:hover, .intro-card:hover, .admin-stat:hover {
+  transform: none;
+  border-color: var(--navy-500);
+  box-shadow: var(--shadow-md);
+}
+.team-card:hover .team-card-cover img, .year-card:hover .year-card-cover img { transform: none; }
+.team-card-cover, .year-card-cover { border-radius: 10px 10px 0 0; }
+.team-card-year, .year-badge, .eb-year-badge {
+  background: var(--navy-900); color: var(--accent);
+  border: 1px solid var(--navy-600); border-radius: 6px;
+  backdrop-filter: none; font-weight: 600;
+}
+
+/* Emoji ikonlar yerine sade numaralar */
+.intro-card-icon { font-size: 0; width: auto; height: auto; background: none; border: 0; margin-bottom: 0.5rem; }
+.intro-cards { counter-reset: introcard; }
+.intro-card { counter-increment: introcard; }
+.intro-card-icon::before { content: "0" counter(introcard); font-family: var(--font-display); font-size: 1.6rem; color: var(--accent); }
+.intro-card-blue, .intro-card-navy, .intro-card-light { background: var(--navy-800); color: inherit; }
+.empty-icon, .pending-icon { filter: grayscale(0.6); opacity: 0.8; }
+
+/* ── CTA bandı ── */
+.cta-banner { background: var(--navy-700); }
+.cta-banner-bg, .cta-orb { display: none !important; }
+.cta-banner-content { text-align: left; }
+
+/* ── İç sayfa başlığı ── */
+.page-hero, .page-hero-bg, .eb-hero-overlay { background-image: none; }
+.page-hero { background: var(--navy-800); border-bottom: 1px solid var(--navy-600); }
+.eb-hero-overlay { background: linear-gradient(180deg, rgba(26,23,20,0.15), rgba(26,23,20,0.85)); }
+
+/* ── Formlar ── */
+.form-input, input[type="text"], input[type="email"], input[type="password"], input[type="url"], input[type="date"],
+input[type="datetime-local"], input[type="tel"], textarea, select {
+  background: var(--navy-900);
+  border: 1px solid var(--navy-500);
+  border-radius: 8px;
+  color: var(--gray-100);
+}
+.form-input:focus, input:focus, textarea:focus, select:focus {
+  outline: 2px solid var(--blue-400); outline-offset: 1px;
+  border-color: var(--blue-400); box-shadow: none;
+}
+.auth-panel-left { background: var(--navy-700); }
+.auth-panel-orb { display: none !important; }
+
+/* ── Admin ── */
+.admin-stat-pending, .admin-stat-approved, .admin-stat-rejected, .admin-stat-total { background: var(--navy-800); }
+.user-avatar-approved { background: var(--green-500); }
+.admin-row:hover td { background: var(--navy-700); }
+.admin-tab { border-radius: 6px; }
+
+/* ── Footer ── */
+.footer { background: var(--navy-800); border-top: 1px solid var(--navy-600); }
+
+/* ── Hareket: gösterişli animasyonları azalt ── */
+@media (prefers-reduced-motion: no-preference) {
+  .team-card, .year-card, .member-card { transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
+}
+@media (max-width: 768px) {
+  .hero { padding-block: calc(var(--navbar-h) + 2.5rem) 3rem; }
+  .hero-content { margin-inline: auto; }
+}
