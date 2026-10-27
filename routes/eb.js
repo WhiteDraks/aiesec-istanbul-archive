@@ -135,8 +135,11 @@ router.get('/:year', isLoggedIn, isApproved, async (req, res) => {
     };
 
     if (members.length === 0 && !meta) {
-      req.flash('error', 'Bu döneme ait veri bulunamadı.');
-      return res.redirect('/eb');
+      return res.status(404).render('error', {
+        title: '404 - Dönem Bulunamadı',
+        statusCode: 404,
+        message: 'Bu döneme ait veri bulunamadı.',
+      });
     }
 
     const canEditTeam = req.session.user && (

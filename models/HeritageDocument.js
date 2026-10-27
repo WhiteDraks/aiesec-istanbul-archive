@@ -5,30 +5,17 @@ const HeritageDocument = {
     const sql = getSQL();
     const { category, search, year } = filters;
 
-    // Direct SQL builder approach
-    let query = sql`
-      SELECT hd.*, u.name as uploader_name 
+    // Tek, parametreli sorgu: boş filtreler NULL olarak geçer (sorgu parçalarını iç içe geçirmek sürücüde desteklenmez)
+    const searchPattern = search ? `%${String(search).slice(0, 100).replace(/[\\%_]/g, '\\$&')}%` : null;
+    return await sql`
+      SELECT hd.*, u.name as uploader_name
       FROM heritage_documents hd
       LEFT JOIN users u ON hd.uploaded_by = u.id
-      WHERE 1=1
+      WHERE (${category || null}::text IS NULL OR hd.category = ${category || null}::text)
+        AND (${year || null}::text IS NULL OR hd.year = ${year || null}::text)
+        AND (${searchPattern}::text IS NULL OR hd.title ILIKE ${searchPattern}::text OR hd.description ILIKE ${searchPattern}::text)
+      ORDER BY hd.year DESC, hd.created_at DESC
     `;
-
-    if (category) {
-      query = sql`${query} AND hd.category = ${category}`;
-    }
-
-    if (year) {
-      query = sql`${query} AND hd.year = ${year}`;
-    }
-
-    if (search) {
-      const searchPattern = `%${String(search).slice(0, 100).replace(/[\\%_]/g, '\\$&')}%`;
-      query = sql`${query} AND (hd.title ILIKE ${searchPattern} OR hd.description ILIKE ${searchPattern})`;
-    }
-
-    query = sql`${query} ORDER BY hd.year DESC, hd.created_at DESC`;
-
-    return await query;
   },
 
   async findById(id) {

@@ -131,6 +131,17 @@ app.use(express.static(path.join(__dirname, 'public'), {
   },
 }));
 
+// Tarayıcılar /favicon.ico ister: SVG simgeye yönlendir (404 yerine)
+app.get('/favicon.ico', (req, res) => res.redirect(301, '/images/favicon.svg'));
+
+// Paylaşım (Open Graph) ve canonical adresleri için site adresi
+const { SITE_URL: _SITE_URL } = require('./utils/escape');
+app.use((req, res, next) => {
+  res.locals.siteUrl = _SITE_URL;
+  res.locals.canonicalUrl = _SITE_URL + req.path;
+  next();
+});
+
 // Tarayıcının "Veri Tasarrufu" (Save-Data) isteği: ağır arka plan görseli ve analitik atlanır
 app.use((req, res, next) => {
   res.vary('Save-Data');

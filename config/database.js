@@ -104,6 +104,7 @@ async function initDB() {
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS roles_history JSONB DEFAULT '[]'::jsonb`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS city VARCHAR(100)`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS country VARCHAR(100)`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS show_phone BOOLEAN DEFAULT FALSE`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_mentor BOOLEAN DEFAULT FALSE`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_mentee BOOLEAN DEFAULT FALSE`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS mentorship_details TEXT`;
