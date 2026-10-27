@@ -74,7 +74,7 @@
                   </td>
                   <td style="text-align: right;">
                     <div style="display: inline-flex; gap: 0.5rem; justify-content: flex-end;">
-                      <a href="<%= doc.file_url %>" target="_blank" class="btn btn-outline btn-xs" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">İncele 👁️</a>
+                      <a href="<%= doc.file_url %>" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-xs" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">İncele 👁️</a>
                       <a href="/admin/archive/<%= doc.id %>/edit" class="btn btn-outline btn-xs" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Düzenle ✏️</a>
                       <form action="/admin/archive/<%= doc.id %>/delete" method="POST" onsubmit="return confirm('Bu belgeyi silmek istediğinizden emin misiniz?')" style="display: inline;">
                         <button type="submit" class="btn btn-outline btn-xs" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; border-color: rgba(239, 68, 68, 0.4); color: #ef4444; background: rgba(239, 68, 68, 0.02);">Sil 🗑️</button>

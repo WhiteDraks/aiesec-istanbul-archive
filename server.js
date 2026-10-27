@@ -3,7 +3,6 @@ const express = require('express');
 const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
 const { Pool } = require('pg');
-const methodOverride = require('method-override');
 const path = require('path');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -91,6 +90,23 @@ const loginAccountLimiter = rateLimit({
   message: 'Bu hesap için çok fazla başarısız deneme yapıldı. Lütfen 15 dakika sonra tekrar deneyin.',
 });
 
+// Kaydolma / şifre sıfırlama / geri bildirim: e-posta bombardımanı ve spam'e karşı saatlik sınırlar
+const mkHourly = (prefix, max, message, keyFn) => rateLimit({
+  store: new PgRateLimitStore(prefix),
+  windowMs: 60 * 60 * 1000,
+  max,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.method !== 'POST',
+  ...(keyFn ? { keyGenerator: keyFn, validate: { keyGeneratorIpFallback: false } } : {}),
+  message,
+});
+const registerLimiter = mkHourly('register', 5, 'Çok fazla kayıt denemesi. Lütfen daha sonra tekrar deneyin.');
+const forgotIpLimiter = mkHourly('forgot-ip', 10, 'Çok fazla şifre sıfırlama isteği. Lütfen daha sonra tekrar deneyin.');
+const forgotAcctLimiter = mkHourly('forgot-acct', 3, 'Bu e-posta için çok fazla sıfırlama isteği yapıldı. Lütfen bir saat sonra tekrar deneyin.',
+  (req) => 'acct:' + String((req.body && typeof req.body.email === 'string') ? req.body.email : '').toLowerCase().trim().slice(0, 254));
+const feedbackHourlyLimiter = mkHourly('feedback-hourly', 10, 'Çok fazla geri bildirim gönderdiniz. Lütfen daha sonra tekrar deneyin.');
+
 // ─── View Engine ─────────────────────────────────────────────────────────────
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -103,7 +119,7 @@ app.use(express.urlencoded({ extended: true, limit: '200kb', parameterLimit: 200
 app.use(express.json({ limit: '200kb' }));
 
 // ─── Method Override ──────────────────────────────────────────────────────────
-app.use(methodOverride('_method'));
+// (method-override kaldırıldı: kullanılmıyordu ve POST'u PUT/DELETE'e çevirerek yetki kontrollerini atlatma yüzeyi açıyordu)
 
 // ─── Session ──────────────────────────────────────────────────────────────────
 const sessionConfig = {
@@ -213,6 +229,8 @@ const contentLimiter = rateLimit({
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use('/',         require('./routes/index'));
 app.post('/auth/login', loginAccountLimiter);
+app.post('/auth/register', registerLimiter);
+app.post('/auth/forgot-password', forgotIpLimiter, forgotAcctLimiter);
 app.use('/auth',     authLimiter, require('./routes/auth'));  // Rate limit tüm auth rotalarına
 app.use('/eb',       require('./routes/eb'));
 app.use('/admin/import', require('./routes/admin-import'));
@@ -223,7 +241,7 @@ app.use('/archive',  require('./routes/archive'));
 app.use('/ai-assistant', require('./routes/ai'));
 app.use('/profile',  require('./routes/profile'));
 app.use('/alumni',   require('./routes/alumni'));
-app.use('/feedback', contentLimiter, require('./routes/feedback'));
+app.use('/feedback', contentLimiter, feedbackHourlyLimiter, require('./routes/feedback'));
 app.use('/jobs',     contentLimiter, require('./routes/jobs'));
 app.use('/events',   contentLimiter, require('./routes/events'));
 

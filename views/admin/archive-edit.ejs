@@ -57,7 +57,7 @@
           <label class="form-label">Yeni Dosya Yükle (Opsiyonel)</label>
           <div style="margin-bottom: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">Mevcut Dosya:</p>
-            <a href="<%= document.file_url %>" target="_blank" class="btn btn-outline btn-xs" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+            <a href="<%= document.file_url %>" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-xs" style="display: inline-flex; align-items: center; gap: 0.5rem;">
               <% if (document.file_type === 'pdf') { %>
                 📄 PDF Belgesini Görüntüle
               <% } else { %>

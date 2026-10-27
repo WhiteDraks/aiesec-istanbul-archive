@@ -442,7 +442,7 @@ router.get('/timeline/:id/edit', async (req, res) => {
 router.post('/timeline/:id/edit', upload.single('image'), async (req, res) => {
   try {
     const { year, title, description, existing_image } = req.body;
-    let imageUrl = existing_image || '';
+    let imageUrl = (typeof existing_image === 'string' && (existing_image.startsWith('/') && !existing_image.startsWith('//') || safeUrl(existing_image))) ? existing_image : '';
     if (req.file) {
       imageUrl = await uploadToBlob(req.file.buffer, req.file.originalname, 'timeline/');
     }
@@ -564,8 +564,10 @@ router.get('/archive/:id/edit', async (req, res) => {
 router.post('/archive/:id/edit', docUpload.single('file'), async (req, res) => {
   try {
     const { title, description, category, year, existing_file_url, existing_file_type } = req.body;
-    let fileUrl = existing_file_url;
-    let fileType = existing_file_type;
+    // Gizli alandan gelen mevcut URL'ye güvenme: yalnızca http(s) veya site içi yol kabul edilir
+    const okUrl = (u) => (typeof u === 'string' && (u.startsWith('/') && !u.startsWith('//') || safeUrl(u)) ? u : '');
+    let fileUrl = okUrl(existing_file_url);
+    let fileType = ['pdf', 'image'].includes(existing_file_type) ? existing_file_type : 'image';
 
     if (req.file) {
       fileUrl = await uploadToBlob(req.file.buffer, req.file.originalname, 'archive/');

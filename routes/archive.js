@@ -6,7 +6,8 @@ const { isLoggedIn, isApproved } = require('../middleware/auth');
 // GET /archive - View heritage documents and search/filter them
 router.get('/', isLoggedIn, isApproved, async (req, res) => {
   try {
-    const { category, search, year } = req.query;
+    const s1 = (v) => (typeof v === 'string' ? v.slice(0, 100) : '');
+    const category = s1(req.query.category), search = s1(req.query.search), year = s1(req.query.year);
 
     // Fetch documents matching filters
     const documents = await HeritageDocument.findAll({ category, search, year });
