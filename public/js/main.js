@@ -171,3 +171,32 @@ document.addEventListener('click', function (e) {
     window.toggleMemberDetails(tg.getAttribute('data-toggle-member'));
   }
 });
+
+// ── Yatay tarih şeridi: ok düğmeleri ve fareyle sürükleyerek kaydırma ───────────
+document.addEventListener('click', function (e) {
+  const b = e.target.closest && e.target.closest('[data-timeline-scroll]');
+  const t = document.querySelector('.hline-track');
+  if (b && t) {
+    const dir = parseInt(b.getAttribute('data-timeline-scroll'), 10) || 1;
+    t.scrollBy({ left: dir * Math.max(240, t.clientWidth * 0.8), behavior: 'smooth' });
+  }
+});
+
+(function () {
+  const t = document.querySelector('.hline-track');
+  if (!t) return;
+  let down = false, startX = 0, startLeft = 0;
+  t.addEventListener('pointerdown', function (e) {
+    if (e.pointerType !== 'mouse') return;
+    down = true; startX = e.clientX; startLeft = t.scrollLeft;
+    t.classList.add('dragging');
+  });
+  window.addEventListener('pointermove', function (e) {
+    if (down) t.scrollLeft = startLeft - (e.clientX - startX);
+  });
+  window.addEventListener('pointerup', function () { down = false; t.classList.remove('dragging'); });
+  t.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') t.scrollBy({ left: 240, behavior: 'smooth' });
+    if (e.key === 'ArrowLeft') t.scrollBy({ left: -240, behavior: 'smooth' });
+  });
+})();
