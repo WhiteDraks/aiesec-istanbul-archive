@@ -198,7 +198,19 @@ async function sendAdminNotificationEmail(candidateName, candidateEmail) {
     </div>
   `;
   const html = getEmailTemplate('Yeni Üye Kayıt Başvurusu 🔔', htmlContent);
-  return await sendMailHelper({ to: 'lcpist@gmail.com', subject: 'AIESEC İstanbul Mezunlar Portalı - Yeni Üye Kayıt Başvurusu 🔔', html });
+  // Bildirim, admin rolündeki tüm hesaplara gider (kimse diğerlerinin adresini görmesin diye ayrı ayrı).
+  // Admin bulunamazsa ya da sorgu hata verirse eski sabit adrese düşer.
+  let recipients = [];
+  try {
+    const { getSQL } = require('../config/database');
+    const rows = await getSQL()`SELECT email FROM users WHERE role = 'admin' AND email IS NOT NULL`;
+    recipients = [...new Set(rows.map((r) => String(r.email).trim().toLowerCase()).filter(Boolean))];
+  } catch (err) {
+    console.error('Admin e-postaları okunamadı:', err.message);
+  }
+  if (recipients.length === 0) recipients = ['lcpist@gmail.com'];
+  const subject = 'AIESEC İstanbul Mezunlar Portalı - Yeni Üye Kayıt Başvurusu 🔔';
+  return await Promise.allSettled(recipients.map((to) => sendMailHelper({ to, subject, html })));
 }
 
 module.exports = {
