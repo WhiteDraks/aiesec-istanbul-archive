@@ -8,6 +8,20 @@
   ],
   "routes": [
     {
+      "src": "/(css|js)/(.*)",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      },
+      "continue": true
+    },
+    {
+      "src": "/images/(.*)",
+      "headers": {
+        "cache-control": "public, max-age=604800"
+      },
+      "continue": true
+    },
+    {
       "src": "/public/(.*)",
       "dest": "/public/$1"
     },
