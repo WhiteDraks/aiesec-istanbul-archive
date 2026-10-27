@@ -6,6 +6,6 @@ function esc(value) {
 }
 
 // Sitenin kök adresi: SITE_URL ortam değişkeni, yoksa güncel canlı alan adı.
-const SITE_URL = (process.env.SITE_URL || 'https://istanbul-alumni-archive.vercel.app').replace(/\/+$/, '');
+const SITE_URL = (process.env.SITE_URL || 'https://www.1stanbullu.com.tr').replace(/\/+$/, '');
 
 module.exports = { esc, SITE_URL };
