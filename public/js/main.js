@@ -185,17 +185,35 @@ document.addEventListener('click', function (e) {
 (function () {
   const t = document.querySelector('.hline-track');
   if (!t) return;
-  let down = false, startX = 0, startLeft = 0;
+  let down = false, startX = 0, startLeft = 0, moved = false;
   t.addEventListener('pointerdown', function (e) {
     if (e.pointerType !== 'mouse') return;
-    down = true; startX = e.clientX; startLeft = t.scrollLeft;
+    down = true; moved = false; startX = e.clientX; startLeft = t.scrollLeft;
     t.classList.add('dragging');
   });
   window.addEventListener('pointermove', function (e) {
-    if (down) t.scrollLeft = startLeft - (e.clientX - startX);
+    if (!down) return;
+    if (Math.abs(e.clientX - startX) > 5) moved = true;
+    t.scrollLeft = startLeft - (e.clientX - startX);
   });
   window.addEventListener('pointerup', function () { down = false; t.classList.remove('dragging'); });
+
+  // Karta tıklayınca açıklama açılır/kapanır (sürükleme tıklama sayılmaz)
+  function toggleCard(card) {
+    const open = card.classList.toggle('open');
+    card.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  t.addEventListener('click', function (e) {
+    const card = e.target.closest('[data-expandable]');
+    if (card && !moved) toggleCard(card);
+    moved = false;
+  });
   t.addEventListener('keydown', function (e) {
+    const card = e.target.closest && e.target.closest('[data-expandable]');
+    if (card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleCard(card); }
+  });
+  t.addEventListener('keydown', function (e) {
+    if (e.target !== t) return;
     if (e.key === 'ArrowRight') t.scrollBy({ left: 240, behavior: 'smooth' });
     if (e.key === 'ArrowLeft') t.scrollBy({ left: -240, behavior: 'smooth' });
   });
