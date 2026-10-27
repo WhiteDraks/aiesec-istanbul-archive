@@ -185,22 +185,59 @@ document.addEventListener('click', function (e) {
 (function () {
   const t = document.querySelector('.hline-track');
   if (!t) return;
-  let down = false, startX = 0, startLeft = 0, moved = false;
+  const items = Array.prototype.slice.call(t.querySelectorAll('.timeline-item'));
+  const chips = Array.prototype.slice.call(document.querySelectorAll('[data-timeline-jump]'));
+  const bar = document.querySelector('.hline-progress-bar');
+
+  // Fareyle sürükleyerek kaydırma
+  let down = false, startX = 0, startLeft = 0;
   t.addEventListener('pointerdown', function (e) {
     if (e.pointerType !== 'mouse') return;
-    down = true; moved = false; startX = e.clientX; startLeft = t.scrollLeft;
+    down = true; startX = e.clientX; startLeft = t.scrollLeft;
     t.classList.add('dragging');
   });
   window.addEventListener('pointermove', function (e) {
-    if (!down) return;
-    if (Math.abs(e.clientX - startX) > 5) moved = true;
-    t.scrollLeft = startLeft - (e.clientX - startX);
+    if (down) t.scrollLeft = startLeft - (e.clientX - startX);
   });
   window.addEventListener('pointerup', function () { down = false; t.classList.remove('dragging'); });
-
   t.addEventListener('keydown', function (e) {
     if (e.target !== t) return;
     if (e.key === 'ArrowRight') t.scrollBy({ left: 240, behavior: 'smooth' });
     if (e.key === 'ArrowLeft') t.scrollBy({ left: -240, behavior: 'smooth' });
   });
+
+  // On yıl düğmeleri: ilgili on yılın ilk kaydına kaydır
+  chips.forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      const dec = parseInt(chip.getAttribute('data-timeline-jump'), 10);
+      const target = items.find(function (it) { return Math.floor(parseInt(it.getAttribute('data-year'), 10) / 10) * 10 === dec; });
+      if (target) t.scrollTo({ left: target.offsetLeft - (t.clientWidth - target.offsetWidth) / 2, behavior: 'smooth' });
+    });
+  });
+
+  // İlerleme çubuğu + görünen on yılı vurgula
+  function update() {
+    const max = t.scrollWidth - t.clientWidth;
+    if (bar) bar.style.width = (max > 0 ? Math.min(100, (t.scrollLeft / max) * 100) : 100) + '%';
+    const center = t.scrollLeft + t.clientWidth / 2;
+    let cur = items[0];
+    items.forEach(function (it) { if (it.offsetLeft + it.offsetWidth / 2 <= center) cur = it; });
+    const dec = Math.floor(parseInt(cur.getAttribute('data-year'), 10) / 10) * 10;
+    chips.forEach(function (c) { c.classList.toggle('active', parseInt(c.getAttribute('data-timeline-jump'), 10) === dec); });
+  }
+  t.addEventListener('scroll', function () { window.requestAnimationFrame(update); }, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+
+  // Kartlar görününce yumuşak giriş (JS yoksa hepsi zaten görünür)
+  t.classList.add('tl-js');
+  document.querySelector('.hline-wrap').classList.add('tl-js');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+    }, { root: t, threshold: 0.1 });
+    items.forEach(function (it) { io.observe(it); });
+  } else {
+    items.forEach(function (it) { it.classList.add('in'); });
+  }
 })();

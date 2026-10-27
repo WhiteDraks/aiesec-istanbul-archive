@@ -1,175 +1,205 @@
 <%- include('../layout/header') %>
 
+<%
+  const decadeOf = (y) => Math.floor(y / 10) * 10;
+  const decades = [];
+  milestones.forEach((m) => { const d = decadeOf(m.year); if (!decades.includes(d)) decades.push(d); });
+  const firstYear = milestones.length ? milestones[0].year : null;
+  const lastYear = milestones.length ? milestones[milestones.length - 1].year : null;
+%>
+
 <style>
-  /* Timeline Section Styles */
-  .timeline-hero {
-    padding: 5rem 0 3rem 0;
+  .tl-hero {
+    padding: 4.5rem 0 2rem;
     text-align: center;
-    background: radial-gradient(circle at center, rgba(3, 126, 243, 0.08) 0%, transparent 70%);
+    background:
+      radial-gradient(60% 80% at 50% 0%, rgba(3, 126, 243, 0.18) 0%, transparent 70%),
+      radial-gradient(40% 60% at 85% 20%, rgba(255, 200, 10, 0.07) 0%, transparent 70%);
   }
-  
-  .timeline-hero h1 {
-    font-size: 2.5rem;
-    font-weight: 800;
-    margin-bottom: 1rem;
-    background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+  .tl-eyebrow {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-size: 0.78rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--primary); padding: 0.3rem 0.85rem; border-radius: 999px;
+    border: 1px solid rgba(3, 126, 243, 0.3); background: rgba(3, 126, 243, 0.08);
   }
+  .tl-hero h1 {
+    font-size: clamp(2.2rem, 6vw, 3.6rem); font-weight: 800; line-height: 1.05; margin: 1rem 0 0.75rem;
+    background: linear-gradient(120deg, var(--text, #fff) 20%, var(--primary) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .tl-hero p { color: var(--text-lighter); max-width: 560px; margin: 0 auto; }
+  .tl-stats { display: flex; justify-content: center; gap: 2.2rem; margin-top: 1.6rem; flex-wrap: wrap; }
+  .tl-stat b { display: block; font-size: 1.7rem; font-weight: 800; color: var(--text, #fff); }
+  .tl-stat span { font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
 
-  /* Yatay zaman şeridi: sayfaya sığar, yana kaydırılır */
+  /* On yıl seçici */
+  .tl-decades { display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap; margin: 1.6rem 0 0.5rem; }
+  .tl-chip {
+    appearance: none; cursor: pointer; font: inherit; font-size: 0.85rem; font-weight: 600;
+    padding: 0.4rem 0.95rem; border-radius: 999px; color: var(--text-lighter);
+    border: 1px solid var(--border); background: var(--surface);
+    transition: all 0.2s ease;
+  }
+  .tl-chip:hover { border-color: var(--primary); color: var(--text, #fff); }
+  .tl-chip.active { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 0 18px rgba(3, 126, 243, 0.45); }
+
+  /* Şerit */
   .hline-wrap { position: relative; }
-
   .hline-track {
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x proximity;
-    -webkit-overflow-scrolling: touch;
-    padding: 0.5rem 0 1.25rem;
-    cursor: grab;
-    scrollbar-width: thin;
+    overflow-x: auto; overflow-y: hidden; cursor: grab; scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 1rem 0 0.5rem;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 36px, #000 calc(100% - 36px), transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0, #000 36px, #000 calc(100% - 36px), transparent 100%);
   }
+  .hline-track::-webkit-scrollbar { display: none; }
   .hline-track.dragging { cursor: grabbing; scroll-snap-type: none; user-select: none; }
 
-  .hline-inner {
-    position: relative;
-    display: flex;
-    gap: 1rem;
-    width: max-content;
-    min-width: 100%;
-    padding: 0 1rem;
-  }
-
-  /* Yatay çizgi */
+  .hline-inner { position: relative; display: flex; width: max-content; padding: 0 3rem; }
   .hline-inner::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 3.1rem;
-    height: 3px;
-    background: linear-gradient(to right, rgba(3, 126, 243, 0.1), var(--primary) 8%, var(--primary) 92%, rgba(3, 126, 243, 0.1));
-    border-radius: 2px;
+    content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 3px; transform: translateY(-50%);
+    background: linear-gradient(to right, transparent, var(--primary) 6%, #5ec2ff 50%, var(--primary) 94%, transparent);
+    box-shadow: 0 0 18px rgba(3, 126, 243, 0.55); border-radius: 2px;
   }
 
-  .hline-inner { align-items: flex-start; }
   .timeline-item {
-    position: relative;
-    flex: 0 0 15rem;
-    scroll-snap-align: start;
-    padding-top: 0;
+    --hue: 210;
+    position: relative; flex: 0 0 12.5rem; height: 25rem; scroll-snap-align: center;
+    display: grid; grid-template-rows: 1fr auto 1fr; justify-items: center;
   }
+  .tl-top { align-self: end; padding-bottom: 0.4rem; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+  .tl-bottom { align-self: start; padding-top: 0.4rem; width: 100%; display: flex; flex-direction: column; align-items: center; }
 
   .timeline-marker {
-    position: relative;
-    width: 18px;
-    height: 18px;
-    margin: 0.2rem 0 1.1rem 1.1rem;
-    border-radius: 50%;
-    background: var(--primary);
-    border: 4px solid var(--background);
-    box-shadow: 0 0 10px var(--primary);
-    z-index: 2;
+    position: relative; z-index: 2; width: 20px; height: 20px; border-radius: 50%;
+    background: hsl(var(--hue) 95% 58%); border: 4px solid var(--background);
+    box-shadow: 0 0 0 2px hsl(var(--hue) 95% 58% / 0.5), 0 0 20px hsl(var(--hue) 95% 58% / 0.8);
   }
+  .timeline-marker::after {
+    content: ''; position: absolute; inset: -9px; border-radius: 50%;
+    border: 1px solid hsl(var(--hue) 95% 58% / 0.5); animation: tl-pulse 2.6s ease-out infinite;
+  }
+  @keyframes tl-pulse { 0% { transform: scale(0.6); opacity: 0.9; } 100% { transform: scale(1.5); opacity: 0; } }
 
+  .tl-stem { width: 2px; height: 1.4rem; background: linear-gradient(to bottom, hsl(var(--hue) 95% 58% / 0.7), transparent); }
+  .tl-top .tl-stem { background: linear-gradient(to top, hsl(var(--hue) 95% 58% / 0.7), transparent); }
+
+  /* Büyük yıl rakamı */
   .timeline-year {
-    font-size: 1.15rem;
-    font-weight: 800;
-    color: var(--primary);
-    margin: 0 0 0.9rem;
-    display: inline-block;
-    padding: 0.15rem 0.7rem;
-    border-radius: 20px;
-    background: rgba(3, 126, 243, 0.08);
-    border: 1px solid rgba(3, 126, 243, 0.15);
+    font-size: 2.9rem; font-weight: 900; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
+    background: linear-gradient(180deg, hsl(var(--hue) 95% 65%), hsl(var(--hue) 80% 40% / 0.35));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    margin: 0.3rem 0;
   }
 
   .timeline-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 1.1rem 1.2rem;
-    border-radius: 14px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
-    transition: transform 0.25s ease, border-color 0.25s ease;
-    min-height: 6rem;
+    width: 11.4rem; padding: 0.9rem 1rem; border-radius: 16px; text-align: center;
+    background: linear-gradient(160deg, var(--surface), rgba(3, 126, 243, 0.05));
+    border: 1px solid var(--border); border-top: 2px solid hsl(var(--hue) 95% 58% / 0.8);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18); backdrop-filter: blur(6px);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   }
-  .timeline-card:hover { transform: translateY(-3px); border-color: var(--primary); }
+  .timeline-item:hover .timeline-card { transform: translateY(-4px); border-color: hsl(var(--hue) 95% 58%); box-shadow: 0 14px 36px hsl(var(--hue) 95% 58% / 0.25); }
+  .timeline-card h3 { font-size: 0.92rem; font-weight: 600; line-height: 1.45; margin: 0; color: var(--text, #fff); }
 
-  .timeline-card h3 {
-    font-size: 0.98rem;
-    font-weight: 600;
-    line-height: 1.45;
-    margin: 0;
-    color: var(--text, #fff);
+  /* Sona doğru: hikâye sürüyor */
+  .tl-end {
+    flex: 0 0 11rem; height: 25rem; display: flex; align-items: center; justify-content: center; text-align: center;
+    position: relative; z-index: 2;
   }
-
-  .timeline-card p {
-    font-size: 0.9rem;
-    color: var(--text-lighter);
-    line-height: 1.55;
-    margin: 0.6rem 0 0;
+  .tl-end span {
+    font-weight: 700; font-size: 1.05rem; color: var(--primary); padding: 0.7rem 1.1rem; border-radius: 999px;
+    border: 1px dashed rgba(3, 126, 243, 0.6); background: var(--background);
   }
 
-  .timeline-image {
-    width: 100%;
-    max-height: 150px;
-    object-fit: cover;
-    border-radius: 10px;
-    margin-top: 0.8rem;
-    border: 1px solid var(--border);
+  /* Giriş animasyonu (JS varsa) */
+  .tl-js .timeline-item { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .tl-js .timeline-item.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .tl-js .timeline-item { opacity: 1; transform: none; transition: none; }
+    .timeline-marker::after { animation: none; }
   }
 
-  .hline-nav { display: flex; justify-content: center; gap: 0.75rem; margin-top: 0.5rem; }
-  .hline-hint { text-align: center; font-size: 0.85rem; color: var(--text-muted); margin: 0 0 0.5rem; }
+  /* İlerleme çubuğu ve gezinme */
+  .hline-progress { height: 3px; border-radius: 2px; background: var(--border); margin: 0.6rem auto 0; max-width: 420px; overflow: hidden; }
+  .hline-progress-bar { height: 100%; width: 0; background: linear-gradient(to right, var(--primary), #5ec2ff); transition: width 0.1s linear; }
+  .hline-nav { display: flex; justify-content: center; gap: 0.75rem; margin-top: 1rem; }
+  .hline-hint { text-align: center; font-size: 0.85rem; color: var(--text-muted); margin: 0.8rem 0 0; }
 
-  /* Fallback */
   .timeline-empty {
-    text-align: center;
-    padding: 4rem 2rem;
-    background: var(--surface);
-    border: 1px dashed var(--border);
-    border-radius: 16px;
-    max-width: 500px;
-    margin: 2rem auto;
+    text-align: center; padding: 4rem 2rem; background: var(--surface); border: 1px dashed var(--border);
+    border-radius: 16px; max-width: 500px; margin: 2rem auto;
   }
 
   @media (max-width: 768px) {
-    .timeline-item { flex-basis: 72vw; }
+    .timeline-item { flex-basis: 10.5rem; height: 23rem; }
+    .timeline-card { width: 9.8rem; }
+    .timeline-year { font-size: 2.3rem; }
+    .hline-inner { padding: 0 1.5rem; }
+    .tl-end { height: 23rem; }
   }
 </style>
 
-<div class="timeline-hero">
+<div class="tl-hero">
   <div class="container">
-    <h1>⏳ Tarih Şeridi</h1>
-    <p style="color: var(--text-lighter); max-width: 600px; margin: 0 auto;">AIESEC İstanbul'un 1954'teki kuruluşundan bugüne uzanan ilham verici kilometre taşlarını ve başarı hikayelerini keşfedin.</p>
+    <span class="tl-eyebrow">⏳ Zaman Tüneli</span>
+    <h1>Tarih Şeridi</h1>
+    <p>İstanbul'un kuruluşundan bugüne uzanan dönüm noktaları.</p>
+    <% if (milestones.length) { %>
+      <div class="tl-stats">
+        <div class="tl-stat"><b><%= milestones.length %></b><span>Dönüm noktası</span></div>
+        <div class="tl-stat"><b><%= firstYear %> – <%= lastYear %></b><span>Zaman aralığı</span></div>
+        <div class="tl-stat"><b><%= decades.length %></b><span>On yıl</span></div>
+      </div>
+      <div class="tl-decades" role="tablist" aria-label="On yıla git">
+        <% decades.forEach((d) => { %>
+          <button type="button" class="tl-chip" data-timeline-jump="<%= d %>"><%= d %>'ler</button>
+        <% }) %>
+      </div>
+    <% } %>
   </div>
 </div>
 
-<section class="section" style="padding-top: 1rem;">
+<section class="section" style="padding-top: 0.5rem;">
   <div class="container">
-    
+
     <% if (milestones.length === 0) { %>
       <div class="timeline-empty">
         <div style="font-size: 3rem; margin-bottom: 1rem;">⏳</div>
-        <h3 style="color: #fff; margin-bottom: 0.5rem;">Zaman Tüneli Boş</h3>
+        <h3 style="color: var(--text, #fff); margin-bottom: 0.5rem;">Zaman Tüneli Boş</h3>
         <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">Henüz sisteme bir kilometre taşı eklenmemiş. Yöneticiler tarafından yakında güncellenecektir.</p>
       </div>
     <% } else { %>
-      <p class="hline-hint">Yana kaydırın ya da okları kullanın</p>
       <div class="hline-wrap">
         <div class="hline-track" tabindex="0" aria-label="Tarih şeridi">
           <div class="hline-inner">
-            <% milestones.forEach((milestone) => { %>
-              <div class="timeline-item">
-                <span class="timeline-year"><%= milestone.year %></span>
+            <% milestones.forEach((milestone, i) => {
+                 const hue = 195 + decades.indexOf(decadeOf(milestone.year)) * 11;
+                 const up = i % 2 === 0; %>
+              <div class="timeline-item" data-year="<%= milestone.year %>" style="--hue: <%= hue %>;">
+                <div class="tl-top">
+                  <% if (up) { %>
+                    <div class="timeline-card"><h3><%= milestone.title %></h3></div>
+                    <div class="tl-stem"></div>
+                  <% } else { %>
+                    <div class="timeline-year"><%= milestone.year %></div>
+                  <% } %>
+                </div>
                 <div class="timeline-marker"></div>
-                <div class="timeline-card">
-                  <h3><%= milestone.title %></h3>
+                <div class="tl-bottom">
+                  <% if (up) { %>
+                    <div class="timeline-year"><%= milestone.year %></div>
+                  <% } else { %>
+                    <div class="tl-stem"></div>
+                    <div class="timeline-card"><h3><%= milestone.title %></h3></div>
+                  <% } %>
                 </div>
               </div>
             <% }) %>
+            <div class="tl-end"><span>Hikâye devam ediyor…</span></div>
           </div>
         </div>
+        <div class="hline-progress"><div class="hline-progress-bar"></div></div>
+        <p class="hline-hint">Yana kaydırın, sürükleyin ya da on yıllardan birini seçin</p>
         <div class="hline-nav">
           <button type="button" class="btn btn-outline btn-sm" data-timeline-scroll="-1" aria-label="Geri">‹ Geri</button>
           <button type="button" class="btn btn-outline btn-sm" data-timeline-scroll="1" aria-label="İleri">İleri ›</button>
