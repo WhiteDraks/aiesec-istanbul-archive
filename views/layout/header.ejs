@@ -1,14 +1,25 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3C8XNNZQLL"></script>
+  <!-- Google Analytics: sayfa yüklendikten ve tarayıcı boştayken yüklenir; "Veri Tasarrufu" (Save-Data) açıksa hiç yüklenmez -->
   <script nonce="<%= typeof cspNonce !== 'undefined' ? cspNonce : '' %>">
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-3C8XNNZQLL');
+    (function () {
+      var saver = (navigator.connection && navigator.connection.saveData) || <%= typeof saveData !== 'undefined' && saveData ? 'true' : 'false' %>;
+      if (saver) return;
+      function load() {
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=G-3C8XNNZQLL';
+        document.head.appendChild(s);
+      }
+      window.addEventListener('load', function () {
+        if ('requestIdleCallback' in window) requestIdleCallback(load, { timeout: 4000 }); else setTimeout(load, 2000);
+      });
+    })();
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -18,14 +29,12 @@
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="/css/style.css?v=1.0.5" />
+  <link rel="stylesheet" href="<%= asset('/css/style.css') %>" />
 
-  <!-- Cropper.js for image resizing/cropping -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" integrity="sha384-oMy41mb/qJnpJlpXOF57hSu2KGi47l/UV9+tPNrBOs7/ap5Vubj/3phrCtjutHMQ" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js" integrity="sha384-r+ljwOAhwY4/kdyzMnuBg7MEVoWpTMp5EYUDntB/E9qzNwL9dAEcNrb2XaV+mJc2" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- Cropper.js yalnızca bir görsel seçildiğinde yüklenir (bkz. footer: ensureCropper) -->
 
   <!-- Dynamic Theme Settings -->
   <style>
@@ -359,7 +368,7 @@
     });
   </script>
 
-  <link rel="stylesheet" href="/css/theme-light.css?v=1.0.0" />
+  <link rel="stylesheet" href="<%= asset('/css/theme-light.css') %>" />
 
   <!-- Favicon -->
   <link class="favicon-icon" rel="icon" type="image/svg+xml" href="/images/favicon.svg" />

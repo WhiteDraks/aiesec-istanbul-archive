@@ -109,3 +109,72 @@ html.light-theme { color-scheme: light; }
 
 /* Koyu kalan, görsel üzerindeki düğmeler (kapak değiştir vb.) okunur kalsın */
 .light-theme .btn[style*="rgba(4,13,26"], .light-theme .btn[style*="rgba(4, 13, 26"] { color: #fff !important; border-color: rgba(255,255,255,0.5) !important; }
+
+/* ── Düşük veri / mobil performans ── */
+@media (prefers-reduced-data: reduce) {
+  .hero.has-bg-image { background-image: none !important; }
+}
+@media (max-width: 768px) {
+  /* fixed arka plan mobilde takılır ve görseli gereksiz büyük çizdirir */
+  .hero.has-bg-image { background-attachment: scroll; }
+  /* bulanık, hareketli dekor katmanları pil/işlemci yer; telefonda gizle */
+  .hero-orb, .hero-grid, .cta-orb, .auth-panel-orb { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+/* ═══ Mobil uyum: taşma, kayma ve dokunma hedefleri ═══ */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { overflow-x: clip; }
+img, video, canvas, svg, iframe { max-width: 100%; }
+img { height: auto; }
+.hero { min-height: 100vh; min-height: 100svh; }
+
+/* Uzun kelime/e-posta/bağlantılar kartı taşırmasın */
+.member-card, .alumni-card, .team-card, .year-card, .detail-section, .admin-table td, .admin-table th,
+.detail-link, .alumni-link, .flash, .form-hint, .page-hero-sub, .section-desc { overflow-wrap: anywhere; word-break: normal; }
+
+/* Tablolar yan kaydırılabilir olsun, sayfayı genişletmesin */
+.admin-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+.admin-table-wrap > table { min-width: 560px; }
+
+@media (max-width: 768px) {
+  .container { padding-inline: 1rem; }
+  .section { padding-block: 3rem; }
+  .form-row { grid-template-columns: 1fr !important; flex-direction: column; }
+  .action-cell { flex-wrap: wrap; gap: 0.35rem; }
+  .page-header { flex-direction: column; align-items: flex-start !important; }
+  .page-header > div:last-child { width: 100%; }
+  .btn-lg { padding: 0.8rem 1.25rem; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .hero-actions .btn { justify-content: center; width: 100%; }
+  .hero-scroll-indicator { display: none; }
+  .hero-stats { flex-wrap: wrap; gap: 1rem 1.5rem; }
+  .stat-divider { display: none; }
+  /* Pencere/modal içerikleri ekrana sığsın */
+  [id$="-modal"] > div, .modal-content { max-width: calc(100vw - 1.5rem) !important; }
+  #feedback-widget-card { width: calc(100vw - 1.5rem) !important; right: 0.75rem !important; left: 0.75rem !important; max-height: 80vh; overflow-y: auto; }
+  #feedback-widget-trigger { right: 0.75rem !important; top: auto !important; bottom: 1rem !important; width: 46px !important; height: 46px !important; }
+}
+
+@media (max-width: 480px) {
+  /* Satır içi çok sütunlu ızgaralar telefonda tek sütun (360 px'te minmax(320px) taşıyordu) */
+  [style*="grid-template-columns"], .alumni-grid, .teams-grid, .years-grid, .members-grid, .admin-stats, .intro-grid, .intro-cards, .footer-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .admin-stats { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  h1, .hero-title, .page-hero-title { font-size: clamp(1.7rem, 8vw, 2.4rem); line-height: 1.15; }
+  .section-title { font-size: 1.6rem; }
+}
+
+/* iOS: 16px altı yazı alanlarına odaklanınca sayfa yakınlaşıp kayıyor; engelle. Dokunma hedefleri ≥44px */
+@media (hover: none) and (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]), select, textarea { font-size: 16px !important; }
+  .btn, .nav-link, .admin-tab, .dropdown-item { min-height: 44px; }
+  .btn-xs, .btn-sm { min-height: 40px; }
+}
+
+/* Admin sekmeleri taşarsa yana kayar */
+.admin-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; scrollbar-width: thin; }
+.admin-tab { flex-shrink: 0; white-space: nowrap; }

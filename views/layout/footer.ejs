@@ -287,7 +287,7 @@
 <% } %>
 
 <!-- Main JS -->
-<script src="/js/main.js?v=1.0.6"></script>
+<script src="<%= asset('/js/main.js') %>"></script>
 
 <!-- Global Image Cropper Modal -->
 <div id="cropper-modal" style="display: none; position: fixed; inset: 0; background: rgba(9, 13, 22, 0.95); z-index: 99999; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(8px);">
@@ -307,6 +307,29 @@
 </div>
 
 <script nonce="<%= typeof cspNonce !== 'undefined' ? cspNonce : '' %>">
+// Cropper.js (~25 KB) yalnızca ilk görsel seçildiğinde indirilir; düşük veri kullanan ziyaretçiler bedelini ödemez.
+let cropperLoading = null;
+function ensureCropper() {
+  if (typeof Cropper !== 'undefined') return Promise.resolve();
+  if (cropperLoading) return cropperLoading;
+  cropperLoading = new Promise(function (resolve, reject) {
+    var css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = 'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css';
+    css.integrity = 'sha384-oMy41mb/qJnpJlpXOF57hSu2KGi47l/UV9+tPNrBOs7/ap5Vubj/3phrCtjutHMQ';
+    css.crossOrigin = 'anonymous';
+    document.head.appendChild(css);
+    var js = document.createElement('script');
+    js.src = 'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js';
+    js.integrity = 'sha384-r+ljwOAhwY4/kdyzMnuBg7MEVoWpTMp5EYUDntB/E9qzNwL9dAEcNrb2XaV+mJc2';
+    js.crossOrigin = 'anonymous';
+    js.onload = resolve;
+    js.onerror = function () { cropperLoading = null; reject(new Error('Cropper yüklenemedi')); };
+    document.head.appendChild(js);
+  });
+  return cropperLoading;
+}
+
 let cropperInstance = null;
 let currentFileInput = null;
 let currentPreviewImg = null;
@@ -325,7 +348,8 @@ function openCropper(event, fileInputId, previewImgId, removeInputId, labelId, a
   currentAspectRatio = aspectRatio;
 
   const reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = async function(e) {
+    try { await ensureCropper(); } catch (err) { alert('Görsel düzenleyici yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin.'); return; }
     const cropperImg = document.getElementById('cropper-image');
     cropperImg.src = e.target.result;
     

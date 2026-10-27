@@ -1,8 +1,9 @@
 <%- include('./layout/header', { currentPage: 'home' }) %>
 
 <!-- ── Hero Section ── -->
-<section class="hero<%= siteSettings.hero_bg_image ? ' has-bg-image' : '' %>" id="hero"<% if (siteSettings.hero_bg_image) { %> style="background-image: url('<%= siteSettings.hero_bg_image %>');"<% } %>>">
-  <div class="hero-bg" style="<%= siteSettings.hero_bg_image ? 'display: none;' : '' %>">
+<% const heroBg = !saveData && siteSettings.hero_bg_image; %>
+<section class="hero<%= heroBg ? ' has-bg-image' : '' %>" id="hero"<% if (heroBg) { %> style="background-image: url('<%= siteSettings.hero_bg_image %>');"<% } %>>
+  <div class="hero-bg" style="<%= heroBg ? 'display: none;' : '' %>">
     <div class="hero-orb hero-orb-1"></div>
     <div class="hero-orb hero-orb-2"></div>
     <div class="hero-orb hero-orb-3"></div>

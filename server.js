@@ -113,7 +113,30 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // ─── Static Files ─────────────────────────────────────────────────────────────
-app.use(express.static(path.join(__dirname, 'public')));
+// Statik dosyalar: CSS/JS içeriğe göre sürümlendiği için (asset() yardımcısı) 1 yıl "immutable" önbelleğe
+// alınır; görseller 7 gün. Ziyaretçi her sayfada yeniden indirmez (düşük veri kullanımı).
+const fs = require('fs');
+const assetHashes = {};
+app.locals.asset = (p) => {
+  if (!assetHashes[p]) {
+    try { assetHashes[p] = crypto.createHash('md5').update(fs.readFileSync(path.join(__dirname, 'public', p))).digest('hex').slice(0, 10); }
+    catch (e) { assetHashes[p] = '0'; }
+  }
+  return `${p}?v=${assetHashes[p]}`;
+};
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: '7d',
+  setHeaders: (res, file) => {
+    if (/\.(css|js)$/.test(file)) res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  },
+}));
+
+// Tarayıcının "Veri Tasarrufu" (Save-Data) isteği: ağır arka plan görseli ve analitik atlanır
+app.use((req, res, next) => {
+  res.vary('Save-Data');
+  res.locals.saveData = /\bon\b/i.test(String(req.headers['save-data'] || ''));
+  next();
+});
 
 // ─── Body Parsing ─────────────────────────────────────────────────────────────
 app.use(express.urlencoded({ extended: true, limit: '200kb', parameterLimit: 200 }));
