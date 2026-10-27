@@ -186,6 +186,21 @@ router.post('/change-password', async (req, res) => {
 // POST /profile/delete - Kendi hesabını sil
 router.post('/delete', async (req, res) => {
   try {
+    // Çalınmış bir oturumla hesap silinemesin: şifre yeniden doğrulanır
+    const password = typeof req.body.password === 'string' ? req.body.password : '';
+    const user = await User.findByEmail(req.session.user.email);
+    if (!password || password.length > 128 || !user || !(await User.comparePassword(password, user.password))) {
+      req.flash('error', 'Hesabı silmek için mevcut şifrenizi doğru girmelisiniz.');
+      return res.redirect('/profile');
+    }
+    if (user.role === 'admin') {
+      const { getSQL } = require('../config/database');
+      const [{ count }] = await getSQL()`SELECT COUNT(*)::integer AS count FROM users WHERE role = 'admin'`;
+      if (count <= 1) {
+        req.flash('error', 'Son admin hesabı silinemez. Önce başka bir kullanıcıyı admin yapın.');
+        return res.redirect('/profile');
+      }
+    }
     await User.delete(req.session.userId);
     await revokeUserSessions(req.session.userId);
     req.session.destroy((err) => {

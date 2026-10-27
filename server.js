@@ -147,7 +147,8 @@ app.use(express.json({ limit: '200kb' }));
 
 // ─── Session ──────────────────────────────────────────────────────────────────
 const sessionConfig = {
-  secret: process.env.SESSION_SECRET || 'aiesec-istanbul-fallback-secret-change-me',
+  // Ortam değişkeni yoksa kaynak kodda bilinen bir sır yerine her başlatmada rastgele bir sır kullanılır
+  secret: process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex'),
   resave: false,
   saveUninitialized: false,
   cookie: {

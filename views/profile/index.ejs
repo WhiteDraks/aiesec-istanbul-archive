@@ -247,6 +247,10 @@
     <h3>Tehlikeli Bölge</h3>
     <p class="form-hint">Hesabını sildiğinde tüm bilgilerin kalıcı olarak kaldırılır. Bu işlem geri alınamaz.</p>
     <form action="/profile/delete" method="POST" data-confirm="Hesabını kalıcı olarak silmek istediğine emin misin? Bu işlem geri alınamaz.">
+      <div class="form-group">
+        <label for="delete_password">Onaylamak için şifreni gir</label>
+        <input type="password" id="delete_password" name="password" maxlength="128" autocomplete="current-password" required>
+      </div>
       <button type="submit" class="btn btn-delete">Hesabımı Sil</button>
     </form>
   </div>
