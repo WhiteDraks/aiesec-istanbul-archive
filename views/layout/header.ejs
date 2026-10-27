@@ -23,14 +23,14 @@
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="İstanbul Alumni Archive - AIESEC İstanbul geçmiş Executive Board dönemlerini, üyelerini ve hikayelerini keşfedin." />
+  <meta name="description" content="<%= typeof metaDescription !== 'undefined' ? metaDescription : 'İstanbul Alumni Archive - AIESEC İstanbul geçmiş Executive Board dönemlerini, üyelerini ve hikayelerini keşfedin.' %>" />
   <title><%= title || 'İstanbul Alumni Archive' %></title>
   <link rel="canonical" href="<%= typeof canonicalUrl !== 'undefined' ? canonicalUrl : '' %>" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="İstanbul Alumni Archive" />
   <meta property="og:locale" content="tr_TR" />
   <meta property="og:title" content="<%= title || 'İstanbul Alumni Archive' %>" />
-  <meta property="og:description" content="İstanbul Alumni Archive - geçmiş Executive Board dönemlerini, üyelerini ve hikayelerini keşfedin." />
+  <meta property="og:description" content="<%= typeof metaDescription !== 'undefined' ? metaDescription : 'İstanbul Alumni Archive - geçmiş Executive Board dönemlerini, üyelerini ve hikayelerini keşfedin.' %>" />
   <meta property="og:url" content="<%= typeof canonicalUrl !== 'undefined' ? canonicalUrl : '' %>" />
   <meta property="og:image" content="<%= typeof siteUrl !== 'undefined' ? siteUrl : '' %>/images/default-cover.jpg" />
   <meta name="twitter:card" content="summary_large_image" />

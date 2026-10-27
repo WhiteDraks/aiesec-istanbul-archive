@@ -1,0 +1,48 @@
+<%- include('./layout/header', { currentPage: 'privacy' }) %>
+
+<section class="page-hero page-hero-sm">
+  <div class="page-hero-bg"></div>
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="/">Ana Sayfa</a>
+      <span>›</span>
+      <span>Gizlilik ve Veri Kullanımı</span>
+    </div>
+    <h1 class="page-hero-title">Gizlilik ve Veri Kullanımı</h1>
+    <p class="page-hero-sub">Hangi bilgileri topluyoruz, kimler görebiliyor, nasıl silebilirsiniz?</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container prose-page">
+
+    <h2>Hangi bilgileri topluyoruz?</h2>
+    <p>Kayıt olurken ad soyad, e-posta adresi ve şifre istenir. Profilinizde isteğe bağlı olarak okul, bölüm, EB dönemi ve görevi, fotoğraf, LinkedIn bağlantısı, çalıştığınız yer, sektör, şehir, telefon ve kısa bir AIESEC hikayesi ekleyebilirsiniz. Hangi alanları dolduracağınıza siz karar verirsiniz.</p>
+
+    <h2>Bilgilerinizi kimler görebilir?</h2>
+    <ul>
+      <li><strong>Giriş yapmamış ziyaretçiler</strong> yalnızca ana sayfayı ve dönem listesini görür. Üye bilgilerini göremez.</li>
+      <li><strong>Onaylı üyeler</strong> profil bilgilerinizi alumni rehberinde ve dönem sayfalarında görebilir.</li>
+      <li><strong>Telefon numaranız</strong> yalnızca profilinizde "telefonumu göster" seçeneğini açarsanız diğer üyelere gösterilir.</li>
+      <li><strong>Yöneticiler</strong> başvuruları onaylamak ve içeriği düzenlemek için üye bilgilerine erişebilir.</li>
+      <li>Bilgileriniz satılmaz ve reklam amacıyla üçüncü kişilerle paylaşılmaz.</li>
+    </ul>
+
+    <h2>Şifreniz nasıl saklanır?</h2>
+    <p>Şifreniz düz metin olarak saklanmaz; geri döndürülemeyen şekilde şifrelenerek (hash) tutulur. Yöneticiler dahil kimse şifrenizi göremez.</p>
+
+    <h2>Çerezler ve ölçüm</h2>
+    <p>Oturumunuzu açık tutmak için zorunlu bir oturum çerezi kullanılır. Sitenin kaç kişi tarafından kullanıldığını anlamak için anonim ölçüm (Google Analytics) kullanılabilir. Tarayıcınızda "Veri Tasarrufu" modu açıksa ölçüm yüklenmez.</p>
+
+    <h2>E-postalar</h2>
+    <p>Size yalnızca hesabınızla ilgili e-postalar gönderilir: başvurunun alındığı, onaylandığı ve şifre sıfırlama talebi yaptığınızda. Tanıtım e-postası gönderilmez.</p>
+
+    <h2>Verilerinizi silme ve düzeltme</h2>
+    <p>Giriş yaptıktan sonra <a href="/profile">Profilim</a> sayfasından bilgilerinizi dilediğiniz zaman güncelleyebilir, hesabınızı şifrenizi girerek kalıcı olarak silebilirsiniz. Hesabınız silindiğinde profil bilgileriniz sitedeki üyeler listesinden kaldırılır.</p>
+    <p>KVKK kapsamındaki diğer talepleriniz için <a href="/feedback">Geri Bildirim</a> formunu kullanabilirsiniz. Genel bilgilendirme için <a href="https://www.icisleri.gov.tr/kisisel-verilerin-korunmasi-kanunu-aydinlatma-metni" target="_blank" rel="noopener noreferrer">KVKK Aydınlatma Metni</a>'ne de bakabilirsiniz.</p>
+
+    <p class="form-hint" style="margin-top: 2rem;">Bu sayfa genel bir bilgilendirmedir ve sitenin çalışma biçimine göre güncellenir.</p>
+  </div>
+</section>
+
+<%- include('./layout/footer') %>

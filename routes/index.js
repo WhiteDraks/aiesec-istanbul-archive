@@ -3,8 +3,17 @@ const router = express.Router();
 const { getSQL } = require('../config/database');
 const EBTeam = require('../models/EBTeam');
 
+// GET /gizlilik - Gizlilik ve veri kullanımı bilgilendirmesi
+router.get('/gizlilik', (req, res) => {
+  res.render('privacy', {
+    title: 'Gizlilik ve Veri Kullanımı - İstanbul Alumni Archive',
+    metaDescription: 'İstanbul Alumni Archive hangi bilgileri topluyor, kimler görebiliyor ve verilerinizi nasıl silebilirsiniz.',
+  });
+});
+
 // GET / - Ana sayfa
 router.get('/', async (req, res) => {
+  res.locals.metaDescription = 'Geçmiş Executive Board dönemlerini, liderlerini ve hikayelerini bir araya getiren İstanbul Alumni Archive. Kayıt ol, dönemini ekle, eski arkadaşlarına ulaş.';
   try {
     const sql = getSQL();
 
@@ -52,6 +61,7 @@ router.get('/sitemap.xml', async (req, res) => {
       '/eb',
       '/alumni',
       '/feedback',
+      '/gizlilik',
       '/auth/login',
       '/auth/register'
     ];

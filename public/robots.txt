@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /auth/
+Disallow: /profile
+Disallow: /feedback
 
 Sitemap: https://www.1stanbullu.com.tr/sitemap.xml

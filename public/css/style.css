@@ -2182,3 +2182,21 @@ a[href*="instagram.com"] svg {
   color: var(--blue-sky, #00AEEF) !important;
   stroke: var(--blue-sky, #00AEEF) !important;
 }
+
+
+/* ── Ana sayfa: nasıl çalışır / SSS / gizlilik sayfası ── */
+.how-grid { list-style: none; margin: 0 0 var(--space-6, 2rem); padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4, 1rem); }
+.how-step { padding: var(--space-6, 1.5rem); border-radius: var(--radius-xl, 16px); border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); }
+.how-step h3 { margin: 0.5rem 0 0.35rem; font-size: 1.1rem; }
+.how-step p { margin: 0; color: var(--text-muted, #94a3b8); font-size: 0.95rem; line-height: 1.55; }
+.how-num { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--primary, #037ef3); color: #fff; font-weight: 700; }
+.faq details { border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-lg, 12px); padding: 0.9rem 1.1rem; margin-bottom: 0.75rem; background: rgba(255,255,255,0.03); }
+.faq summary { cursor: pointer; font-weight: 600; }
+.faq details[open] summary { margin-bottom: 0.5rem; }
+.faq details p { margin: 0; color: var(--text-muted, #94a3b8); line-height: 1.6; }
+.faq a, .prose-page a { color: var(--primary, #037ef3); text-decoration: underline; }
+.prose-page { max-width: 760px; }
+.prose-page h2 { margin: 2rem 0 0.5rem; font-size: 1.25rem; }
+.prose-page p, .prose-page li { line-height: 1.7; color: var(--text-muted, #94a3b8); }
+.prose-page ul { padding-left: 1.25rem; }
+@media (max-width: 720px) { .how-grid { grid-template-columns: 1fr; } }

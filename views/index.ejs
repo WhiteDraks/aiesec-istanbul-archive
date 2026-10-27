@@ -1,5 +1,7 @@
 <%- include('./layout/header', { currentPage: 'home' }) %>
 
+<script type="application/ld+json"><%- JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebSite', name: 'İstanbul Alumni Archive', url: siteUrl, inLanguage: 'tr', description: 'Geçmiş Executive Board dönemlerini, liderlerini ve hikayelerini bir araya getiren alumni arşivi.' }).replace(/</g, '\\u003c') %></script>
+
 <!-- ── Hero Section ── -->
 <% const heroBg = !saveData && siteSettings.hero_bg_image; %>
 <section class="hero<%= heroBg ? ' has-bg-image' : '' %>" id="hero"<% if (heroBg) { %> style="background-image: url('<%= siteSettings.hero_bg_image %>');"<% } %>>
@@ -103,6 +105,36 @@
   </div>
 </section>
 
+<!-- ── How it works ── -->
+<section class="section section-how" id="nasil-calisir">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Nasıl Çalışır</span>
+      <h2 class="section-title">Üç adımda katıl</h2>
+    </div>
+    <ol class="how-grid">
+      <li class="how-step">
+        <span class="how-num">1</span>
+        <h3>Kayıt ol</h3>
+        <p>Adını, okulunu ve EB dönemini yaz. Dönem sayfası sen ekledikçe otomatik oluşur.</p>
+      </li>
+      <li class="how-step">
+        <span class="how-num">2</span>
+        <h3>Onayını bekle</h3>
+        <p>Yöneticiler başvuruyu inceler, onaylanınca e-posta alırsın (spam klasörüne de bak).</p>
+      </li>
+      <li class="how-step">
+        <span class="how-num">3</span>
+        <h3>Ağa katıl</h3>
+        <p>Profilini tamamla, dönem arkadaşlarını bul, fotoğraf ve anılarını ekle.</p>
+      </li>
+    </ol>
+    <% if (!currentUser) { %>
+      <div class="section-cta"><a href="/auth/register" class="btn btn-primary btn-lg">Hemen Kayıt Ol</a></div>
+    <% } %>
+  </div>
+</section>
+
 <!-- ── EB Teams Section ── -->
 <section class="section section-teams" id="teams">
   <div class="container">
@@ -157,6 +189,38 @@
         <p>Üyeler profillerinden dönemlerini girdikçe burada görünecek.</p>
       </div>
     <% } %>
+  </div>
+</section>
+
+<!-- ── FAQ ── -->
+<section class="section section-faq" id="sss">
+  <div class="container" style="max-width: 760px;">
+    <div class="section-header">
+      <span class="section-label">Sık Sorulanlar</span>
+      <h2 class="section-title">Aklınıza takılanlar</h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary>Kimler katılabilir?</summary>
+        <p>Geçmişte İstanbul'da Executive Board'da görev almış alumniler. Başvurular yöneticiler tarafından onaylanır.</p>
+      </details>
+      <details>
+        <summary>Bilgilerimi kimler görebilir?</summary>
+        <p>Yalnızca onaylı üyeler. Giriş yapmamış ziyaretçiler üye bilgilerini göremez. Telefon numaranız ancak siz izin verirseniz gösterilir.</p>
+      </details>
+      <details>
+        <summary>Dönemim listede yok, ne yapmalıyım?</summary>
+        <p>Kayıt olurken ya da profilinden dönemini <strong>2021-2022</strong> biçiminde yazman yeterli, dönem sayfası otomatik oluşturulur.</p>
+      </details>
+      <details>
+        <summary>Hesabımı silebilir miyim?</summary>
+        <p>Evet. Profil sayfandan şifreni girerek hesabını istediğin zaman kalıcı olarak silebilirsin. Ayrıntılar için <a href="/gizlilik">Gizlilik ve Veri Kullanımı</a> sayfasına bak.</p>
+      </details>
+      <details>
+        <summary>Onay e-postası gelmedi</summary>
+        <p>Spam klasörüne bakın. Yine de gelmediyse <a href="/feedback">Geri Bildirim</a> formundan bize yazın.</p>
+      </details>
+    </div>
   </div>
 </section>
 
