@@ -59,8 +59,8 @@ function getEmailTemplate(title, content) {
                   <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px solid #f0f0f0; padding-top: 30px;">
                     <tr>
                       <td style="vertical-align: top;">
-                        <p style="margin: 0; font-size: 14px; font-weight: 700; color: #111827;">AIESEC İstanbul Mezunlar Birliği</p>
-                        <p style="margin: 2px 0 10px 0; font-size: 13px; color: #6b7280;">Alumni Relations Team</p>
+                        <p style="margin: 0; font-size: 14px; font-weight: 700; color: #111827;">26-27 LCVP F&amp;L Elif Kurnaz</p>
+                        <p style="margin: 2px 0 10px 0; font-size: 13px; color: #6b7280;">AIESEC İstanbul</p>
                         <p style="margin: 0; font-size: 12px; color: #9ca3af;">
                           Bu e-posta otomatik olarak gönderilmiştir. Lütfen yanıtlamayınız.
                         </p>
