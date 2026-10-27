@@ -409,7 +409,7 @@ router.post('/timeline/create', upload.single('image'), async (req, res) => {
     await TimelineMilestone.create({
       year: parseInt(year, 10),
       title,
-      description,
+      description: typeof description === 'string' ? description : '',
       image_url: imageUrl
     });
     req.flash('success', 'Kilometre taşı başarıyla eklendi.');
@@ -449,7 +449,7 @@ router.post('/timeline/:id/edit', upload.single('image'), async (req, res) => {
     await TimelineMilestone.update(req.params.id, {
       year: parseInt(year, 10),
       title,
-      description,
+      description: typeof description === 'string' ? description : '',
       image_url: imageUrl
     });
     req.flash('success', 'Kilometre taşı güncellendi.');

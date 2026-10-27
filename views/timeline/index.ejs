@@ -195,7 +195,7 @@
             <div class="timeline-card">
               <div class="timeline-year"><%= milestone.year %></div>
               <h3><%= milestone.title %></h3>
-              <p><%= milestone.description %></p>
+              <% if (milestone.description) { %><p><%= milestone.description %></p><% } %>
               <% if (milestone.image_url) { %>
                 <img src="<%= milestone.image_url %>" alt="<%= milestone.title %>" class="timeline-image">
               <% } %>
