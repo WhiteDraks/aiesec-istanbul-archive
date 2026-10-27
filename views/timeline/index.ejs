@@ -95,13 +95,6 @@
   }
   .timeline-card:hover { transform: translateY(-3px); border-color: var(--primary); }
 
-  .timeline-card.expandable { cursor: pointer; }
-  .timeline-more { display: none; }
-  .timeline-card.open .timeline-more { display: block; }
-  .timeline-chevron { float: right; margin-left: 0.5rem; color: var(--primary); transition: transform 0.2s ease; }
-  .timeline-card.open .timeline-chevron { transform: rotate(180deg); }
-  .timeline-card.open { border-color: var(--primary); }
-
   .timeline-card h3 {
     font-size: 0.98rem;
     font-weight: 600;
@@ -170,17 +163,8 @@
               <div class="timeline-item">
                 <span class="timeline-year"><%= milestone.year %></span>
                 <div class="timeline-marker"></div>
-                <% const hasMore = !!(milestone.description || milestone.image_url); %>
-                <div class="timeline-card<%= hasMore ? ' expandable' : '' %>"<% if (hasMore) { %> data-expandable role="button" tabindex="0" aria-expanded="false"<% } %>>
-                  <h3><%= milestone.title %><% if (hasMore) { %><span class="timeline-chevron" aria-hidden="true">▾</span><% } %></h3>
-                  <% if (hasMore) { %>
-                    <div class="timeline-more">
-                      <% if (milestone.description) { %><p><%= milestone.description %></p><% } %>
-                      <% if (milestone.image_url) { %>
-                        <img src="<%= milestone.image_url %>" alt="<%= milestone.title %>" class="timeline-image" loading="lazy">
-                      <% } %>
-                    </div>
-                  <% } %>
+                <div class="timeline-card">
+                  <h3><%= milestone.title %></h3>
                 </div>
               </div>
             <% }) %>

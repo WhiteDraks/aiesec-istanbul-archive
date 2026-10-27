@@ -198,20 +198,6 @@ document.addEventListener('click', function (e) {
   });
   window.addEventListener('pointerup', function () { down = false; t.classList.remove('dragging'); });
 
-  // Karta tıklayınca açıklama açılır/kapanır (sürükleme tıklama sayılmaz)
-  function toggleCard(card) {
-    const open = card.classList.toggle('open');
-    card.setAttribute('aria-expanded', open ? 'true' : 'false');
-  }
-  t.addEventListener('click', function (e) {
-    const card = e.target.closest('[data-expandable]');
-    if (card && !moved) toggleCard(card);
-    moved = false;
-  });
-  t.addEventListener('keydown', function (e) {
-    const card = e.target.closest && e.target.closest('[data-expandable]');
-    if (card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleCard(card); }
-  });
   t.addEventListener('keydown', function (e) {
     if (e.target !== t) return;
     if (e.key === 'ArrowRight') t.scrollBy({ left: 240, behavior: 'smooth' });
