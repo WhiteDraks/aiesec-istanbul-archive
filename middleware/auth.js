@@ -72,10 +72,14 @@ const setLocals = async (req, res, next) => {
           id: dbUser.id,
           name: dbUser.name,
           email: dbUser.email,
-          role: dbUser.role,
+          // Gerçek rol her istekte veritabanından okunur; "kullanıcı görünümü" yalnızca gerçek adminler için
+          // oturumdaki etkin rolü düşürür (yetki yükseltemez).
+          role: dbUser.role === 'admin' && req.session.viewAsUser ? 'user' : dbUser.role,
           status: dbUser.status,
           photo: dbUser.photo,
         };
+        req.session.realRole = dbUser.role;
+        if (dbUser.role !== 'admin') delete req.session.viewAsUser;
       } else {
         // Hesap silinmiş (admin veya kullanıcı tarafından): eski oturum yetkisini kaybeder
         delete req.session.userId;
@@ -88,6 +92,8 @@ const setLocals = async (req, res, next) => {
 
   res.locals.currentUser = req.session.user || null;
   res.locals.isAdmin = req.session.user?.role === 'admin';
+  res.locals.canSwitchRole = req.session.realRole === 'admin';
+  res.locals.viewAsUser = !!(req.session.viewAsUser && req.session.realRole === 'admin');
   res.locals.isApproved =
     req.session.user?.status === 'approved' ||
     req.session.user?.role === 'admin';

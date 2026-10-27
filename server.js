@@ -285,7 +285,7 @@ app.use((err, req, res, next) => {
   console.error('Uygulama hatası:', err.message);
   const status = err.status === 413 ? 413 : 500;
   // Hata, setLocals'tan önce (örn. body parser) oluşmuş olabilir: şablonun ihtiyaç duyduğu varsayılanlar
-  const d = { currentUser: null, isAdmin: false, isApproved: false, siteSettings: {}, success: [], error: [], csrfToken: '', safeUrl: (v) => '', appVersion: '' };
+  const d = { currentUser: null, isAdmin: false, isApproved: false, canSwitchRole: false, viewAsUser: false, siteSettings: {}, success: [], error: [], csrfToken: '', safeUrl: (v) => '', appVersion: '' };
   for (const k of Object.keys(d)) if (res.locals[k] === undefined) res.locals[k] = d[k];
   res.status(status).render('error', {
     title: status === 413 ? '413 - İstek Çok Büyük' : '500 - Sunucu Hatası',

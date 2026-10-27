@@ -484,6 +484,13 @@
             <span class="admin-dot"></span>Admin
           </a></li>
         <% } %>
+        <% if (canSwitchRole) { %>
+          <li>
+            <form action="/auth/switch-role" method="POST" style="display:inline;">
+              <button type="submit" class="btn btn-outline btn-sm" id="role-switch-btn"><%= viewAsUser ? '🛡️ Admin\'e Dön' : '👤 Kullanıcı Görünümü' %></button>
+            </form>
+          </li>
+        <% } %>
         <li>
           <form action="/auth/logout" method="POST" style="display:inline;">
             <button type="submit" class="btn btn-outline btn-sm">Çıkış (<%= currentUser.name.split(' ')[0] %>)</button>

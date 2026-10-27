@@ -347,6 +347,15 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
+// POST /auth/switch-role - Gerçek adminler için Admin ↔ Kullanıcı görünümü
+router.post('/switch-role', (req, res) => {
+  if (!req.session.userId || req.session.realRole !== 'admin') return res.redirect('/');
+  if (req.session.viewAsUser) delete req.session.viewAsUser;
+  else req.session.viewAsUser = true;
+  req.flash('success', req.session.viewAsUser ? 'Kullanıcı görünümüne geçildi.' : 'Admin görünümüne dönüldü.');
+  res.redirect(req.session.viewAsUser ? '/' : '/admin');
+});
+
 // POST /auth/logout - Çıkış (GET yerine POST — CSRF koruması için)
 router.post('/logout', (req, res) => {
   req.session.destroy((err) => {
