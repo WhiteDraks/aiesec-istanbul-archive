@@ -263,7 +263,8 @@ app.use('/admin',    require('./routes/admin'));
 app.use('/admin/eb', require('./routes/admin-eb'));
 app.use('/timeline', require('./routes/timeline'));
 app.use('/archive',  require('./routes/archive'));
-app.use('/ai-assistant', require('./routes/ai'));
+// AI Asistan henüz hazır değil: rota kapalı (açmak için ENABLE_AI=1)
+if (process.env.ENABLE_AI === '1') app.use('/ai-assistant', require('./routes/ai'));
 app.use('/profile',  require('./routes/profile'));
 app.use('/alumni',   require('./routes/alumni'));
 app.use('/feedback', contentLimiter, feedbackHourlyLimiter, require('./routes/feedback'));
