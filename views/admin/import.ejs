@@ -68,7 +68,7 @@
 
         <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;">
           <% if (s.create + s.update + s.teamUpdates + s.newTeams > 0) { %>
-            <form action="/admin/import/apply" method="POST" onsubmit="return confirm('Bu değişiklikler sitede uygulanacak. Onaylıyor musunuz?')">
+            <form action="/admin/import/apply" method="POST" data-confirm="Bu değişiklikler sitede uygulanacak. Onaylıyor musunuz?">
               <button type="submit" class="btn btn-primary">✓ Onayla ve içe aktar</button>
             </form>
           <% } %>

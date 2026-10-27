@@ -499,14 +499,14 @@
   <div class="flash flash-success" role="alert">
     <span class="flash-icon">✓</span>
     <% success.forEach(msg => { %><span><%= msg %></span><% }) %>
-    <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+    <button class="flash-close" data-remove-row>×</button>
   </div>
 <% } %>
 <% if (error && error.length > 0) { %>
   <div class="flash flash-error" role="alert">
     <span class="flash-icon">!</span>
     <% error.forEach(msg => { %><span><%= msg %></span><% }) %>
-    <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+    <button class="flash-close" data-remove-row>×</button>
   </div>
 <% } %>
 

@@ -113,7 +113,7 @@
                 <label class="form-label">Görev</label>
                 <input type="text" name="role_titles[]" class="form-input" value="<%= r.role %>" placeholder="Örn: Başkan (LCP)">
               </div>
-              <button type="button" class="btn btn-outline" style="align-self: flex-end; margin-bottom: 0.2rem;" onclick="this.parentElement.remove(); checkEmptyRolesState()">Sil</button>
+              <button type="button" class="btn btn-outline" style="align-self: flex-end; margin-bottom: 0.2rem;" data-remove-row>Sil</button>
             </div>
           <% }) %>
         </div>
@@ -211,7 +211,7 @@ function addRoleRow() {
       <label class="form-label">Görev</label>
       <input type="text" name="role_titles[]" class="form-input" placeholder="Örn: Başkan (LCP)">
     </div>
-    <button type="button" class="btn btn-outline" style="align-self: flex-end; margin-bottom: 0.2rem;" onclick="this.parentElement.remove(); checkEmptyRolesState()">Sil</button>
+    <button type="button" class="btn btn-outline" style="align-self: flex-end; margin-bottom: 0.2rem;" data-remove-row>Sil</button>
   `;
   container.appendChild(div);
 }

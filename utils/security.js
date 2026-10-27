@@ -45,4 +45,12 @@ function isPdf(buffer) {
   return Buffer.isBuffer(buffer) && buffer.slice(0, 5).toString('ascii') === '%PDF-';
 }
 
-module.exports = { safeUrl, str, isSafeLocalPath, detectImage, isPdf };
+// EB dönemi yalnızca YYYY-YYYY biçiminde (ardışık yıllar) kabul edilir; aksi halde ''.
+// Dönem metni bazı sayfalarda yönetici arayüzüne yazıldığından serbest metin olarak saklanmamalı.
+function cleanYear(value) {
+  const v = str(value, 20);
+  const m = v.match(/^(\d{4})-(\d{4})$/);
+  return m && parseInt(m[2], 10) === parseInt(m[1], 10) + 1 ? v : '';
+}
+
+module.exports = { cleanYear, safeUrl, str, isSafeLocalPath, detectImage, isPdf };

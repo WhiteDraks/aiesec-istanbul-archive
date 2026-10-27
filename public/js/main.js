@@ -146,3 +146,28 @@ document.querySelectorAll('.auth-form').forEach(form => {
     }
   });
 });
+
+// ── Satır-içi olay yazıları yerine (CSP) belge düzeyinde dinleyiciler ─────────
+// data-confirm="metin"   : form gönderilmeden önce onay sorar
+// data-remove-row        : tıklanan düğmenin üst öğesini (satırı) kaldırır
+// data-toggle-member="id": EB üye detay kartını açar/kapatır
+document.addEventListener('submit', function (e) {
+  const form = e.target.closest && e.target.closest('[data-confirm]');
+  if (form && !window.confirm(form.getAttribute('data-confirm'))) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  }
+}, true);
+
+document.addEventListener('click', function (e) {
+  const rm = e.target.closest && e.target.closest('[data-remove-row]');
+  if (rm) {
+    rm.parentElement.remove();
+    if (typeof window.checkEmptyRolesState === 'function') window.checkEmptyRolesState();
+    return;
+  }
+  const tg = e.target.closest && e.target.closest('[data-toggle-member]');
+  if (tg && typeof window.toggleMemberDetails === 'function') {
+    window.toggleMemberDetails(tg.getAttribute('data-toggle-member'));
+  }
+});

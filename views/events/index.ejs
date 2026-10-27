@@ -53,7 +53,7 @@
                 </div>
               </div>
               <% if (currentUser && (currentUser.role === 'admin' || event.created_by === currentUser.id)) { %>
-                <form action="/events/delete/<%= event.id %>" method="POST" style="margin: 0;" onsubmit="return confirm('Bu etkinliği silmek istediğinizden emin misiniz?')">
+                <form action="/events/delete/<%= event.id %>" method="POST" style="margin: 0;" data-confirm="Bu etkinliği silmek istediğinizden emin misiniz?">
                   <button type="submit" class="btn btn-delete btn-xs" style="padding: 0.45rem 0.9rem; font-size: 0.75rem; border-radius: 6px; background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">🗑 Sil</button>
                 </form>
               <% } %>

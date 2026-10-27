@@ -4,7 +4,7 @@ const User = require('../models/User');
 const upload = require('../middleware/upload');
 const { uploadToBlob } = require('../utils/blob');
 const { isLoggedIn } = require('../middleware/auth');
-const { safeUrl, str } = require('../utils/security');
+const { safeUrl, str, cleanYear } = require('../utils/security');
 const { revokeUserSessions } = require('../utils/sessions');
 
 // Bütün profile rotaları için giriş yapılmış olması zorunlu
@@ -63,12 +63,12 @@ router.post('/', upload.single('photo'), async (req, res) => {
       const titles = Array.isArray(role_titles) ? role_titles : [role_titles];
       for (let i = 0; i < years.length; i++) {
         const resolvedYear = years[i];
-        const yr = str(resolvedYear, 20), ttl = str(titles[i], 150);
-        if (yr || ttl) {
+        const yr = cleanYear(resolvedYear), ttl = str(titles[i], 150);
+        if (yr) {
           // XSS koruması: Rol başlığını temizle
-          const cleanYear = stripTags(yr);
+          const safeYear = stripTags(yr);
           const cleanTitle = stripTags(ttl);
-          roles_history.push({ year: cleanYear, role: cleanTitle });
+          roles_history.push({ year: safeYear, role: cleanTitle });
         }
       }
 

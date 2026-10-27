@@ -4,7 +4,7 @@ const User = require('../models/User');
 const upload = require('../middleware/upload');
 const { uploadToBlob } = require('../utils/blob');
 const { isLoggedIn, isAdmin } = require('../middleware/auth');
-const { safeUrl, str } = require('../utils/security');
+const { safeUrl, str, cleanYear } = require('../utils/security');
 const { stripTags } = require('../utils/sanitize');
 const { revokeUserSessions } = require('../utils/sessions');
 const { sendApprovalEmail } = require('../utils/email');
@@ -178,8 +178,8 @@ router.post('/user/:id/edit', upload.single('photo'), async (req, res) => {
       const titles = Array.isArray(role_titles) ? role_titles : [role_titles];
       for (let i = 0; i < years.length; i++) {
         const resolvedYear = years[i];
-        const yr = stripTags(str(resolvedYear, 20)), ttl = stripTags(str(titles[i], 150));
-        if (yr || ttl) {
+        const yr = cleanYear(resolvedYear), ttl = stripTags(str(titles[i], 150));
+        if (yr) {
           roles_history.push({ year: yr, role: ttl });
         }
       }

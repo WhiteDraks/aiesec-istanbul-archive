@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const crypto = require('crypto');
 const { SITE_URL } = require('../utils/escape');
-const { str, isSafeLocalPath } = require('../utils/security');
+const { str, isSafeLocalPath, cleanYear } = require('../utils/security');
 const { stripTags } = require('../utils/sanitize');
 const { revokeUserSessions } = require('../utils/sessions');
 
@@ -39,7 +39,7 @@ router.post('/register', async (req, res) => {
 
   let { name, email, password, passwordConfirm, school, ebYear, ebRole, kvkk } = req.body;
   name = str(name, 100); email = str(email, 254).toLowerCase(); school = str(school, 150);
-  ebYear = str(ebYear, 20); ebRole = str(ebRole, 100);
+  ebYear = cleanYear(ebYear); ebRole = str(ebRole, 100);
   password = typeof password === 'string' ? password : '';
   passwordConfirm = typeof passwordConfirm === 'string' ? passwordConfirm : '';
 

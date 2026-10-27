@@ -62,7 +62,7 @@
                   <td style="text-align: right;">
                     <div style="display: inline-flex; gap: 0.5rem; justify-content: flex-end;">
                       <a href="/admin/timeline/<%= m.id %>/edit" class="btn btn-outline btn-xs" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Düzenle ✏️</a>
-                      <form action="/admin/timeline/<%= m.id %>/delete" method="POST" onsubmit="return confirm('Bu kilometre taşını silmek istediğinizden emin misiniz?')" style="display: inline;">
+                      <form action="/admin/timeline/<%= m.id %>/delete" method="POST" data-confirm="Bu kilometre taşını silmek istediğinizden emin misiniz?" style="display: inline;">
                         <button type="submit" class="btn btn-outline btn-xs" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; border-color: rgba(239, 68, 68, 0.4); color: #ef4444; background: rgba(239, 68, 68, 0.02);">Sil 🗑️</button>
                       </form>
                     </div>

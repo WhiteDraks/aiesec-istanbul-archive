@@ -41,7 +41,7 @@ app.use(helmet({
       // useDefaults:true ile bunu açıkça belirtilmezse 'none' yapar — bu da
       // onclick="..." gibi tüm satır-içi olay tetikleyicilerini (tema anahtarı,
       // iş ilanı/etkinlik modalleri vb.) sessizce engelliyordu.
-      "script-src-attr": ["'unsafe-inline'"],
+      "script-src-attr": ["'none'"],
       "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"],
       "font-src": ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
       "img-src": ["'self'", "data:", "blob:", "https://www.googletagmanager.com", "https://*.public.blob.vercel-storage.com", "https://aiesec-blob-public.s3.amazonaws.com", "https://www.google-analytics.com", "https://*.google-analytics.com"],
@@ -108,6 +108,7 @@ const forgotAcctLimiter = mkHourly('forgot-acct', 3, 'Bu e-posta için çok fazl
 const feedbackHourlyLimiter = mkHourly('feedback-hourly', 10, 'Çok fazla geri bildirim gönderdiniz. Lütfen daha sonra tekrar deneyin.');
 
 // ─── View Engine ─────────────────────────────────────────────────────────────
+app.engine('ejs', require('./utils/inlineHandlers').ejsEngine());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 

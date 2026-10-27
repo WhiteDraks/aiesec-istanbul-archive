@@ -198,7 +198,7 @@
                 <label class="form-label">Görev</label>
                 <input type="text" name="role_titles[]" class="form-input" value="<%= r.role %>" placeholder="Örn: Başkan (LCP)">
               </div>
-              <button type="button" class="btn btn-outline" style="align-self: flex-end; margin-bottom: 0.2rem; color: #ff4d4f; border-color: rgba(255,77,79,0.4);" onclick="this.parentElement.remove()">Sil</button>
+              <button type="button" class="btn btn-outline" style="align-self: flex-end; margin-bottom: 0.2rem; color: #ff4d4f; border-color: rgba(255,77,79,0.4);" data-remove-row>Sil</button>
             </div>
           <% }) %>
         </div>
@@ -246,7 +246,7 @@
   <div class="profile-card danger-zone">
     <h3>Tehlikeli Bölge</h3>
     <p class="form-hint">Hesabını sildiğinde tüm bilgilerin kalıcı olarak kaldırılır. Bu işlem geri alınamaz.</p>
-    <form action="/profile/delete" method="POST" onsubmit="return confirm('Hesabını kalıcı olarak silmek istediğine emin misin? Bu işlem geri alınamaz.')">
+    <form action="/profile/delete" method="POST" data-confirm="Hesabını kalıcı olarak silmek istediğine emin misin? Bu işlem geri alınamaz.">
       <button type="submit" class="btn btn-delete">Hesabımı Sil</button>
     </form>
   </div>
@@ -342,7 +342,7 @@ function addRoleRow() {
       <label class="form-label">Görev</label>
       <input type="text" name="role_titles[]" class="form-input" placeholder="Örn: Başkan (LCP)">
     </div>
-    <button type="button" class="btn btn-outline" style="align-self: flex-end; margin-bottom: 0.2rem; color: #ff4d4f; border-color: rgba(255,77,79,0.4);" onclick="this.parentElement.remove()">Sil</button>
+    <button type="button" class="btn btn-outline" style="align-self: flex-end; margin-bottom: 0.2rem; color: #ff4d4f; border-color: rgba(255,77,79,0.4);" data-remove-row>Sil</button>
   `;
   container.appendChild(div);
 }

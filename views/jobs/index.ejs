@@ -42,7 +42,7 @@
               </div>
             </div>
             <% if (currentUser && (currentUser.role === 'admin' || job.user_id === currentUser.id)) { %>
-              <form action="/jobs/delete/<%= job.id %>" method="POST" style="margin: 0;" onsubmit="return confirm('Bu ilanı silmek istediğinizden emin misiniz?')">
+              <form action="/jobs/delete/<%= job.id %>" method="POST" style="margin: 0;" data-confirm="Bu ilanı silmek istediğinizden emin misiniz?">
                 <button type="submit" class="btn btn-delete btn-xs" style="padding: 0.45rem 0.9rem; font-size: 0.75rem; border-radius: 6px; background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">🗑 Sil</button>
               </form>
             <% } %>

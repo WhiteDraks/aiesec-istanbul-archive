@@ -5,6 +5,7 @@ const EBMember = require('../models/EBMember');
 const upload = require('../middleware/upload');
 const { uploadToBlob } = require('../utils/blob');
 const { isLoggedIn, isAdmin } = require('../middleware/auth');
+const { cleanYear: validYear } = require('../utils/security');
 const { getSQL } = require('../config/database');
 
 router.use(isLoggedIn, isAdmin);
@@ -207,7 +208,11 @@ router.post('/new', async (req, res) => {
       return res.redirect('/admin/eb');
     }
 
-    const cleanYear = year.trim();
+    const cleanYear = validYear(year);
+    if (!cleanYear) {
+      req.flash('error', 'Dönem biçimi YYYY-YYYY olmalıdır (örn. 2025-2026).');
+      return res.redirect('/admin/eb');
+    }
     const cleanTitle = title?.trim() || `${cleanYear} Executive Board`;
 
     // Create the team record

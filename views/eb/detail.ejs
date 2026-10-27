@@ -112,7 +112,7 @@
             <div class="member-card-inner">
               <!-- Front face -->
               <div class="member-front">
-                <div class="member-photo-wrap" onclick="toggleMemberDetails('<%= member.id %>')" style="cursor: pointer; position: relative; width: 90px; height: 90px; flex-shrink: 0;">
+                <div class="member-photo-wrap" data-toggle-member="<%= member.id %>" style="cursor: pointer; position: relative; width: 90px; height: 90px; flex-shrink: 0;">
                   <img
                     src="<%= member.photo || '/images/default-avatar.svg' %>"
                     alt="<%= member.name %>"
@@ -122,7 +122,7 @@
                   />
                   <div class="member-photo-ring"></div>
                 </div>
-                <div class="member-info" onclick="toggleMemberDetails('<%= member.id %>')" style="cursor: pointer;">
+                <div class="member-info" data-toggle-member="<%= member.id %>" style="cursor: pointer;">
                   <h3 class="member-name"><%= member.name %></h3>
                   <span class="member-role"><%= member.current_role || 'EB Üyesi' %></span>
                   <% if (member.department) { %>
@@ -142,7 +142,7 @@
                   <% } %>
                 </div>
                 <div class="member-card-actions">
-                  <button class="btn-details" onclick="toggleMemberDetails('<%= member.id %>')" aria-expanded="false">
+                  <button class="btn-details" data-toggle-member="<%= member.id %>" aria-expanded="false">
                     Detayları Gör ↓
                   </button>
                 </div>
@@ -200,7 +200,7 @@
                     </a>
                   <% } %>
                 </div>
-                <button class="btn-details btn-details-close" onclick="toggleMemberDetails('<%= member.id %>')">
+                <button class="btn-details btn-details-close" data-toggle-member="<%= member.id %>">
                   Kapat ↑
                 </button>
               </div>
@@ -271,7 +271,7 @@
               
               <!-- Delete option (if owner or admin) -->
               <% if (currentUser && (currentUser.role === 'admin' || currentUser.id === m.user_id)) { %>
-                <form action="/eb/<%= encodeURIComponent(team.year) %>/memories/<%= m.id %>/delete" method="POST" style="text-align: right;" onsubmit="return confirm('Bu anıyı silmek istediğinizden emin misiniz?')">
+                <form action="/eb/<%= encodeURIComponent(team.year) %>/memories/<%= m.id %>/delete" method="POST" style="text-align: right;" data-confirm="Bu anıyı silmek istediğinizden emin misiniz?">
                   <button type="submit" style="background: none; border: none; color: #ff4d4f; font-size: 0.75rem; cursor: pointer; padding: 0; font-weight: 500; display: inline-flex; align-items: center; gap: 0.25rem;">
                     Anıyı Sil 🗑
                   </button>
