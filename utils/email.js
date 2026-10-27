@@ -22,7 +22,7 @@ if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
 /**
  * Premium Email Wrapper HTML Template
  */
-function getEmailTemplate(title, content) {
+function getEmailTemplate(title, content, sig = {}) {
   return `
     <!DOCTYPE html>
     <html>
@@ -59,10 +59,10 @@ function getEmailTemplate(title, content) {
                   <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px solid #f0f0f0; padding-top: 30px;">
                     <tr>
                       <td style="vertical-align: top;">
-                        <p style="margin: 0; font-size: 14px; font-weight: 700; color: #111827; white-space: nowrap;">26-27 LCVP F&amp;L Elif Kurnaz</p>
-                        <p style="margin: 2px 0 10px 0; font-size: 13px; color: #6b7280;">AIESEC İstanbul</p>
+                        <p style="margin: 0; font-size: 14px; font-weight: 700; color: #111827; white-space: nowrap;">${esc(sig.sig_name || '26-27 LCVP F&L Elif Kurnaz')}</p>
+                        <p style="margin: 2px 0 10px 0; font-size: 13px; color: #6b7280;">${esc(sig.sig_org || 'AIESEC İstanbul')}</p>
                         <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-                          Bu e-posta otomatik olarak gönderilmiştir. Lütfen yanıtlamayınız.
+                          ${esc(sig.sig_note || 'Bu e-posta otomatik olarak gönderilmiştir. Lütfen yanıtlamayınız.')}
                         </p>
                       </td>
                       <td align="right" style="vertical-align: top; width: 80px;">
@@ -132,73 +132,38 @@ async function sendMailHelper({ to, subject, html }) {
 }
 
 /**
- * Onay maili gönderir
+ * Admin panelinden düzenlenebilen taslaktan { subject, html } üretir (bkz. utils/mailTemplates.js)
  */
+async function composeMail(key, vars, buttonUrl) {
+  const { buildMail } = require('./mailTemplates');
+  const { subject, content, sig } = await buildMail(key, vars, buttonUrl);
+  return { subject, html: getEmailTemplate(subject, content, sig) };
+}
+
+/** Onay maili gönderir */
 async function sendApprovalEmail(email, name) {
-  const htmlContent = `
-    <h2 style="color: #111827; font-size: 20px; margin-top: 0;">Merhaba ${esc(name)},</h2>
-    <p>AIESEC İstanbul Alumni Archive sistemine yaptığınız kayıt başvurusu <strong>başarıyla onaylanmıştır!</strong></p>
-    <p>Artık sisteme giriş yapabilir, geçmiş dönem takımlarını detaylıca inceleyebilir, diğer mezunların bilgilerine "Mezunlar Rehberi" üzerinden erişebilir ve kendi profil bilgilerinizi güncelleyebilirsiniz.</p>
-    <div style="text-align: center; margin: 35px 0;">
-      <a href="${SITE_URL}/auth/login" style="background-color: #037ef3; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px rgba(3,126,243,0.2);">Sisteme Giriş Yap</a>
-    </div>
-    <p style="margin-bottom: 0;">Aramıza tekrar hoş geldiniz!</p>
-  `;
-  const html = getEmailTemplate('Hesabınız Onaylandı! 🎉', htmlContent);
-  return await sendMailHelper({ to: email, subject: 'AIESEC İstanbul Alumni Archive - Hesabınız Onaylandı! 🎉', html });
+  const mail = await composeMail('approved', { ad: name }, `${SITE_URL}/auth/login`);
+  return await sendMailHelper({ to: email, ...mail });
 }
 
-/**
- * Şifre sıfırlama maili gönderir
- */
+/** Şifre sıfırlama maili gönderir */
 async function sendResetPasswordEmail(email, name, resetLink) {
-  const htmlContent = `
-    <h2 style="color: #111827; font-size: 20px; margin-top: 0;">Merhaba ${esc(name)},</h2>
-    <p>Hesabınız için şifre sıfırlama talebinde bulundunuz.</p>
-    <p>Aşağıdaki bağlantıya tıklayarak yeni şifrenizi belirleyebilirsiniz. Bu bağlantı güvenlik nedeniyle <strong>1 saat</strong> geçerli kalacaktır:</p>
-    <div style="text-align: center; margin: 35px 0;">
-      <a href="${esc(resetLink)}" style="background-color: #037ef3; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px rgba(3,126,243,0.2);">Şifremi Sıfırla</a>
-    </div>
-    <p style="margin-bottom: 0; color: #6b7280; font-size: 14px;">Eğer bu talebi siz yapmadıysanız bu e-postayı görmezden gelebilirsiniz.</p>
-  `;
-  const html = getEmailTemplate('Şifre Sıfırlama Talebi 🔑', htmlContent);
-  return await sendMailHelper({ to: email, subject: 'AIESEC İstanbul Mezunlar Portalı - Şifre Sıfırlama Talebi 🔑', html });
+  const mail = await composeMail('reset', { ad: name }, resetLink);
+  return await sendMailHelper({ to: email, ...mail });
 }
 
-/**
- * Kayıt bilgilendirme maili gönderir
- */
+/** Kayıt bilgilendirme maili gönderir */
 async function sendWelcomePendingEmail(email, name) {
-  const htmlContent = `
-    <h2 style="color: #111827; font-size: 20px; margin-top: 0;">Merhaba ${esc(name)},</h2>
-    <p>AIESEC İstanbul Alumni Archive platformuna yaptığınız kayıt talebi <strong>başarıyla alınmıştır.</strong></p>
-    <p>Üyeliğinizin doğrulanması ve platformun güvenli kalması amacıyla başvurunuz yöneticilerimiz tarafından incelemeye alınmıştır.</p>
-    <p>Hesabınız onaylandığında giriş yapabilmeniz için size yeni bir onay e-postası göndereceğiz.</p>
-    <p style="margin-bottom: 0; color: #6b7280; font-size: 14px;">Gösterdiğiniz ilgi için teşekkür ederiz.</p>
-  `;
-  const html = getEmailTemplate('Kayıt Talebiniz Alındı 📩', htmlContent);
-  return await sendMailHelper({ to: email, subject: 'AIESEC İstanbul Mezunlar Portalı - Kayıt Talebiniz Alındı 📩', html });
+  const mail = await composeMail('welcome_pending', { ad: name });
+  return await sendMailHelper({ to: email, ...mail });
 }
 
 /**
- * Yeni üye adayı başvurduğunda yöneticiye bildirim maili gönderir
+ * Yeni üye adayı başvurduğunda admin rolündeki tüm hesaplara bildirim maili gönderir
  */
 async function sendAdminNotificationEmail(candidateName, candidateEmail) {
-  const htmlContent = `
-    <h2 style="color: #111827; font-size: 20px; margin-top: 0;">Sayın Yönetici,</h2>
-    <p>AIESEC İstanbul Alumni Archive sistemine yeni bir üye adayı kayıt başvurusu yapmıştır.</p>
-    <p><strong>Aday Detayları:</strong></p>
-    <ul>
-      <li><strong>Ad Soyad:</strong> ${esc(candidateName)}</li>
-      <li><strong>E-posta:</strong> ${esc(candidateEmail)}</li>
-    </ul>
-    <p>Başvuruyu değerlendirmek, onaylamak veya reddetmek için lütfen admin paneline giriş yapınız:</p>
-    <div style="text-align: center; margin: 35px 0;">
-      <a href="${SITE_URL}/admin" style="background-color: #037ef3; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px rgba(3,126,243,0.2);">Admin Paneline Git</a>
-    </div>
-  `;
-  const html = getEmailTemplate('Yeni Üye Kayıt Başvurusu 🔔', htmlContent);
-  // Bildirim, admin rolündeki tüm hesaplara gider (kimse diğerlerinin adresini görmesin diye ayrı ayrı).
+  const mail = await composeMail('admin_new', { ad: candidateName, email: candidateEmail }, `${SITE_URL}/admin`);
+  // Herkese ayrı mail gider (kimse diğerlerinin adresini görmesin).
   // Admin bulunamazsa ya da sorgu hata verirse eski sabit adrese düşer.
   let recipients = [];
   try {
@@ -209,8 +174,7 @@ async function sendAdminNotificationEmail(candidateName, candidateEmail) {
     console.error('Admin e-postaları okunamadı:', err.message);
   }
   if (recipients.length === 0) recipients = ['lcpist@gmail.com'];
-  const subject = 'AIESEC İstanbul Mezunlar Portalı - Yeni Üye Kayıt Başvurusu 🔔';
-  return await Promise.allSettled(recipients.map((to) => sendMailHelper({ to, subject, html })));
+  return await Promise.allSettled(recipients.map((to) => sendMailHelper({ to, ...mail })));
 }
 
 module.exports = {
@@ -219,4 +183,5 @@ module.exports = {
   sendWelcomePendingEmail,
   sendAdminNotificationEmail,
   sendMailHelper,
+  composeMail,
 };

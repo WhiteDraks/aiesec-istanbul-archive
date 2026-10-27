@@ -1,0 +1,86 @@
+<%- include('../layout/header', { currentPage: 'admin' }) %>
+
+<section class="page-hero page-hero-sm page-hero-admin">
+  <div class="page-hero-bg"></div>
+  <div class="container">
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 class="page-hero-title">E-posta Taslakları</h1>
+        <p class="page-hero-sub">Sitenin gönderdiği maillerin konu ve metinlerini düzenleyin</p>
+      </div>
+      <a href="/admin" class="btn btn-outline">Panele Dön</a>
+    </div>
+  </div>
+</section>
+
+<section class="section section-admin">
+  <div class="container" style="max-width: 860px; display: grid; gap: 1.5rem;">
+
+    <div class="detail-section" style="padding: 1.25rem 1.5rem;">
+      <p class="form-hint" style="margin: 0;">
+        Metni düz yazı olarak yazın. Paragraflar arasında boş satır bırakın, <code>**kalın**</code> yazarak kalın yapın.
+        <code>{ad}</code> alıcının adıyla, <code>{email}</code> (yalnızca admin bildiriminde) adayın e-postasıyla değişir.
+        Düğme bağlantıları otomatik eklenir. Alanı varsayılanla aynı bırakırsanız ya da boşaltırsanız varsayılan metin kullanılır.
+        Önizleme, <strong>kaydedilmiş</strong> hâli gösterir.
+      </p>
+    </div>
+
+    <form action="/admin/mail" method="POST" style="display: grid; gap: 1.5rem;">
+      <% Object.keys(templates).forEach((key) => { const t = templates[key]; %>
+        <div class="detail-section" style="padding: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
+            <div>
+              <h2 class="section-title-sm" style="margin: 0;"><%= t.label %><% if (t.customized) { %> <span class="form-optional">(düzenlendi)</span><% } %></h2>
+              <p class="form-hint" style="margin: 0.25rem 0 0;"><%= t.hint %> Kullanılabilir: <% t.vars.forEach((v, i) => { %><code>{<%= v %>}</code> <% }) %></p>
+            </div>
+            <a href="/admin/mail/preview/<%= key %>" target="_blank" rel="noopener" class="btn btn-outline btn-sm">👁 Önizle</a>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="<%= key %>__subject">Konu</label>
+            <input type="text" class="form-input" id="<%= key %>__subject" name="<%= key %>__subject" maxlength="<%= LIMITS.subject %>" value="<%= t.subject %>">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="<%= key %>__body">Metin</label>
+            <textarea class="form-input" id="<%= key %>__body" name="<%= key %>__body" rows="10" maxlength="<%= LIMITS.body %>"><%= t.body %></textarea>
+          </div>
+
+          <% if (t.button) { %>
+            <div class="form-group">
+              <label class="form-label" for="<%= key %>__button">Düğme yazısı</label>
+              <input type="text" class="form-input" id="<%= key %>__button" name="<%= key %>__button" maxlength="<%= LIMITS.button %>" value="<%= t.buttonLabel %>">
+            </div>
+          <% } %>
+
+          <% if (t.after) { %>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="<%= key %>__after">Son satır (düğmeden sonra)</label>
+              <input type="text" class="form-input" id="<%= key %>__after" name="<%= key %>__after" maxlength="<%= LIMITS.after %>" value="<%= t.afterText %>">
+            </div>
+          <% } %>
+        </div>
+      <% }) %>
+
+      <div class="detail-section" style="padding: 1.5rem;">
+        <h2 class="section-title-sm" style="margin-top: 0;">İmza (tüm maillerde ortak)</h2>
+        <% Object.keys(SIGNATURE).forEach((k) => { %>
+          <div class="form-group">
+            <label class="form-label" for="<%= k %>"><%= SIGNATURE[k].label %></label>
+            <input type="text" class="form-input" id="<%= k %>" name="<%= k %>" maxlength="<%= SIGNATURE[k].max %>" value="<%= sig[k] %>">
+          </div>
+        <% }) %>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+      </div>
+    </form>
+
+    <form action="/admin/mail/reset" method="POST" data-confirm="Tüm e-posta taslakları ve imza varsayılana dönecek. Emin misiniz?">
+      <button type="submit" class="btn btn-outline">↩ Hepsini Varsayılana Döndür</button>
+    </form>
+  </div>
+</section>
+
+<%- include('../layout/footer') %>
