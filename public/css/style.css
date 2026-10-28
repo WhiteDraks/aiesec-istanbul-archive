@@ -2099,7 +2099,7 @@ input, textarea, select { font-family: inherit; }
   .nav-links {
     display: none;
     position: fixed;
-    top: var(--navbar-h);
+    top: 72px; /* fallback, JS setMobileMenuTop() overwrites this */
     left: 0;
     right: 0;
     background: rgba(4, 13, 26, 0.98);
@@ -2111,6 +2111,8 @@ input, textarea, select { font-family: inherit; }
     border-bottom: 1px solid rgba(255,255,255,0.06);
     z-index: 999;
     flex-wrap: nowrap !important;
+    overflow-y: auto;
+    max-height: calc(100dvh - 72px);
   }
 
   .nav-links.open { display: flex; }

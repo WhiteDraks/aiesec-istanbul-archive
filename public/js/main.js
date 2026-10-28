@@ -10,10 +10,21 @@ if (navbar) {
 const hamburger = document.getElementById('nav-hamburger');
 const navLinks = document.getElementById('nav-links');
 
+function setMobileMenuTop() {
+  if (navLinks && navbar) {
+    const navH = navbar.getBoundingClientRect().height;
+    navLinks.style.top = navH + 'px';
+  }
+}
+
 if (hamburger && navLinks) {
   hamburger.addEventListener('click', () => {
     const isOpen = navLinks.classList.toggle('open');
     hamburger.setAttribute('aria-expanded', isOpen);
+
+    if (isOpen) {
+      setMobileMenuTop();
+    }
 
     // Animate hamburger → X
     const spans = hamburger.querySelectorAll('span');
@@ -35,6 +46,13 @@ if (hamburger && navLinks) {
       spans.forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
     }
   });
+
+  // Recalculate on resize
+  window.addEventListener('resize', () => {
+    if (navLinks.classList.contains('open')) {
+      setMobileMenuTop();
+    }
+  }, { passive: true });
 }
 
 // ── Mobile Dropdown Toggle ───────────────────────────────────────────────────
