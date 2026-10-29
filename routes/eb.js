@@ -318,4 +318,58 @@ router.post('/:year/cover', isLoggedIn, isApproved, upload.single('cover_image')
   }
 });
 
+/**
+ * POST /eb/:year/info
+ * Updates the title (name) and description for an EB period.
+ * Only the period's EB team members or admin can edit.
+ */
+router.post('/:year/info', isLoggedIn, isApproved, async (req, res) => {
+  try {
+    const { year } = req.params;
+    const { title, description } = req.body;
+
+    const sql = getSQL();
+    const isMember = await sql`
+      SELECT 1 FROM users
+      WHERE id = ${req.session.userId}
+        AND status = 'approved'
+        AND EXISTS (
+          SELECT 1
+          FROM jsonb_array_elements(
+            CASE WHEN roles_history IS NULL OR roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE roles_history END
+          ) AS role_entry
+          WHERE role_entry->>'year' = ${year}
+        )
+    `;
+
+    const canEdit = req.session.user?.role === 'admin' || isMember.length > 0;
+    if (!canEdit) {
+      req.flash('error', 'Bu dönemin adını değiştirme yetkiniz bulunmamaktadır.');
+      return res.redirect(`/eb/${encodeURIComponent(year)}`);
+    }
+
+    const { stripTags } = require('../utils/sanitize');
+    const cleanTitle = typeof title === 'string' ? stripTags(title).trim().slice(0, 150) : '';
+    const cleanDesc = typeof description === 'string' ? stripTags(description).trim().slice(0, 1000) : null;
+
+    if (!cleanTitle) {
+      req.flash('error', 'Dönem adı boş bırakılamaz.');
+      return res.redirect(`/eb/${encodeURIComponent(year)}`);
+    }
+
+    const teamMeta = await EBTeam.findOrCreateByYear(year);
+    await EBTeam.update(teamMeta.id, {
+      title: cleanTitle,
+      description: cleanDesc,
+    });
+
+    req.flash('success', 'Dönem adı ve bilgileri başarıyla güncellendi!');
+    res.redirect(`/eb/${encodeURIComponent(year)}`);
+  } catch (err) {
+    console.error('Failed to update EB info:', err);
+    req.flash('error', 'Dönem bilgileri güncellenirken bir hata oluştu.');
+    res.redirect(`/eb/${encodeURIComponent(req.params.year)}`);
+  }
+});
+
 module.exports = router;

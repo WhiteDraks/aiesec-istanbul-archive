@@ -113,8 +113,37 @@ router.post('/:id/edit', async (req, res) => {
       return res.redirect('/admin/eb');
     }
 
+    const trimmedYear = year?.trim() || existingTeam.year;
+    if (trimmedYear !== existingTeam.year) {
+      const sql = getSQL();
+      const oldYear = existingTeam.year;
+      const newYear = trimmedYear;
+      await sql`UPDATE eb_memories SET team_year = ${newYear} WHERE team_year = ${oldYear}`;
+      await sql`
+        UPDATE users
+        SET 
+          eb_year = CASE WHEN eb_year = ${oldYear} THEN ${newYear} ELSE eb_year END,
+          roles_history = (
+            SELECT COALESCE(jsonb_agg(
+              CASE 
+                WHEN elem->>'year' = ${oldYear} THEN jsonb_set(elem, '{year}', to_jsonb(${newYear}::text))
+                ELSE elem 
+              END
+            ), '[]'::jsonb)
+            FROM jsonb_array_elements(
+              CASE WHEN roles_history IS NULL OR roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE roles_history END
+            ) AS elem
+          )
+        WHERE EXISTS (
+          SELECT 1 FROM jsonb_array_elements(
+            CASE WHEN roles_history IS NULL OR roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE roles_history END
+          ) AS e WHERE e->>'year' = ${oldYear}
+        ) OR eb_year = ${oldYear}
+      `;
+    }
+
     await EBTeam.update(req.params.id, {
-      year: year?.trim() || existingTeam.year,
+      year: trimmedYear,
       title: title?.trim() || existingTeam.title,
       description: description?.trim() || null,
       achievements: achievementsArray

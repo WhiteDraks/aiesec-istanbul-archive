@@ -7,7 +7,7 @@ const { isLoggedIn, isAdmin } = require('../middleware/auth');
 const { safeUrl, str, cleanYear } = require('../utils/security');
 const { stripTags } = require('../utils/sanitize');
 const { revokeUserSessions } = require('../utils/sessions');
-const { sendApprovalEmail } = require('../utils/email');
+const { sendApprovalEmail, sendApprovedListNotification } = require('../utils/email');
 const TimelineMilestone = require('../models/TimelineMilestone');
 const HeritageDocument = require('../models/HeritageDocument');
 
@@ -89,6 +89,10 @@ router.post('/approve/:id', async (req, res) => {
     if (user && user.email) {
       await sendApprovalEmail(user.email, user.name);
     }
+    // Onaylı liste güncellendiğinde döküman maili gönder
+    sendApprovedListNotification({ reason: `Yeni üye onaylandı: ${user ? user.name : 'Bilinmeyen'}` }).catch(err => {
+      console.error('Onaylı üye listesi bildirimi hatası:', err.message);
+    });
     req.flash('success', 'Kullanıcı başarıyla onaylandı.');
   } catch (err) {
     console.error(err);
@@ -105,8 +109,14 @@ router.post('/reject/:id', async (req, res) => {
       req.flash('error', 'Admin hesabının durumu değiştirilemez.');
       return res.redirect('/admin');
     }
+    const wasApproved = target && target.status === 'approved';
     await User.updateStatus(req.params.id, 'rejected');
     await revokeUserSessions(req.params.id);
+    if (wasApproved) {
+      sendApprovedListNotification({ reason: `Üye onay listesinden çıkarıldı (Reddedildi): ${target.name}` }).catch(err => {
+        console.error('Onaylı üye listesi bildirimi hatası:', err.message);
+      });
+    }
     req.flash('success', 'Kullanıcı reddedildi.');
   } catch (err) {
     console.error(err);
@@ -123,8 +133,14 @@ router.post('/delete/:id', async (req, res) => {
       req.flash('error', 'Admin hesapları buradan silinemez.');
       return res.redirect('/admin');
     }
+    const wasApproved = target && target.status === 'approved';
     await User.delete(req.params.id);
     await revokeUserSessions(req.params.id);
+    if (wasApproved) {
+      sendApprovedListNotification({ reason: `Üye silindi: ${target.name}` }).catch(err => {
+        console.error('Onaylı üye listesi bildirimi hatası:', err.message);
+      });
+    }
     req.flash('success', 'Kullanıcı silindi.');
   } catch (err) {
     console.error(err);
@@ -219,6 +235,12 @@ router.post('/user/:id/edit', upload.single('photo'), async (req, res) => {
       photo: photoUrl || existingUser.photo,
     });
 
+    if (existingUser.status === 'approved') {
+      sendApprovedListNotification({ reason: `Üye bilgileri güncellendi: ${name || existingUser.name}` }).catch(err => {
+        console.error('Onaylı üye listesi bildirimi hatası:', err.message);
+      });
+    }
+
     req.flash('success', 'Kullanıcı bilgileri güncellendi.');
     res.redirect('/admin');
   } catch (err) {
@@ -226,6 +248,22 @@ router.post('/user/:id/edit', upload.single('photo'), async (req, res) => {
     req.flash('error', 'Kullanıcı güncellenirken bir hata oluştu.');
     res.redirect(`/admin/user/${req.params.id}/edit`);
   }
+});
+
+// POST /admin/send-approved-list - Onaylı üye listesini manuel olarak e-posta ile gönder
+router.post('/send-approved-list', async (req, res) => {
+  try {
+    const result = await sendApprovedListNotification({ reason: 'Admin panelinden manuel talep edildi' });
+    if (result.success) {
+      req.flash('success', `Güncel onaylı üye listesi (${result.count} üye) ve dökümanı ${result.recipients.join(', ')} adreslerine başarıyla gönderildi.`);
+    } else {
+      req.flash('error', result.message || result.error || 'Döküman gönderilemedi.');
+    }
+  } catch (err) {
+    console.error('Manuel döküman gönderme hatası:', err);
+    req.flash('error', 'Döküman gönderilirken bir hata oluştu.');
+  }
+  res.redirect('/admin');
 });
 
 // POST /admin/reset/:id - Rejected → Pending yap (tekrar değerlendirme)

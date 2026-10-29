@@ -103,6 +103,14 @@ router.post('/apply', async (req, res) => {
     if (r.skipped) parts.push(`${r.skipped} satır atlandı`);
     req.flash('success', 'İçe aktarma tamamlandı: ' + parts.join(', ') + '.');
     r.errors.forEach(e => req.flash('error', e));
+
+    if (r.created > 0 || r.updated > 0) {
+      const { sendApprovedListNotification } = require('../utils/email');
+      sendApprovedListNotification({ reason: `Excel ile içe aktarma tamamlandı (${r.created} yeni, ${r.updated} güncellendi)` }).catch(err => {
+        console.error('İçe aktarma sonrası onaylı liste bildirimi hatası:', err.message);
+      });
+    }
+
     res.redirect('/admin/import');
   } catch (err) {
     console.error('Import apply error:', err);

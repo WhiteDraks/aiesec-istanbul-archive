@@ -85,20 +85,24 @@ function getEmailTemplate(title, content, sig = {}) {
 /**
  * Genel e-posta gönderme yardımcısı
  */
-async function sendMailHelper({ to, subject, html }) {
+async function sendMailHelper({ to, subject, html, attachments = [] }) {
   const SiteSetting = require('../models/SiteSetting');
   const settings = await SiteSetting.getAll();
-  const fromEmail = settings.email_from || 'AIESEC Alumni <onboarding@resend.dev>';
+  const fromEmail = settings.email_from || 'Alumni Archive <onboarding@resend.dev>';
 
   if (transporter) {
     try {
-      let fromAddress = fromEmail.includes('<') ? fromEmail : `AIESEC Alumni <${fromEmail}>`;
-      await transporter.sendMail({
+      let fromAddress = fromEmail.includes('<') ? fromEmail : `Alumni Archive <${fromEmail}>`;
+      const mailOptions = {
         from: fromAddress,
         to: Array.isArray(to) ? to.join(', ') : to,
         subject,
         html,
-      });
+      };
+      if (attachments && attachments.length > 0) {
+        mailOptions.attachments = attachments;
+      }
+      await transporter.sendMail(mailOptions);
       console.log(`Email successfully sent via SMTP to: ${to}`);
       return true;
     } catch (smtpErr) {
@@ -108,12 +112,16 @@ async function sendMailHelper({ to, subject, html }) {
 
   if (resend) {
     try {
-      const { data, error } = await resend.emails.send({
+      const payload = {
         from: fromEmail,
         to: Array.isArray(to) ? to : [to],
         subject,
         html,
-      });
+      };
+      if (attachments && attachments.length > 0) {
+        payload.attachments = attachments;
+      }
+      const { data, error } = await resend.emails.send(payload);
 
       if (error) {
         console.error('Resend API Error:', error);
@@ -177,11 +185,17 @@ async function sendAdminNotificationEmail(candidateName, candidateEmail) {
   return await Promise.allSettled(recipients.map((to) => sendMailHelper({ to, ...mail })));
 }
 
+function sendApprovedListNotification(...args) {
+  const notifier = require('./approvedListNotifier');
+  return notifier.sendApprovedListNotification(...args);
+}
+
 module.exports = {
   sendApprovalEmail,
   sendResetPasswordEmail,
   sendWelcomePendingEmail,
   sendAdminNotificationEmail,
+  sendApprovedListNotification,
   sendMailHelper,
   composeMail,
 };
