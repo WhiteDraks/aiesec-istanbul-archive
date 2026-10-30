@@ -142,6 +142,15 @@ router.get('/:year', isLoggedIn, isApproved, async (req, res) => {
       });
     }
 
+    // Prev / Next dönem navigasyonu için tüm dönemleri sırala
+    const allYears = teamMetas.map(t => t.year).sort((a, b) => b.localeCompare(a));
+    const currentIdx = allYears.indexOf(year);
+    const prevYear = currentIdx < allYears.length - 1 ? allYears[currentIdx + 1] : null; // daha eski
+    const nextYear = currentIdx > 0 ? allYears[currentIdx - 1] : null; // daha yeni
+
+    const prevMeta = prevYear ? teamMetas.find(t => t.year === prevYear) : null;
+    const nextMeta = nextYear ? teamMetas.find(t => t.year === nextYear) : null;
+
     const canEditTeam = req.session.user && (
       req.session.user.role === 'admin' ||
       members.some(m => m.id === req.session.userId)
@@ -153,6 +162,10 @@ router.get('/:year', isLoggedIn, isApproved, async (req, res) => {
       members,
       memories,
       canEditTeam,
+      prevYear,
+      nextYear,
+      prevTitle: prevMeta?.title || (prevYear ? `${prevYear} Executive Board` : null),
+      nextTitle: nextMeta?.title || (nextYear ? `${nextYear} Executive Board` : null),
     });
   } catch (err) {
     console.error(err);

@@ -348,10 +348,49 @@
 </div>
 <% } %>
 
-<!-- ── Back Navigation ── -->
-<section class="section section-xs">
+<!-- ── Period Navigation ── -->
+<section class="section section-xs" style="border-top: 1px solid var(--border);">
   <div class="container">
-    <a href="/eb" class="btn btn-outline">← Tüm EB Takımlarına Dön</a>
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+
+      <!-- Prev (older period) -->
+      <div style="flex: 1; min-width: 0;">
+        <% if (typeof prevYear !== 'undefined' && prevYear) { %>
+          <a href="/eb/<%= encodeURIComponent(prevYear) %>" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 0.5rem; max-width: 100%; text-decoration: none;">
+            <span style="flex-shrink: 0; font-size: 1.1rem;">←</span>
+            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              <span style="font-size: 0.7rem; color: var(--text-muted); display: block; line-height: 1.2;">Önceki Dönem</span>
+              <span style="font-size: 0.9rem; font-weight: 600;"><%= prevTitle || prevYear %></span>
+            </span>
+          </a>
+        <% } else { %>
+          <span></span>
+        <% } %>
+      </div>
+
+      <!-- Back to list -->
+      <div style="flex-shrink: 0;">
+        <a href="/eb" class="btn btn-outline btn-sm" style="font-size: 0.8rem; white-space: nowrap;">
+          ⊞ Tüm Dönemler
+        </a>
+      </div>
+
+      <!-- Next (newer period) -->
+      <div style="flex: 1; min-width: 0; text-align: right;">
+        <% if (typeof nextYear !== 'undefined' && nextYear) { %>
+          <a href="/eb/<%= encodeURIComponent(nextYear) %>" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 0.5rem; max-width: 100%; justify-content: flex-end; text-decoration: none;">
+            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right;">
+              <span style="font-size: 0.7rem; color: var(--text-muted); display: block; line-height: 1.2;">Sonraki Dönem</span>
+              <span style="font-size: 0.9rem; font-weight: 600;"><%= nextTitle || nextYear %></span>
+            </span>
+            <span style="flex-shrink: 0; font-size: 1.1rem;">→</span>
+          </a>
+        <% } else { %>
+          <span></span>
+        <% } %>
+      </div>
+
+    </div>
   </div>
 </section>
 
