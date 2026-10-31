@@ -41,8 +41,11 @@ async function sendWeeklyDigest(customSubject = null, customIntro = null, extraT
     ORDER BY approved_at DESC
   `;
 
-  // If no new content AND no custom intro message, do not send email
-  if (newJobs.length === 0 && newMemories.length === 0 && newAlumni.length === 0 && !customIntro) {
+  // If no new content AND no custom message/extra content, do not send email
+  const hasCustomContent = (customIntro && customIntro.trim()) ||
+                           (extraTitle && extraTitle.trim()) ||
+                           (extraContent && extraContent.trim());
+  if (newJobs.length === 0 && newMemories.length === 0 && newAlumni.length === 0 && !hasCustomContent) {
     console.log('No new content in the last 7 days and no custom announcement. Digest email skipped.');
     return { success: true, sent: 0, reason: 'No new content' };
   }
