@@ -57,12 +57,15 @@ async function sendWeeklyDigest(customSubject = null, customIntro = null, extraT
       SELECT DISTINCT email, name 
       FROM users u
       WHERE status = 'approved'
-        AND EXISTS (
-          SELECT 1 
-          FROM jsonb_array_elements(
-            CASE WHEN u.roles_history IS NULL OR u.roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE u.roles_history END
-          ) AS role_entry
-          WHERE role_entry->>'year' IN ${sql(targetYears)}
+        AND (
+          u.eb_year = ANY(${targetYears})
+          OR EXISTS (
+            SELECT 1 
+            FROM jsonb_array_elements(
+              CASE WHEN u.roles_history IS NULL OR u.roles_history = 'null'::jsonb THEN '[]'::jsonb ELSE u.roles_history END
+            ) AS role_entry
+            WHERE role_entry->>'year' = ANY(${targetYears})
+          )
         )
     `;
   } else {
