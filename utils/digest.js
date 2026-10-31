@@ -119,7 +119,7 @@ async function sendWeeklyDigest(
     <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #090d16; color: #f3f4f6; padding: 2rem; border-radius: 12px; max-width: 600px; margin: 0 auto; border: 1px solid #1f2937;">
       <div style="text-align: center; border-bottom: 2px solid #037ef3; padding-bottom: 1.5rem; margin-bottom: 2rem;">
         <h1 style="color: #037ef3; margin: 0; font-size: 1.8rem; letter-spacing: 1px;">AIESEC İstanbul</h1>
-        <p style="color: #9ca3af; margin: 0.5rem 0 0 0; font-size: 1rem;">Mezunlar Bülteni 📰</p>
+        <p style="color: #9ca3af; margin: 0.5rem 0 0 0; font-size: 1rem;">Alumni Gündemi 📰</p>
       </div>
   `;
 
@@ -205,7 +205,7 @@ async function sendWeeklyDigest(
     try {
       const isSent = await sendMailHelper({
         to: recipientEmail,
-        subject: customSubject || 'AIESEC İstanbul Mezunlar Portalı - Bülten 📰',
+        subject: customSubject || 'Alumni Gündemi 📰',
         html: htmlContent
       });
       if (isSent) sentCount++;
