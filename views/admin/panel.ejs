@@ -282,8 +282,8 @@
 </section>
 
 <!-- Digest (Bülten) Modal -->
-<div id="digestModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(8px); align-items: center; justify-content: center;">
-  <div class="modal-content" style="background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; max-width: 600px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+<div id="digestModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(8px); align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 0;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
       <h3 style="margin: 0; color: #fff; font-size: 1.25rem;">📰 Mezunlar Bülteni Gönder</h3>
       <span onclick="closeDigestModal()" style="cursor: pointer; color: var(--text-muted); font-size: 1.5rem; font-weight: bold;">&times;</span>
@@ -371,10 +371,16 @@
 <script nonce="<%= typeof cspNonce !== 'undefined' ? cspNonce : '' %>">
 function openDigestModal() {
   document.getElementById('digestModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 }
 function closeDigestModal() {
   document.getElementById('digestModal').style.display = 'none';
+  document.body.style.overflow = '';
 }
+// Close on backdrop click
+document.getElementById('digestModal').addEventListener('click', function(e) {
+  if (e.target === this) closeDigestModal();
+});
 function toggleTargetYears(value) {
   const selector = document.getElementById('target-years-selector');
   if (value === 'specific_eb') {
