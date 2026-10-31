@@ -340,10 +340,27 @@
         </div>
       </div>
 
-      <p class="form-hint" style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">
-        * Bülten Resend e-posta altyapısı üzerinden gönderilecektir. Son 7 günde eklenen yeni mezunlar, iş ilanları ve dönem anıları şablona otomatik olarak eklenir.
-      </p>
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem;">
+      <!-- Otomatik İçerik Seçimi -->
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem;">
+        <p style="margin: 0 0 0.75rem 0; font-size: 0.85rem; font-weight: 600; color: var(--text);">📦 Son 7 Günün İçeriği <span style="font-weight:400; color: var(--text-muted);">(Bültene otomatik eklenmesini istediklerinizi seçin)</span></p>
+        <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+          <label style="display: inline-flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.875rem;">
+            <input type="checkbox" name="include_alumni" value="1" checked>
+            👥 Yeni onaylanan mezunlar
+          </label>
+          <label style="display: inline-flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.875rem;">
+            <input type="checkbox" name="include_jobs" value="1" checked>
+            💼 Yeni iş & staj ilanları
+          </label>
+          <label style="display: inline-flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.875rem;">
+            <input type="checkbox" name="include_memories" value="1" checked>
+            📸 Yeni dönem anıları
+          </label>
+        </div>
+        <p style="margin: 0.75rem 0 0 0; font-size: 0.75rem; color: var(--text-muted);">* Seçilmeyen bölümler bültene eklenmez. Hiçbir yeni içerik yoksa ve özel mesaj da yazılmamışsa gönderim atlanır.</p>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 0.5rem;">
         <button type="button" onclick="closeDigestModal()" class="btn btn-outline">İptal</button>
         <button type="submit" class="btn btn-primary">Bülteni Gönder</button>
       </div>
